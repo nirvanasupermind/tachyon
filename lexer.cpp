@@ -6,7 +6,7 @@
 #include "lexer.h"
 #include "tokens.h"
 
-namespace volcano
+namespace eris
 {
 
     Lexer::Lexer(const std::string &text)
@@ -115,4 +115,4 @@ namespace volcano
         return Token(TokenType::NUMBER, std::stod(number_str));
     }
 
-} // namespace volcano
+} // namespace eris

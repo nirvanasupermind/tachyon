@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-namespace volcano {
+namespace eris {
 
 Parser::Parser(const std::vector<Token>& tokens)
     : tokens(tokens),
@@ -101,4 +101,4 @@ std::unique_ptr<Node> Parser::factor() {
     return std::unique_ptr<Node>();
 }
 
-} // namespace volcano
+} // namespace eris

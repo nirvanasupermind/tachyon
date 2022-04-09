@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace volcano
+namespace eris
 {
 
     enum class TokenType
@@ -36,6 +36,6 @@ namespace volcano
 
     void print_tokens(const std::vector<Token> &tokens);
 
-} // namespace volcano
+} // namespace eris
 
 #endif // TOKENS_H

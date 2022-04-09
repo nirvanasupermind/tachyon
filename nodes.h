@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-namespace volcano {
+namespace eris {
 
 enum class NodeKind {
     Number,
@@ -91,7 +91,7 @@ public:
     std::string str() const;
 };
 
-} // namespace volcano
+} // namespace eris
 
 
 #endif // NODES_H

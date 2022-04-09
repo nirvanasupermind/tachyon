@@ -6,7 +6,7 @@
 
 #include "tokens.h"
 
-namespace volcano
+namespace eris
 {
 
     const std::string WHITESPACE = " \n\t";
@@ -26,6 +26,6 @@ namespace volcano
         Token generate_number();
     };
 
-} // namespace volcano
+} // namespace eris
 
 #endif // LEXER_H

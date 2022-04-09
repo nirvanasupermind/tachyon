@@ -5,7 +5,7 @@
 
 #include "tokens.h"
 
-namespace volcano
+namespace eris
 {
 
     std::string Token::str() const
@@ -85,4 +85,4 @@ namespace volcano
         std::cout << oss.str() << '\n';
     }
 
-} // namespace volcano
+} // namespace eris

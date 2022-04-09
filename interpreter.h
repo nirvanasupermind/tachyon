@@ -6,7 +6,7 @@
 #include "values.h"
 #include "nodes.h"
 
-namespace volcano {
+namespace eris {
 
 class Interpreter {
 public:
@@ -22,7 +22,7 @@ public:
     Number visit(MinusNode *node);
 };
 
-} // namespace volcano
+} // namespace eris
 
 
 #endif // INTERPRETER_H

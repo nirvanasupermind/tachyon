@@ -5,7 +5,7 @@
 #include "values.h"
 #include "nodes.h"
 
-namespace volcano {
+namespace eris {
 
 Number Interpreter::visit(const std::unique_ptr<Node>& node) {
     return visit(node.get());
@@ -66,4 +66,4 @@ Number Interpreter::visit(MinusNode *node) {
     return Number(-1 * visit(node->node).value);
 }
 
-} // namespace volcano
+} // namespace eris

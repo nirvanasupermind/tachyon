@@ -4,7 +4,7 @@
 
 #include "nodes.h"
 
-namespace volcano {
+namespace eris {
 
 NumberNode::NumberNode(double value)
     : value(value)
@@ -118,4 +118,4 @@ std::string MinusNode::str() const {
     return oss.str();
 }
 
-} // namespace volcano
+} // namespace eris

@@ -2,10 +2,10 @@
 
 #include "values.h"
 
-namespace volcano {
+namespace eris {
 
 std::string Number::str() const {
     return std::to_string(value);
 }
 
-} // namespace volcano
+} // namespace eris

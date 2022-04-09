@@ -20,16 +20,16 @@ std::string read_file(std::string filename)
 void run(const std::string &text)
 {
 
-    volcano::Lexer lexer(text);
-    std::vector<volcano::Token> tokens = lexer.generate_tokens();
+    eris::Lexer lexer(text);
+    std::vector<eris::Token> tokens = lexer.generate_tokens();
 
-    // volcano::print_tokens(tokens);
+    // eris::print_tokens(tokens);
 
-    volcano::Parser parser(tokens);
-    std::unique_ptr<volcano::Node> tree = parser.parse();
+    eris::Parser parser(tokens);
+    std::unique_ptr<eris::Node> tree = parser.parse();
 
-    volcano::Interpreter interpreter;
-    volcano::Number value = interpreter.visit(tree);
+    eris::Interpreter interpreter;
+    eris::Number value = interpreter.visit(tree);
 
     std::cout << value.str() << '\n';
 }

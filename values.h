@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace volcano {
+namespace eris {
 
 class Number {
 public:
@@ -14,7 +14,7 @@ public:
     std::string str() const;
 };
 
-} // namespace volcano
+} // namespace eris
 
 
 #endif // VALUES_H

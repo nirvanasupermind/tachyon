@@ -8,7 +8,7 @@
 #include "tokens.h"
 #include "nodes.h"
 
-namespace volcano {
+namespace eris {
 
 class Parser {
 private:
@@ -28,7 +28,7 @@ public:
     std::unique_ptr<Node> parse();
 };
 
-} // namespace volcano
+} // namespace eris
 
 
 #endif // PARSER_H
