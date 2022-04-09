@@ -17,7 +17,7 @@ class Point {
     }
 }
 
-let p = new Point(10, 20);
+var p = Point(10, 20);
 
-print(p);
+print(p.calc());
 ```
