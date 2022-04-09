@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-namespace Math_Interpreter {
+namespace volcano {
 
 enum class NodeKind {
     Number,
@@ -91,7 +91,7 @@ public:
     std::string str() const;
 };
 
-} // namespace Math_Interpreter
+} // namespace volcano
 
 
 #endif // NODES_H

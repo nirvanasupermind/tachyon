@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-namespace Math_Interpreter {
+namespace volcano {
 
 Parser::Parser(const std::vector<Token>& tokens)
     : tokens(tokens),
@@ -101,4 +101,4 @@ std::unique_ptr<Node> Parser::factor() {
     return std::unique_ptr<Node>();
 }
 
-} // namespace Math_Interpreter
+} // namespace volcano

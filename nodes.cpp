@@ -4,7 +4,7 @@
 
 #include "nodes.h"
 
-namespace Math_Interpreter {
+namespace volcano {
 
 NumberNode::NumberNode(double value)
     : value(value)
@@ -118,4 +118,4 @@ std::string MinusNode::str() const {
     return oss.str();
 }
 
-} // namespace Math_Interpreter
+} // namespace volcano
