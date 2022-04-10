@@ -6,7 +6,7 @@ C++ interpreter for the Eris programming language. Based on jackprogramsjp's [si
 
 # Compilaton
 
-To compile on Unix, navigate to the Eris directory and run
+To compile on Unix, navigate to the folder where Eris is installed and run
 
 ```
 source build.sh
