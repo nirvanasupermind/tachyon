@@ -4,6 +4,24 @@
 
 C++ interpreter for the Eris programming language. Based on jackprogramsjp's [simple math interpreter](https://github.com/jackprogramsjp/CPP-Simple-Math-Interpreter-V2).
 
+# Synopsis
+```
+class Point {
+    def constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    def calc() {
+        return this.x + this.y;
+    }
+}
+
+var p = Point(10, 20);
+
+print(p.calc());
+```
+
 # Compilaton
 
 To compile on Unix, navigate to the folder where Eris is installed and run
@@ -25,22 +43,3 @@ build.cmd
 An executable named `eris.exe` will be created.
 
 In both cases, clang is required to be installed.
-
-# Synopsis
-```
-class Point {
-    def constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    def calc() {
-        return this.x + this.y;
-    }
-}
-
-var p = Point(10, 20);
-
-print(p.calc());
-```
-
