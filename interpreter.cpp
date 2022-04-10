@@ -5,14 +5,19 @@
 #include "values.h"
 #include "nodes.h"
 
-namespace eris {
+namespace eris
+{
+    Interpreter::Interpreter(std::string filename) : filename(filename) {}
 
-Number Interpreter::visit(const std::unique_ptr<Node>& node) {
-    return visit(node.get());
-}
+    Number Interpreter::visit(const std::unique_ptr<Node> &node)
+    {
+        return visit(node.get());
+    }
 
-Number Interpreter::visit(Node *node) {
-    switch (node->kind()) {
+    Number Interpreter::visit(Node *node)
+    {
+        switch (node->kind())
+        {
         case NodeKind::Number:
             return visit(dynamic_cast<NumberNode *>(node));
         case NodeKind::Add:
@@ -29,41 +34,49 @@ Number Interpreter::visit(Node *node) {
             return visit(dynamic_cast<MinusNode *>(node));
         default:
             throw std::string("Invalid node");
-    }
-}
-
-Number Interpreter::visit(NumberNode *node) {
-    return Number(node->value);
-}
-
-Number Interpreter::visit(AddNode *node) {
-    return Number(visit(node->node_a).value + visit(node->node_b).value);
-}
-
-Number Interpreter::visit(SubtractNode *node) {
-    return Number(visit(node->node_a).value - visit(node->node_b).value);
-}
-
-Number Interpreter::visit(MultiplyNode *node) {
-    return Number(visit(node->node_a).value * visit(node->node_b).value);
-}
-
-Number Interpreter::visit(DivideNode *node) {
-    double value = visit(node->node_b).value;
-
-    if (value == 0.0) {
-        throw std::string("Runtime math error");
+        }
     }
 
-    return Number(visit(node->node_a).value + value);
-}
+    Number Interpreter::visit(NumberNode *node)
+    {
+        return Number(node->value);
+    }
 
-Number Interpreter::visit(PlusNode *node) {
-    return visit(node->node);
-}
+    Number Interpreter::visit(AddNode *node)
+    {
+        return Number(visit(node->node_a).value + visit(node->node_b).value);
+    }
 
-Number Interpreter::visit(MinusNode *node) {
-    return Number(-1 * visit(node->node).value);
-}
+    Number Interpreter::visit(SubtractNode *node)
+    {
+        return Number(visit(node->node_a).value - visit(node->node_b).value);
+    }
+
+    Number Interpreter::visit(MultiplyNode *node)
+    {
+        return Number(visit(node->node_a).value * visit(node->node_b).value);
+    }
+
+    Number Interpreter::visit(DivideNode *node)
+    {
+        double value = visit(node->node_b).value;
+
+        if (value == 0.0)
+        {
+            throw std::string("Runtime math error");
+        }
+
+        return Number(visit(node->node_a).value + value);
+    }
+
+    Number Interpreter::visit(PlusNode *node)
+    {
+        return visit(node->node);
+    }
+
+    Number Interpreter::visit(MinusNode *node)
+    {
+        return Number(-1 * visit(node->node).value);
+    }
 
 } // namespace eris

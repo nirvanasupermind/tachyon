@@ -17,18 +17,15 @@ std::string read_file(std::string filename)
     return buffer.str();
 }
 
-void run(const std::string &text)
+void run(const std::string &filename, const std::string &text)
 {
-
-    eris::Lexer lexer(text);
+    eris::Lexer lexer(filename, text);
     std::vector<eris::Token> tokens = lexer.generate_tokens();
 
-    // eris::print_tokens(tokens);
-
-    eris::Parser parser(tokens);
+    eris::Parser parser(filename, tokens);
     std::unique_ptr<eris::Node> tree = parser.parse();
 
-    eris::Interpreter interpreter;
+    eris::Interpreter interpreter(filename);
     eris::Number value = interpreter.visit(tree);
 
     std::cout << value.str() << '\n';
@@ -40,7 +37,7 @@ int main(int argc, char **argv)
     if (argc > 1)
     {
         std::string filename(argv[1]);
-        run(read_file(filename));
+        run(filename, read_file(filename));
     }
     else
     {
@@ -62,7 +59,7 @@ int main(int argc, char **argv)
                     break;
                 }
 
-                run(text);
+                run("stdin", text);
             }
             catch (const std::string &e)
             {

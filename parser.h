@@ -12,6 +12,7 @@ namespace eris {
 
 class Parser {
 private:
+    std::string filename;
     std::vector<Token> tokens;
     std::size_t pos;
     Token current;
@@ -23,7 +24,7 @@ private:
     std::unique_ptr<Node> term();
     std::unique_ptr<Node> factor();
 public:
-    Parser(const std::vector<Token>& tokens);
+    Parser(const std::string &filename, const std::vector<Token>& tokens);
 
     std::unique_ptr<Node> parse();
 };

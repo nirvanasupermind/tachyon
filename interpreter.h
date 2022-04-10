@@ -6,23 +6,26 @@
 #include "values.h"
 #include "nodes.h"
 
-namespace eris {
+namespace eris
+{
 
-class Interpreter {
-public:
-    Interpreter() = default;
-    Number visit(const std::unique_ptr<Node>& node);
-    Number visit(Node *node);
-    Number visit(NumberNode *node);
-    Number visit(AddNode *node);
-    Number visit(SubtractNode *node);
-    Number visit(MultiplyNode *node);
-    Number visit(DivideNode *node);
-    Number visit(PlusNode *node);
-    Number visit(MinusNode *node);
-};
+    class Interpreter
+    {
+    private:
+        std::string filename;
+    public:
+        Interpreter(std::string filename);
+        Number visit(const std::unique_ptr<Node> &node);
+        Number visit(Node *node);
+        Number visit(NumberNode *node);
+        Number visit(AddNode *node);
+        Number visit(SubtractNode *node);
+        Number visit(MultiplyNode *node);
+        Number visit(DivideNode *node);
+        Number visit(PlusNode *node);
+        Number visit(MinusNode *node);
+    };
 
 } // namespace eris
-
 
 #endif // INTERPRETER_H

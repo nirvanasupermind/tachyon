@@ -4,94 +4,112 @@
 #include <string>
 #include <memory>
 
-namespace eris {
+namespace eris
+{
 
-enum class NodeKind {
-    Number,
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    Plus,
-    Minus
-};
+    enum class NodeKind
+    {
+        Number,
+        Add,
+        Subtract,
+        Multiply,
+        Divide,
+        Plus,
+        Minus
+    };
 
-class Node {
-public:
-    virtual NodeKind kind() const = 0;
-    virtual std::string str() const = 0;
-    virtual ~Node() = default;
-};
+    class Node
+    {
+    public:
+        int line;
 
-class NumberNode : public Node {
-public:
-    double value;
+        virtual NodeKind kind() const = 0;
+        virtual std::string str() const = 0;
+        virtual ~Node() = default;
+    };
 
-    explicit NumberNode(double value);
-    NodeKind kind() const;
-    std::string str() const;
-};
+    class NumberNode : public Node
+    {
+    public:
+        int line;
+        double value;
 
-class AddNode : public Node {
-public:
-    std::unique_ptr<Node> node_a;
-    std::unique_ptr<Node> node_b;
-    
-    explicit AddNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
-    NodeKind kind() const;
-    std::string str() const;
-};
+        explicit NumberNode(int line, double value);
+        NodeKind kind() const;
+        std::string str() const;
+    };
 
-class SubtractNode : public Node {
-public:
-    std::unique_ptr<Node> node_a;
-    std::unique_ptr<Node> node_b;
-    
-    explicit SubtractNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
-    NodeKind kind() const;
-    std::string str() const;
-};
+    class AddNode : public Node
+    {
+    public:
+        int line;
+        std::unique_ptr<Node> node_a;
+        std::unique_ptr<Node> node_b;
 
-class MultiplyNode : public Node {
-public:
-    std::unique_ptr<Node> node_a;
-    std::unique_ptr<Node> node_b;
-    
-    explicit MultiplyNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
-    NodeKind kind() const;
-    std::string str() const;
-};
+        explicit AddNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        NodeKind kind() const;
+        std::string str() const;
+    };
 
-class DivideNode : public Node {
-public:
-    std::unique_ptr<Node> node_a;
-    std::unique_ptr<Node> node_b;
-    
-    explicit DivideNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
-    NodeKind kind() const;
-    std::string str() const;
-};
+    class SubtractNode : public Node
+    {
+    public:
+        int line;
+        std::unique_ptr<Node> node_a;
+        std::unique_ptr<Node> node_b;
 
-class PlusNode : public Node {
-public:
-    std::unique_ptr<Node> node;
-    
-    explicit PlusNode(std::unique_ptr<Node> node);
-    
-    NodeKind kind() const;
-    std::string str() const;
-};
+        explicit SubtractNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        NodeKind kind() const;
+        std::string str() const;
+    };
 
-class MinusNode : public Node {
-public:
-    std::unique_ptr<Node> node;
-    
-    explicit MinusNode(std::unique_ptr<Node> node);
-    NodeKind kind() const;
-    std::string str() const;
-};
+    class MultiplyNode : public Node
+    {
+    public:
+        int line;
+        std::unique_ptr<Node> node_a;
+        std::unique_ptr<Node> node_b;
+
+        explicit MultiplyNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class DivideNode : public Node
+    {
+    public:
+        int line;
+        std::unique_ptr<Node> node_a;
+        std::unique_ptr<Node> node_b;
+
+        explicit DivideNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class PlusNode : public Node
+    {
+    public:
+        int line;
+        std::unique_ptr<Node> node;
+
+        explicit PlusNode(int line, std::unique_ptr<Node> node);
+
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class MinusNode : public Node
+    {
+    public:
+        int line;
+        std::unique_ptr<Node> node;
+
+        explicit MinusNode(int line, std::unique_ptr<Node> node);
+        NodeKind kind() const;
+        std::string str() const;
+    };
 
 } // namespace eris
-
 
 #endif // NODES_H

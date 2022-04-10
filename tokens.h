@@ -22,11 +22,12 @@ namespace eris
     class Token
     {
     public:
+        int line;
         TokenType type;
         double value;
 
-        Token(TokenType type) : type(type) {}
-        Token(TokenType type, double value) : type(type), value(value) {}
+        Token(int line, TokenType type) : line(line), type(type) {}
+        Token(int line, TokenType type, double value) : line(line), type(type), value(value) {}
 
         explicit operator bool() const; // returns true if type != TokenType::EOF_ else returns false
 

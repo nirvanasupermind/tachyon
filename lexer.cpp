@@ -9,8 +9,8 @@
 namespace eris
 {
 
-    Lexer::Lexer(const std::string &text)
-        : text(text), pos(0), current(0)
+    Lexer::Lexer(const std::string &filename, const std::string &text)
+        : filename(filename), text(text), line(1), pos(0), current(0)
     {
         advance();
     }
@@ -24,6 +24,11 @@ namespace eris
         else
         {
             current = 0; // 0 means nothing, therefore in the while loop, it will break if current == 0.
+        }
+
+        if (current == '\n')
+        {
+            line++;
         }
     }
 
@@ -44,37 +49,37 @@ namespace eris
             else if (current == '+')
             {
                 advance();
-                tokens.push_back(Token(TokenType::PLUS));
+                tokens.push_back(Token(line, TokenType::PLUS));
             }
             else if (current == '-')
             {
                 advance();
-                tokens.push_back(Token(TokenType::MINUS));
+                tokens.push_back(Token(line, TokenType::MINUS));
             }
             else if (current == '*')
             {
                 advance();
-                tokens.push_back(Token(TokenType::MULTIPLY));
+                tokens.push_back(Token(line, TokenType::MULTIPLY));
             }
             else if (current == '/')
             {
                 advance();
-                tokens.push_back(Token(TokenType::DIVIDE));
+                tokens.push_back(Token(line, TokenType::DIVIDE));
             }
             else if (current == '(')
             {
                 advance();
-                tokens.push_back(Token(TokenType::LPAREN));
+                tokens.push_back(Token(line, TokenType::LPAREN));
             }
             else if (current == ')')
             {
                 advance();
-                tokens.push_back(Token(TokenType::RPAREN));
+                tokens.push_back(Token(line, TokenType::RPAREN));
             }
             else
             {
                 std::ostringstream oss;
-                oss << "Illegal character '" << current << "'";
+                oss << filename << ":" << line << ": illegal character '" << current << "'";
                 throw oss.str();
             }
         }
@@ -84,6 +89,8 @@ namespace eris
 
     Token Lexer::generate_number()
     {
+        int orig_line = line;
+
         std::size_t decimal_point_count = 0;
         std::string number_str(1, current);
         advance();
@@ -112,7 +119,6 @@ namespace eris
             number_str += '0';
         }
 
-        return Token(TokenType::NUMBER, std::stod(number_str));
+        return Token(orig_line, TokenType::NUMBER, std::stod(number_str));
     }
-
 } // namespace eris

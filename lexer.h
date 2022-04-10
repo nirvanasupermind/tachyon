@@ -15,11 +15,13 @@ namespace eris
     class Lexer
     {
     public:
+        std::string filename{};
         std::string text{};
+        std::size_t line;
         std::size_t pos;
         char current;
 
-        Lexer(const std::string &text);
+        Lexer(const std::string &filename, const std::string &text);
 
         void advance();
         std::vector<Token> generate_tokens();

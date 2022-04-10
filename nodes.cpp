@@ -4,118 +4,143 @@
 
 #include "nodes.h"
 
-namespace eris {
+namespace eris
+{
 
-NumberNode::NumberNode(double value)
-    : value(value)
-{}
+    NumberNode::NumberNode(int line, double value)
+        : line(line), value(value)
+    {
+    }
 
-NodeKind NumberNode::kind() const {
-    return NodeKind::Number;
-}
+    NodeKind NumberNode::kind() const
+    {
+        return NodeKind::Number;
+    }
 
-std::string NumberNode::str() const {
-    return std::to_string(value);
-}
+    std::string NumberNode::str() const
+    {
+        std::ostringstream oss;
 
-AddNode::AddNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
-    : node_a(std::move(node_a)),
-    node_b(std::move(node_b))
-{}
+        oss << value;
 
-NodeKind AddNode::kind() const {
-    return NodeKind::Add;
-}
+        return oss.str();
+    }
 
-std::string AddNode::str() const {
-    std::ostringstream oss;
+    AddNode::AddNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+        : line(line), node_a(std::move(node_a)),
+          node_b(std::move(node_b))
+    {
+    }
 
-    oss << "(" << node_a->str() << "+" << node_b->str() << ")";
+    NodeKind AddNode::kind() const
+    {
+        return NodeKind::Add;
+    }
 
-    return oss.str();
-}
+    std::string AddNode::str() const
+    {
+        std::ostringstream oss;
 
-SubtractNode::SubtractNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
-    : node_a(std::move(node_a)),
-    node_b(std::move(node_b))
-{}
+        oss << "(" << node_a->str() << "+" << node_b->str() << ")";
 
-NodeKind SubtractNode::kind() const {
-    return NodeKind::Subtract;
-}
+        return oss.str();
+    }
 
-std::string SubtractNode::str() const {
-    std::ostringstream oss;
+    SubtractNode::SubtractNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+        : line(line), node_a(std::move(node_a)),
+          node_b(std::move(node_b))
+    {
+    }
 
-    oss << "(" << node_a->str() << "-" << node_b->str() << ")";
+    NodeKind SubtractNode::kind() const
+    {
+        return NodeKind::Subtract;
+    }
 
-    return oss.str();
-}
+    std::string SubtractNode::str() const
+    {
+        std::ostringstream oss;
 
-MultiplyNode::MultiplyNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
-    : node_a(std::move(node_a)),
-    node_b(std::move(node_b))
-{}
+        oss << "(" << node_a->str() << "-" << node_b->str() << ")";
 
-NodeKind MultiplyNode::kind() const {
-    return NodeKind::Multiply;
-}
+        return oss.str();
+    }
 
-std::string MultiplyNode::str() const {
-    std::ostringstream oss;
+    MultiplyNode::MultiplyNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+        : line(line), node_a(std::move(node_a)),
+          node_b(std::move(node_b))
+    {
+    }
 
-    oss << "(" << node_a->str() << "*" << node_b->str() << ")";
+    NodeKind MultiplyNode::kind() const
+    {
+        return NodeKind::Multiply;
+    }
 
-    return oss.str();
-}
+    std::string MultiplyNode::str() const
+    {
+        std::ostringstream oss;
 
-DivideNode::DivideNode(std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
-    : node_a(std::move(node_a)),
-    node_b(std::move(node_b))
-{}
+        oss << "(" << node_a->str() << "*" << node_b->str() << ")";
 
-NodeKind DivideNode::kind() const {
-    return NodeKind::Divide;
-}
+        return oss.str();
+    }
 
-std::string DivideNode::str() const {
-    std::ostringstream oss;
+    DivideNode::DivideNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+        : line(line), node_a(std::move(node_a)),
+          node_b(std::move(node_b))
+    {
+    }
 
-    oss << "(" << node_a->str() << "/" << node_b->str() << ")";
+    NodeKind DivideNode::kind() const
+    {
+        return NodeKind::Divide;
+    }
 
-    return oss.str();
-}
+    std::string DivideNode::str() const
+    {
+        std::ostringstream oss;
 
-PlusNode::PlusNode(std::unique_ptr<Node> node)
-    : node(std::move(node))
-{}
+        oss << "(" << node_a->str() << "/" << node_b->str() << ")";
 
-NodeKind PlusNode::kind() const {
-    return NodeKind::Plus;
-}
+        return oss.str();
+    }
 
-std::string PlusNode::str() const {
-    std::ostringstream oss;
+    PlusNode::PlusNode(int line, std::unique_ptr<Node> node)
+        : line(line), node(std::move(node))
+    {
+    }
 
-    oss << "(+" << node->str() << ")";
+    NodeKind PlusNode::kind() const
+    {
+        return NodeKind::Plus;
+    }
 
-    return oss.str();
-}
+    std::string PlusNode::str() const
+    {
+        std::ostringstream oss;
 
-MinusNode::MinusNode(std::unique_ptr<Node> node)
-    : node(std::move(node))
-{}
+        oss << "(+" << node->str() << ")";
 
-NodeKind MinusNode::kind() const {
-    return NodeKind::Minus;
-}
+        return oss.str();
+    }
 
-std::string MinusNode::str() const {
-    std::ostringstream oss;
+    MinusNode::MinusNode(int line, std::unique_ptr<Node> node)
+        : line(line), node(std::move(node))
+    {
+    }
 
-    oss << "(-" << node->str() << ")";
+    NodeKind MinusNode::kind() const
+    {
+        return NodeKind::Minus;
+    }
 
-    return oss.str();
-}
+    std::string MinusNode::str() const
+    {
+        std::ostringstream oss;
 
+        oss << "(-" << node->str() << ")";
+
+        return oss.str();
+    }
 } // namespace eris
