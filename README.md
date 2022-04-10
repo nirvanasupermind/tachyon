@@ -24,6 +24,8 @@ build.cmd
 
 An executable named `eris.exe` will be created.
 
+In both cases, clang is required to be installed.
+
 # Synopsis
 ```
 class Point {
