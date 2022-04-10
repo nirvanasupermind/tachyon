@@ -8,7 +8,6 @@
 
 namespace eris
 {
-
     const std::string WHITESPACE = " \n\t";
     const std::string DIGITS = "0123456789";
 

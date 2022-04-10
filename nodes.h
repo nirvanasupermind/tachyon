@@ -43,10 +43,10 @@ namespace eris
     {
     public:
         int line;
-        std::unique_ptr<Node> node_a;
-        std::unique_ptr<Node> node_b;
+        std::shared_ptr<Node> node_a;
+        std::shared_ptr<Node> node_b;
 
-        explicit AddNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        explicit AddNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -55,10 +55,10 @@ namespace eris
     {
     public:
         int line;
-        std::unique_ptr<Node> node_a;
-        std::unique_ptr<Node> node_b;
+        std::shared_ptr<Node> node_a;
+        std::shared_ptr<Node> node_b;
 
-        explicit SubtractNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        explicit SubtractNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -67,10 +67,10 @@ namespace eris
     {
     public:
         int line;
-        std::unique_ptr<Node> node_a;
-        std::unique_ptr<Node> node_b;
+        std::shared_ptr<Node> node_a;
+        std::shared_ptr<Node> node_b;
 
-        explicit MultiplyNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        explicit MultiplyNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -79,10 +79,10 @@ namespace eris
     {
     public:
         int line;
-        std::unique_ptr<Node> node_a;
-        std::unique_ptr<Node> node_b;
+        std::shared_ptr<Node> node_a;
+        std::shared_ptr<Node> node_b;
 
-        explicit DivideNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b);
+        explicit DivideNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -91,9 +91,9 @@ namespace eris
     {
     public:
         int line;
-        std::unique_ptr<Node> node;
+        std::shared_ptr<Node> node;
 
-        explicit PlusNode(int line, std::unique_ptr<Node> node);
+        explicit PlusNode(int line, std::shared_ptr<Node> node);
 
         NodeKind kind() const;
         std::string str() const;
@@ -103,9 +103,9 @@ namespace eris
     {
     public:
         int line;
-        std::unique_ptr<Node> node;
+        std::shared_ptr<Node> node;
 
-        explicit MinusNode(int line, std::unique_ptr<Node> node);
+        explicit MinusNode(int line, std::shared_ptr<Node> node);
         NodeKind kind() const;
         std::string str() const;
     };

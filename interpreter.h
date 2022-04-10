@@ -8,14 +8,14 @@
 
 namespace eris
 {
-
     class Interpreter
     {
     private:
         std::string filename;
     public:
-        Interpreter(std::string filename);
-        Number visit(const std::unique_ptr<Node> &node);
+        Interpreter(const std::string& filename);
+        Number visit(const std::shared_ptr<Node> &node);
+        void raise_error(int line, const std::string &message) const;
         Number visit(Node *node);
         Number visit(NumberNode *node);
         Number visit(AddNode *node);

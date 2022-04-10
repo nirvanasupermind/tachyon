@@ -26,7 +26,7 @@ namespace eris
         return oss.str();
     }
 
-    AddNode::AddNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+    AddNode::AddNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b)
         : line(line), node_a(std::move(node_a)),
           node_b(std::move(node_b))
     {
@@ -46,7 +46,7 @@ namespace eris
         return oss.str();
     }
 
-    SubtractNode::SubtractNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+    SubtractNode::SubtractNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b)
         : line(line), node_a(std::move(node_a)),
           node_b(std::move(node_b))
     {
@@ -66,7 +66,7 @@ namespace eris
         return oss.str();
     }
 
-    MultiplyNode::MultiplyNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+    MultiplyNode::MultiplyNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b)
         : line(line), node_a(std::move(node_a)),
           node_b(std::move(node_b))
     {
@@ -86,7 +86,7 @@ namespace eris
         return oss.str();
     }
 
-    DivideNode::DivideNode(int line, std::unique_ptr<Node> node_a, std::unique_ptr<Node> node_b)
+    DivideNode::DivideNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b)
         : line(line), node_a(std::move(node_a)),
           node_b(std::move(node_b))
     {
@@ -106,7 +106,7 @@ namespace eris
         return oss.str();
     }
 
-    PlusNode::PlusNode(int line, std::unique_ptr<Node> node)
+    PlusNode::PlusNode(int line, std::shared_ptr<Node> node)
         : line(line), node(std::move(node))
     {
     }
@@ -125,7 +125,7 @@ namespace eris
         return oss.str();
     }
 
-    MinusNode::MinusNode(int line, std::unique_ptr<Node> node)
+    MinusNode::MinusNode(int line, std::shared_ptr<Node> node)
         : line(line), node(std::move(node))
     {
     }

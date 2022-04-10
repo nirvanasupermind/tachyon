@@ -7,11 +7,18 @@
 
 namespace eris
 {
-    Interpreter::Interpreter(std::string filename) : filename(filename) {}
+    Interpreter::Interpreter(const std::string &filename) : filename(filename) {}
 
-    Number Interpreter::visit(const std::unique_ptr<Node> &node)
+    Number Interpreter::visit(const std::shared_ptr<Node> &node)
     {
         return visit(node.get());
+    }
+
+    void Interpreter::raise_error(int line, const std::string &message) const
+    {
+        std::ostringstream oss;
+        oss << filename << ":" << line << ": " << message;
+        throw oss.str();
     }
 
     Number Interpreter::visit(Node *node)

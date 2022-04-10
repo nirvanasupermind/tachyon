@@ -4,6 +4,26 @@
 
 C++ interpreter for the Eris programming language. Based on jackprogramsjp's [simple math interpreter](https://github.com/jackprogramsjp/CPP-Simple-Math-Interpreter-V2).
 
+# Compilaton
+
+To compile on Unix, navigate to the Eris directory and run
+
+```
+source build.sh
+```
+
+An executable named `eris` will be created.
+
+<hr />
+
+To compile on Windows, navigate to the Eris directory and run
+
+```
+build.cmd
+```
+
+An executable named `eris.exe` will be created.
+
 # Synopsis
 ```
 class Point {
@@ -21,3 +41,4 @@ var p = Point(10, 20);
 
 print(p.calc());
 ```
+
