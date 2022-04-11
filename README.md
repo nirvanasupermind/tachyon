@@ -21,25 +21,3 @@ var p = Point(10, 20);
 
 print(p.calc());
 ```
-
-# Compilaton
-
-To compile on Unix, navigate to the folder where Eris is installed and run
-
-```
-source build.sh
-```
-
-An executable named `eris` will be created.
-
-<hr />
-
-To compile on Windows, navigate to the Eris directory and run
-
-```
-build.cmd
-```
-
-An executable named `eris.exe` will be created.
-
-In both cases, clang is required to be installed.
