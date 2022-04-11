@@ -7,6 +7,7 @@
 
 #include "tokens.h"
 #include "nodes.h"
+#include "exceptions.h"
 
 namespace eris
 {

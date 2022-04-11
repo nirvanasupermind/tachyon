@@ -5,6 +5,7 @@
 
 #include "lexer.h"
 #include "tokens.h"
+#include "exceptions.h"
 
 namespace eris
 {
@@ -80,7 +81,7 @@ namespace eris
             {
                 std::ostringstream oss;
                 oss << filename << ":" << line << ": illegal character '" << current << "'";
-                throw oss.str();
+                throw Exception(oss.str());
             }
         }
 

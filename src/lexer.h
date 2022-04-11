@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "tokens.h"
+#include "exceptions.h"
 
 namespace eris
 {

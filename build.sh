@@ -1,1 +1,1 @@
-clang++ -std=c++11 main.cpp -o eris
+clang++ -std=c++11 src/main.cpp -o ../../binaries/eris

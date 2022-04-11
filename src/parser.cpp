@@ -10,7 +10,7 @@ namespace eris
     Parser::Parser(const std::string &filename, const std::vector<Token> &tokens)
         : filename(filename), tokens(tokens),
           pos(0),
-          current(Token(1, TokenType::EOF_))
+          current(Token(0, TokenType::EOF_))
     {
         if (this->tokens.empty())
         {
@@ -18,7 +18,7 @@ namespace eris
         }
         else if (this->tokens.back().type != TokenType::EOF_)
         {
-            this->tokens.push_back(Token(1, TokenType::EOF_));
+            this->tokens.push_back(Token(tokens.back().line, TokenType::EOF_));
         }
         advance();
     }
@@ -27,7 +27,7 @@ namespace eris
     {
         std::ostringstream oss;
         oss << filename << ":" << current.line << ": invalid syntax";
-        throw oss.str();
+        throw Exception(oss.str());
     }
 
     void Parser::advance()
