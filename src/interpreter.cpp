@@ -9,7 +9,7 @@ namespace eris
 {
     Interpreter::Interpreter(const std::string &filename) : filename(filename) {}
 
-    Number Interpreter::visit(const std::shared_ptr<Node> &node)
+    std::shared_ptr<Value> Interpreter::visit(const std::shared_ptr<Node> &node)
     {
         return visit(node.get());
     }
@@ -18,15 +18,17 @@ namespace eris
     {
         std::ostringstream oss;
         oss << filename << ":" << line << ": " << message;
-        throw oss.str();
+        throw Exception(oss.str());
     }
 
-    Number Interpreter::visit(Node *node)
+    std::shared_ptr<Value> Interpreter::visit(Node *node)
     {
         switch (node->kind())
         {
-        case NodeKind::Number:
-            return visit(dynamic_cast<NumberNode *>(node));
+        case NodeKind::Int:
+            return visit(dynamic_cast<IntNode *>(node));
+        case NodeKind::Double:
+            return visit(dynamic_cast<DoubleNode *>(node));
         case NodeKind::Add:
             return visit(dynamic_cast<AddNode *>(node));
         case NodeKind::Subtract:
@@ -40,50 +42,100 @@ namespace eris
         case NodeKind::Minus:
             return visit(dynamic_cast<MinusNode *>(node));
         default:
-            throw std::string("Invalid node");
+            throw Exception("Invalid node");
+            return std::shared_ptr<Value>();
         }
     }
 
-    Number Interpreter::visit(NumberNode *node)
+    std::shared_ptr<Value> Interpreter::visit(IntNode *node)
     {
-        return Number(node->value);
+        return std::shared_ptr<Number>(new Int(node->value));
     }
 
-    Number Interpreter::visit(AddNode *node)
+    std::shared_ptr<Value> Interpreter::visit(DoubleNode *node)
     {
-        return Number(visit(node->node_a).value + visit(node->node_b).value);
+        return std::shared_ptr<Number>(new Double(node->value));
     }
 
-    Number Interpreter::visit(SubtractNode *node)
+    std::shared_ptr<Value> Interpreter::visit(AddNode *node)
     {
-        return Number(visit(node->node_a).value - visit(node->node_b).value);
-    }
+        std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
+        std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
 
-    Number Interpreter::visit(MultiplyNode *node)
-    {
-        return Number(visit(node->node_a).value * visit(node->node_b).value);
-    }
-
-    Number Interpreter::visit(DivideNode *node)
-    {
-        double value = visit(node->node_b).value;
-
-        if (value == 0.0)
+        if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
         {
-            throw std::string("Runtime math error");
+            return std::shared_ptr<Int>(new Int(a->getval() + b->getval()));
         }
 
-        return Number(visit(node->node_a).value + value);
+        return std::shared_ptr<Double>(new Double(a->getval() + b->getval()));
     }
 
-    Number Interpreter::visit(PlusNode *node)
+    std::shared_ptr<Value> Interpreter::visit(SubtractNode *node)
     {
-        return visit(node->node);
+        std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
+        std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
+
+        if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
+        {
+            return std::shared_ptr<Int>(new Int(a->getval() - b->getval()));
+        }
+
+        return std::shared_ptr<Double>(new Double(a->getval() - b->getval()));
     }
 
-    Number Interpreter::visit(MinusNode *node)
+    std::shared_ptr<Value> Interpreter::visit(MultiplyNode *node)
     {
-        return Number(-1 * visit(node->node).value);
+        std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
+        std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
+
+        if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
+        {
+            return std::shared_ptr<Int>(new Int(a->getval() * b->getval()));
+        }
+
+        return std::shared_ptr<Double>(new Double(a->getval() * b->getval()));
+    }
+
+    std::shared_ptr<Value> Interpreter::visit(DivideNode *node)
+    {
+        std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
+        std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
+
+        if (b->getval() == 0)
+        {
+            raise_error(node->node_b->line, "attempt to divide by zero");
+        }
+
+        if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
+        {
+            return std::shared_ptr<Int>(new Int(a->getval() / b->getval()));
+        }
+
+        return std::shared_ptr<Double>(new Double(a->getval() / b->getval()));
+    }
+
+    std::shared_ptr<Value> Interpreter::visit(PlusNode *node)
+    {
+        std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node));
+
+        if (a->kind() == ValueKind::IntVal)
+        {
+            return std::shared_ptr<Int>(new Int(-a->getval()));
+        }
+
+        return std::shared_ptr<Double>(new Double(-a->getval()));
+    }
+
+    std::shared_ptr<Value> Interpreter::visit(MinusNode *node)
+    {
+        std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node));
+
+        if (a->kind() == ValueKind::IntVal)
+        {
+            return std::shared_ptr<Int>(new Int(-a->getval()));
+        }
+
+        return std::shared_ptr<Double>(new Double(-a->getval()));
     }
 
 } // namespace eris

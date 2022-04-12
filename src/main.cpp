@@ -27,9 +27,9 @@ void run(const std::string &filename, const std::string &text)
         std::shared_ptr<eris::Node> tree = parser.parse();
 
         eris::Interpreter interpreter(filename);
-        eris::Number value = interpreter.visit(tree);
+        std::shared_ptr<eris::Value> value = interpreter.visit(tree);
 
-        std::cout << value.str() << '\n';
+        std::cout << value->str() << '\n';
     } catch(eris::Exception &e) {
         std::cerr << e.message << '\n';
     }

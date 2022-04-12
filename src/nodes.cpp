@@ -6,18 +6,18 @@
 
 namespace eris
 {
-
-    NumberNode::NumberNode(int line, double value)
-        : line(line), value(value)
+    IntNode::IntNode(int line, std::int32_t value)
+        : value(value)
     {
+        this->line = line;
     }
 
-    NodeKind NumberNode::kind() const
+    NodeKind IntNode::kind() const
     {
-        return NodeKind::Number;
+        return NodeKind::Int;
     }
 
-    std::string NumberNode::str() const
+    std::string IntNode::str() const
     {
         std::ostringstream oss;
 
@@ -26,9 +26,44 @@ namespace eris
         return oss.str();
     }
 
+    DoubleNode::DoubleNode(int line, double value)
+        : value(value)
+    {
+        this->line = line;
+    }
+
+    NodeKind DoubleNode::kind() const
+    {
+        return NodeKind::Double;
+    }
+
+    std::string DoubleNode::str() const
+    {
+        std::ostringstream oss;
+
+        oss << value;
+
+        return oss.str();
+    }
+
+    IdentifierNode::IdentifierNode(int line, const std::string &identifier)
+        : identifier(identifier)
+    {
+        this->line = line;
+    }
+
+    NodeKind IdentifierNode::kind() const
+    {
+        return NodeKind::Identifier;
+    }
+
+    std::string IdentifierNode::str() const
+    {
+        return identifier;
+    }
+
     AddNode::AddNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b)
-        : line(line), node_a(std::move(node_a)),
-          node_b(std::move(node_b))
+        : node_a(node_a), node_b(node_b)
     {
     }
 

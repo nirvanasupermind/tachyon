@@ -17,7 +17,7 @@ namespace eris
     public:
         std::string filename{};
         std::string text{};
-        std::size_t line;
+        int line;
         std::size_t pos;
         char current;
 
@@ -26,6 +26,7 @@ namespace eris
         void advance();
         std::vector<Token> generate_tokens();
         Token generate_number();
+        Token generate_identifier();
     };
 
 } // namespace eris

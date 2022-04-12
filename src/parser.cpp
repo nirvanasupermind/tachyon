@@ -1,6 +1,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 #include "parser.h"
 
@@ -10,23 +11,15 @@ namespace eris
     Parser::Parser(const std::string &filename, const std::vector<Token> &tokens)
         : filename(filename), tokens(tokens),
           pos(0),
-          current(Token(0, TokenType::EOF_))
+          current(Token(0, TokenType::EOF_, "<EOF>"))
     {
-        if (this->tokens.empty())
-        {
-            this->tokens.push_back(Token(1, TokenType::EOF_));
-        }
-        else if (this->tokens.back().type != TokenType::EOF_)
-        {
-            this->tokens.push_back(Token(tokens.back().line, TokenType::EOF_));
-        }
         advance();
     }
 
     void Parser::raise_error() const
     {
         std::ostringstream oss;
-        oss << filename << ":" << current.line << ": invalid syntax";
+        oss << filename << ":" << current.line << ": syntax error near '" << current.lexeme + "'";
         throw Exception(oss.str());
     }
 
@@ -111,10 +104,20 @@ namespace eris
             advance();
             return result;
         }
-        else if (token.type == TokenType::NUMBER)
+        else if (token.type == TokenType::INT)
         {
             advance();
-            return std::shared_ptr<NumberNode>(new NumberNode(token.line, token.value));
+            return std::shared_ptr<IntNode>(new IntNode(token.line, (std::int32_t)std::stol(token.lexeme)));
+        }
+        else if (token.type == TokenType::DOUBLE)
+        {
+            advance();
+            return std::shared_ptr<DoubleNode>(new DoubleNode(token.line, std::stod(token.lexeme)));
+        }
+        else if (token.type == TokenType::IDENTIFIER)
+        {
+            advance();
+            return std::shared_ptr<IdentifierNode>(new IdentifierNode(token.line, token.lexeme));
         }
         else if (token.type == TokenType::PLUS)
         {

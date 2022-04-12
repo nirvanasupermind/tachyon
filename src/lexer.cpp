@@ -35,6 +35,8 @@ namespace eris
 
     std::vector<Token> Lexer::generate_tokens()
     {
+        int orig_line = line;
+        
         std::vector<Token> tokens;
 
         while (current)
@@ -43,39 +45,43 @@ namespace eris
             {
                 advance();
             }
-            else if (current == '.' || DIGITS.find_first_of(current) != std::string::npos)
+            else if (current == '.' || isdigit(current))
             {
                 tokens.push_back(generate_number());
+            }
+            else if (current == '_'  || isalpha(current))
+            {
+                tokens.push_back(generate_identifier());
             }
             else if (current == '+')
             {
                 advance();
-                tokens.push_back(Token(line, TokenType::PLUS));
+                tokens.push_back(Token(line, TokenType::PLUS, "+"));
             }
             else if (current == '-')
             {
                 advance();
-                tokens.push_back(Token(line, TokenType::MINUS));
+                tokens.push_back(Token(line, TokenType::MINUS, "-"));
             }
             else if (current == '*')
             {
                 advance();
-                tokens.push_back(Token(line, TokenType::MULTIPLY));
+                tokens.push_back(Token(line, TokenType::MULTIPLY, "*"));
             }
             else if (current == '/')
             {
                 advance();
-                tokens.push_back(Token(line, TokenType::DIVIDE));
+                tokens.push_back(Token(line, TokenType::DIVIDE, "/"));
             }
             else if (current == '(')
             {
                 advance();
-                tokens.push_back(Token(line, TokenType::LPAREN));
+                tokens.push_back(Token(line, TokenType::LPAREN, "("));
             }
             else if (current == ')')
             {
                 advance();
-                tokens.push_back(Token(line, TokenType::RPAREN));
+                tokens.push_back(Token(line, TokenType::RPAREN, ")"));
             }
             else
             {
@@ -84,6 +90,8 @@ namespace eris
                 throw Exception(oss.str());
             }
         }
+
+        tokens.push_back(Token(line, TokenType::EOF_, "<EOF>"));
 
         return tokens;
     }
@@ -96,7 +104,7 @@ namespace eris
         std::string number_str(1, current);
         advance();
 
-        while (current && (current == '.' || DIGITS.find_first_of(current) != std::string::npos))
+        while (current && (current == '.' || isdigit(current)))
         {
             if (current == '.')
             {
@@ -110,16 +118,27 @@ namespace eris
             advance();
         }
 
-        if (number_str.at(0) == '.')
+        if (decimal_point_count > 0)
         {
-            number_str = '0' + number_str;
+            return Token(orig_line, TokenType::DOUBLE, number_str);
         }
 
-        if (number_str.at(number_str.length() - 1) == '.')
+        return Token(orig_line, TokenType::INT, number_str);
+    }
+
+    Token Lexer::generate_identifier()
+    {
+        int orig_line = line;
+
+        std::string identifier_str(1, current);
+        advance();
+
+        while (current && (current == '_' || isalnum(current)))
         {
-            number_str += '0';
+            identifier_str += current;
+            advance();
         }
 
-        return Token(orig_line, TokenType::NUMBER, std::stod(number_str));
+        return Token(orig_line, TokenType::IDENTIFIER, identifier_str);
     }
 } // namespace eris

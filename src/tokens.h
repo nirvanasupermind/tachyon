@@ -9,7 +9,10 @@ namespace eris
 
     enum class TokenType
     {
-        NUMBER,
+        INT,
+        DOUBLE,
+        IDENTIFIER,
+        VAR,
         PLUS,
         MINUS,
         MULTIPLY,
@@ -24,10 +27,9 @@ namespace eris
     public:
         int line;
         TokenType type;
-        double value;
+        std::string lexeme;
 
-        Token(int line, TokenType type) : line(line), type(type) {}
-        Token(int line, TokenType type, double value) : line(line), type(type), value(value) {}
+        Token(int line, TokenType type, std::string lexeme) : line(line), type(type), lexeme(lexeme) {}
 
         explicit operator bool() const; // returns true if type != TokenType::EOF_ else returns false
 

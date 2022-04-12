@@ -3,13 +3,15 @@
 
 #include <string>
 #include <memory>
+#include <cstdint>
 
 namespace eris
 {
-
     enum class NodeKind
     {
-        Number,
+        Int,
+        Double,
+        Identifier,
         Add,
         Subtract,
         Multiply,
@@ -28,13 +30,32 @@ namespace eris
         virtual ~Node() = default;
     };
 
-    class NumberNode : public Node
+    class IntNode : public Node
     {
     public:
-        int line;
+        std::int32_t value;
+
+        explicit IntNode(int line, std::int32_t value);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class DoubleNode : public Node
+    {
+    public:
         double value;
 
-        explicit NumberNode(int line, double value);
+        explicit DoubleNode(int line, double value);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class IdentifierNode : public Node
+    {
+    public:
+        std::string identifier;
+
+        explicit IdentifierNode(int line, const std::string &identifier);
         NodeKind kind() const;
         std::string str() const;
     };

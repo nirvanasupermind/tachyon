@@ -7,15 +7,23 @@
 
 namespace eris
 {
-
     std::string Token::str() const
     {
         std::string result;
 
         switch (type)
         {
-        case TokenType::NUMBER:
-            result += "NUMBER:" + std::to_string(value);
+        case TokenType::INT:
+            result += "INT";
+            break;
+        case TokenType::DOUBLE:
+            result += "DOUBLE";
+            break;
+        case TokenType::IDENTIFIER:
+            result += "IDENTIFIER";
+            break;
+        case TokenType::VAR:
+            result += "VAR";
             break;
         case TokenType::PLUS:
             result += "PLUS";
@@ -39,6 +47,8 @@ namespace eris
             result += "EOF";
             break;
         }
+
+        result += ":" + lexeme;
 
         return result;
     }

@@ -1,11 +1,37 @@
 #include <string>
+#include <sstream>
 
 #include "values.h"
 
-namespace eris {
+namespace eris
+{
+    ValueKind Int::kind() const
+    {
+        return ValueKind::IntVal;
+    }
 
-std::string Number::str() const {
-    return std::to_string(value);
-}
+    double Int::getval() const
+    {
+        return value;
+    }
 
+    std::string Int::str() const
+    {
+        return std::to_string(value);
+    }
+
+    ValueKind Double::kind() const
+    {
+        return ValueKind::DoubleVal;
+    }
+
+    double Double::getval() const
+    {
+        return value;
+    }
+
+    std::string Double::str() const
+    {
+        return std::to_string(value);
+    }
 } // namespace eris

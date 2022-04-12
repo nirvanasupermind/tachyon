@@ -1,6 +1,7 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
+#include <string>
 #include <memory>
 
 #include "values.h"
@@ -14,16 +15,17 @@ namespace eris
         std::string filename;
     public:
         Interpreter(const std::string& filename);
-        Number visit(const std::shared_ptr<Node> &node);
+        std::shared_ptr<Value> visit(const std::shared_ptr<Node> &node);
         void raise_error(int line, const std::string &message) const;
-        Number visit(Node *node);
-        Number visit(NumberNode *node);
-        Number visit(AddNode *node);
-        Number visit(SubtractNode *node);
-        Number visit(MultiplyNode *node);
-        Number visit(DivideNode *node);
-        Number visit(PlusNode *node);
-        Number visit(MinusNode *node);
+        std::shared_ptr<Value> visit(Node *node);
+        std::shared_ptr<Value> visit(IntNode *node);
+        std::shared_ptr<Value> visit(DoubleNode *node);
+        std::shared_ptr<Value> visit(AddNode *node);
+        std::shared_ptr<Value> visit(SubtractNode *node);
+        std::shared_ptr<Value> visit(MultiplyNode *node);
+        std::shared_ptr<Value> visit(DivideNode *node);
+        std::shared_ptr<Value> visit(PlusNode *node);
+        std::shared_ptr<Value> visit(MinusNode *node);
     };
 
 } // namespace eris
