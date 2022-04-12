@@ -9,12 +9,14 @@ namespace eris
     enum ValueKind
     {
         IntVal,
-        DoubleVal
+        DoubleVal,
+        AtomVal
     };
 
     class Value
     {
     public:
+        virtual ~Value() = default;
         virtual ValueKind kind() const = 0;
         virtual std::string str() const = 0;
     };
@@ -46,6 +48,17 @@ namespace eris
         
         ValueKind kind() const;
         double getval() const;
+        std::string str() const;
+    };
+
+    class Atom : public Value
+    {
+    public:
+        std::string atom;
+
+        Atom(const std::string&atom): atom(atom) {};
+        
+        ValueKind kind() const;
         std::string str() const;
     };
 } // namespace eris

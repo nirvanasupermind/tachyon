@@ -119,6 +119,20 @@ namespace eris
             advance();
             return std::shared_ptr<IdentifierNode>(new IdentifierNode(token.line, token.lexeme));
         }
+        else if (token.type == TokenType::COLON)
+        {
+            advance();
+
+            if (current.type != TokenType::IDENTIFIER) {
+                raise_error();
+            }
+
+            std::string atom = current.lexeme;
+
+            advance();
+
+            return std::shared_ptr<AtomNode>(new AtomNode(token.line, atom));
+        }
         else if (token.type == TokenType::PLUS)
         {
             advance();

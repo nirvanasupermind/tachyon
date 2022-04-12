@@ -29,6 +29,8 @@ namespace eris
             return visit(dynamic_cast<IntNode *>(node));
         case NodeKind::Double:
             return visit(dynamic_cast<DoubleNode *>(node));
+        case NodeKind::Atom:
+            return visit(dynamic_cast<AtomNode *>(node));
         case NodeKind::Add:
             return visit(dynamic_cast<AddNode *>(node));
         case NodeKind::Subtract:
@@ -49,18 +51,35 @@ namespace eris
 
     std::shared_ptr<Value> Interpreter::visit(IntNode *node)
     {
-        return std::shared_ptr<Number>(new Int(node->value));
+        return std::shared_ptr<Int>(new Int(node->value));
     }
 
     std::shared_ptr<Value> Interpreter::visit(DoubleNode *node)
     {
-        return std::shared_ptr<Number>(new Double(node->value));
+        return std::shared_ptr<Double>(new Double(node->value));
+    }
+
+    std::shared_ptr<Value> Interpreter::visit(AtomNode *node)
+    {
+        return std::shared_ptr<Atom>(new Atom(node->atom));
     }
 
     std::shared_ptr<Value> Interpreter::visit(AddNode *node)
     {
         std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
         std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
+
+        if (!a)
+        {
+            raise_error(node->node_a->line, "bad argument #1 to binary operator '+'");
+            return std::shared_ptr<Value>();
+        }
+
+        if (!b)
+        {
+            raise_error(node->node_a->line, "bad argument #2 to binary operator '+'");
+            return std::shared_ptr<Value>();
+        }
 
         if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
         {
@@ -75,6 +94,18 @@ namespace eris
         std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
         std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
 
+        if (!a)
+        {
+            raise_error(node->node_a->line, "bad argument #1 to binary operator '-'");
+            return std::shared_ptr<Value>();
+        }
+
+        if (!b)
+        {
+            raise_error(node->node_a->line, "bad argument #2 to binary operator '-'");
+            return std::shared_ptr<Value>();
+        }
+
         if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
         {
             return std::shared_ptr<Int>(new Int(a->getval() - b->getval()));
@@ -88,6 +119,18 @@ namespace eris
         std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
         std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
 
+        if (!a)
+        {
+            raise_error(node->node_a->line, "bad argument #1 to binary operator '*'");
+            return std::shared_ptr<Value>();
+        }
+
+        if (!b)
+        {
+            raise_error(node->node_a->line, "bad argument #2 to binary operator '*'");
+            return std::shared_ptr<Value>();
+        }
+
         if (a->kind() == ValueKind::IntVal && b->kind() == ValueKind::IntVal)
         {
             return std::shared_ptr<Int>(new Int(a->getval() * b->getval()));
@@ -100,6 +143,18 @@ namespace eris
     {
         std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node_a));
         std::shared_ptr<Number> b = std::dynamic_pointer_cast<Number>(visit(node->node_b));
+
+        if (!a)
+        {
+            raise_error(node->node_a->line, "bad argument #1 to binary operator '/'");
+            return std::shared_ptr<Value>();
+        }
+
+        if (!b)
+        {
+            raise_error(node->node_a->line, "bad argument #2 to binary operator '/'");
+            return std::shared_ptr<Value>();
+        }
 
         if (b->getval() == 0)
         {
@@ -118,6 +173,12 @@ namespace eris
     {
         std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node));
 
+        if (!a)
+        {
+            raise_error(node->node->line, "bad argument #1 to unary operator '+'");
+            return std::shared_ptr<Value>();
+        }
+
         if (a->kind() == ValueKind::IntVal)
         {
             return std::shared_ptr<Int>(new Int(-a->getval()));
@@ -129,6 +190,12 @@ namespace eris
     std::shared_ptr<Value> Interpreter::visit(MinusNode *node)
     {
         std::shared_ptr<Number> a = std::dynamic_pointer_cast<Number>(visit(node->node));
+
+        if (!a)
+        {
+            raise_error(node->node->line, "bad argument #1 to unary operator '-'");
+            return std::shared_ptr<Value>();
+        }
 
         if (a->kind() == ValueKind::IntVal)
         {

@@ -43,6 +43,9 @@ namespace eris
         case TokenType::RPAREN:
             result += "RPAREN";
             break;
+        case TokenType::COLON:
+            result += "COLON";
+            break;
         case TokenType::EOF_:
             result += "EOF";
             break;

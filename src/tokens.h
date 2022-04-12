@@ -19,6 +19,7 @@ namespace eris
         DIVIDE,
         LPAREN,
         RPAREN,
+        COLON,
         EOF_
     };
 

@@ -11,6 +11,7 @@ namespace eris
     {
         Int,
         Double,
+        Atom,
         Identifier,
         Add,
         Subtract,
@@ -56,6 +57,16 @@ namespace eris
         std::string identifier;
 
         explicit IdentifierNode(int line, const std::string &identifier);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class AtomNode : public Node
+    {
+    public:
+        std::string atom;
+
+        explicit AtomNode(int line, const std::string &atom);
         NodeKind kind() const;
         std::string str() const;
     };

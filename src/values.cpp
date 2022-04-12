@@ -34,4 +34,14 @@ namespace eris
     {
         return std::to_string(value);
     }
+
+    ValueKind Atom::kind() const
+    {
+        return ValueKind::AtomVal;
+    }
+
+    std::string Atom::str() const
+    {
+        return atom;
+    }
 } // namespace eris

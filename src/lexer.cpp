@@ -83,6 +83,11 @@ namespace eris
                 advance();
                 tokens.push_back(Token(line, TokenType::RPAREN, ")"));
             }
+            else if (current == ':')
+            {
+                advance();
+                tokens.push_back(Token(line, TokenType::COLON, ":"));
+            }
             else
             {
                 std::ostringstream oss;
