@@ -20,7 +20,7 @@ namespace eris
         std::shared_ptr<Value> visit(Node *node);
         std::shared_ptr<Value> visit(IntNode *node);
         std::shared_ptr<Value> visit(DoubleNode *node);
-        std::shared_ptr<Value> visit(AtomNode *node);
+        std::shared_ptr<Value> visit(SymbolNode *node);
         std::shared_ptr<Value> visit(AddNode *node);
         std::shared_ptr<Value> visit(SubtractNode *node);
         std::shared_ptr<Value> visit(MultiplyNode *node);

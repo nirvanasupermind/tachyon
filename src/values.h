@@ -10,7 +10,7 @@ namespace eris
     {
         IntVal,
         DoubleVal,
-        AtomVal
+        SymbolVal
     };
 
     class Value
@@ -51,12 +51,12 @@ namespace eris
         std::string str() const;
     };
 
-    class Atom : public Value
+    class Symbol : public Value
     {
     public:
-        std::string atom;
+        std::string symbol;
 
-        Atom(const std::string&atom): atom(atom) {};
+        Symbol(const std::string&symbol): symbol(symbol) {};
         
         ValueKind kind() const;
         std::string str() const;

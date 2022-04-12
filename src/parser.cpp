@@ -127,11 +127,11 @@ namespace eris
                 raise_error();
             }
 
-            std::string atom = current.lexeme;
+            std::string symbol = current.lexeme;
 
             advance();
 
-            return std::shared_ptr<AtomNode>(new AtomNode(token.line, atom));
+            return std::shared_ptr<SymbolNode>(new SymbolNode(token.line, symbol));
         }
         else if (token.type == TokenType::PLUS)
         {

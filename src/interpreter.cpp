@@ -29,8 +29,8 @@ namespace eris
             return visit(dynamic_cast<IntNode *>(node));
         case NodeKind::Double:
             return visit(dynamic_cast<DoubleNode *>(node));
-        case NodeKind::Atom:
-            return visit(dynamic_cast<AtomNode *>(node));
+        case NodeKind::Symbol:
+            return visit(dynamic_cast<SymbolNode *>(node));
         case NodeKind::Add:
             return visit(dynamic_cast<AddNode *>(node));
         case NodeKind::Subtract:
@@ -59,9 +59,9 @@ namespace eris
         return std::shared_ptr<Double>(new Double(node->value));
     }
 
-    std::shared_ptr<Value> Interpreter::visit(AtomNode *node)
+    std::shared_ptr<Value> Interpreter::visit(SymbolNode *node)
     {
-        return std::shared_ptr<Atom>(new Atom(node->atom));
+        return std::shared_ptr<Symbol>(new Symbol(node->symbol));
     }
 
     std::shared_ptr<Value> Interpreter::visit(AddNode *node)

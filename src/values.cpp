@@ -35,13 +35,13 @@ namespace eris
         return std::to_string(value);
     }
 
-    ValueKind Atom::kind() const
+    ValueKind Symbol::kind() const
     {
-        return ValueKind::AtomVal;
+        return ValueKind::SymbolVal;
     }
 
-    std::string Atom::str() const
+    std::string Symbol::str() const
     {
-        return atom;
+        return symbol;
     }
 } // namespace eris

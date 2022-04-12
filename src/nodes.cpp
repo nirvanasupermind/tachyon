@@ -62,20 +62,20 @@ namespace eris
         return identifier;
     }
 
-    AtomNode::AtomNode(int line, const std::string &atom)
-        : atom(atom)
+    SymbolNode::SymbolNode(int line, const std::string &symbol)
+        : symbol(symbol)
     {
         this->line = line;
     }
 
-    NodeKind AtomNode::kind() const
+    NodeKind SymbolNode::kind() const
     {
-        return NodeKind::Atom;
+        return NodeKind::Symbol;
     }
 
-    std::string AtomNode::str() const
+    std::string SymbolNode::str() const
     {
-        return atom;
+        return symbol;
     }
 
     AddNode::AddNode(int line, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b)
