@@ -1,67 +1,53 @@
-#include <iostream>
-#include <string>
 #include <fstream>
+#include <iostream>
+#include <sstream> //std::stringstream
+#include <string>
+#include <vector>
 
-#include "tokens.cpp"
-#include "lexer.cpp"
-#include "nodes.cpp"
-#include "parser.cpp"
-#include "values.cpp"
-#include "interpreter.cpp"
+#include "token.hpp"
+#include "tokenizer.hpp"
 
-std::string read_file(std::string filename)
+void run(std::string filename, std::string text)
 {
-    std::ifstream t(filename);
-    std::stringstream buffer;
-    buffer << t.rdbuf();
-    return buffer.str();
-}
+    eris::Tokenizer tokenizer;
+    
+    tokenizer.init(text);
 
-void run(const std::string &filename, const std::string &text)
-{
-    try {
-        eris::Lexer lexer(filename, text);
-        std::vector<eris::Token> tokens = lexer.generate_tokens();
-
-        eris::Parser parser(filename, tokens);
-        std::shared_ptr<eris::Node> tree = parser.parse();
-
-        eris::Interpreter interpreter(filename);
-        std::shared_ptr<eris::Value> value = interpreter.visit(tree);
-
-        std::cout << value->str() << '\n';
-    } catch(eris::Exception &e) {
-        std::cerr << e.message << '\n';
+    while (tokenizer.hasMoreTokens())
+    {
+        eris::Token token = tokenizer.getNextToken();
+        std::cout << token.str() << '\n';
     }
-}
+ }
+
 int main(int argc, char **argv)
 {
-    std::string text;
-
-    if (argc > 1)
+    if (argc != 2)
     {
-        std::string filename(argv[1]);
-        run(filename, read_file(filename));
+        std::cout << "Usage: punylisp [script]" << '\n';
     }
     else
     {
+        std::string filename(argv[1]);
+        std::ifstream inFile;
 
-        while (true)
+        inFile.open(filename);
+
+        std::stringstream strStream;
+        strStream << inFile.rdbuf();
+
+        std::string text = strStream.str();
+
+        try
         {
-            std::cout << "> " << std::flush;
-            std::getline(std::cin, text);
-
-            if (std::cin.bad())
-            {
-                std::cerr << "IO error\n";
-                break;
-            }
-            else if (std::cin.eof())
-            {
-                break;
-            }
-
-            run("stdin", text);
+            run(filename, text);
+        }
+        catch (std::string e)
+        {
+            std::cerr << e << '\n';
+            return 1;
         }
     }
+
+    return 0;
 }
