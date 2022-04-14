@@ -1,7 +1,10 @@
 #ifndef TOKENIZER_HPP
 #define TOKENIZER_HPP
 
+#include <utility>
 #include <string>
+#include <vector>
+#include <regex>
 #include <cctype>
 
 #include "token.hpp"
@@ -9,22 +12,65 @@
 
 namespace eris
 {
+    /**
+     * Tokenizer spec.
+     */
+
+    std::vector<std::pair<std::string, std::string> > Spec{
+        // --------------------------------------------
+        // Whitespace:
+
+        {"^\\s+", "SKIP"},
+
+        // --------------------------------------------
+        // Comments:
+
+        // Skip single-line comments:
+        {"^//.*", "SKIP"},
+
+        // Skip multi-line comments:
+        {"^/\\*[\\s\\S]*?\\*/", "SKIP"},
+
+        // --------------------------------------------
+        // Numbers:
+
+        {"^\\d+", "NUMBER"},
+
+        // --------------------------------------------
+        // Strings:
+
+        {"^\"[^\"]*\"", "STRING"}};
+
+    /**
+     * Tokenizer class.
+     *
+     * Lazily pulls a token from the stream.
+     */
     class Tokenizer
     {
     public:
         std::string string;
         int cursor;
+        int line;
 
         Tokenizer() = default;
 
         /**
          * Initializes the string.
          */
-
         void init(const std::string &string)
         {
             this->string = string;
             this->cursor = 0;
+            this->line = 1;
+        }
+
+        /**
+         * Whether the tokenizer reached EOF.
+         */
+        bool isEOF() const
+        {
+            return this->cursor == this->string.size();
         }
 
         /**
@@ -47,43 +93,48 @@ namespace eris
 
             std::string string = this->string.substr(this->cursor);
 
-            // // Whitespace:
-            // if (string[0] == '\n' || isspace(string[0]))
-            // {
-            //     this->cursor++;
-
-
-            //     return getNextToken();
-            // }
-            
-            // Numbers:
-            if (isdigit(string[0]))
+            for (std::size_t i = 0; i < Spec.size(); i++)
             {
-                std::string number;
+                std::regex regex(Spec.at(i).first);
+                std::string tokenType = Spec.at(i).second;
 
-                while(isdigit(string[this->cursor]))
+                std::string lexeme = match(regex, string);
+
+                // Couldn't match this rule, continue.
+                if (lexeme == "")
                 {
-                    number += string[this->cursor++];
+                    continue;
                 }
 
-                // std::cout << string[this->cursor] << '\n';
+                // Should skip token, e.g. whitespace.
+                if (tokenType == "SKIP") 
+                {
+                    return getNextToken();
+                }
 
-                return Token("NUMBER", number);
+                return Token(tokenType, lexeme);
             }
 
-            // String:
-            if (string[0] == '"')
+            throw std::string(std::to_string(line) + ": unexpected token: \"" + string[0] + "\"");
+            return Token();
+        }
+
+        /**
+         * Matches a token for the regular expression.
+         */
+        std::string match(const std::regex &regex, const std::string &string)
+        {
+            std::smatch sm;
+            std::regex_search(string, sm, regex);
+            std::string matched = sm.str();
+
+            if (matched != "")
             {
-                std::string s;
-
-                do {
-                    s += string[this->cursor++];
-                } while(string[this->cursor] != '"' && this->hasMoreTokens());
-
-                s += string[this->cursor++]; // skip "
-
-                return Token("STRING", s);
+                this->cursor += matched.size();
+                this->line += countNewlines(matched);
             }
+
+            return matched;
         }
     };
 }

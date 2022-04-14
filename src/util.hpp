@@ -3,16 +3,17 @@
 
 namespace eris
 {
-    std::string trimSpaces(const std::string &s)
+    int countNewlines(const std::string &s)
     {        
-        int i = 0;
+        int result = 0;
 
-        while(s.substr(i).front() == ' ')
+        for(int i = 0; i < s.length(); i++)
         {
-            i++;
+            if(s[i] == '\n')
+                result++;
         }
 
-        return s.substr(i);
+        return result;
     }
 }
 #endif

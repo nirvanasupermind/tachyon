@@ -11,6 +11,7 @@ namespace eris
         std::string type;
         std::string lexeme;
 
+        Token() = default;
         Token(const std::string &type, const std::string &lexeme) : type(type), lexeme(lexeme) {}
 
         std::string str() const

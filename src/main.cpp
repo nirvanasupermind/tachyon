@@ -4,27 +4,19 @@
 #include <string>
 #include <vector>
 
-#include "token.hpp"
-#include "tokenizer.hpp"
+#include "parser.hpp"
 
 void run(std::string filename, std::string text)
 {
-    eris::Tokenizer tokenizer;
-    
-    tokenizer.init(text);
-
-    while (tokenizer.hasMoreTokens())
-    {
-        eris::Token token = tokenizer.getNextToken();
-        std::cout << token.str() << '\n';
-    }
+    eris::Parser parser;
+    std::cout << parser.parse(text)->str() << '\n';
  }
 
 int main(int argc, char **argv)
 {
     if (argc != 2)
     {
-        std::cout << "Usage: punylisp [script]" << '\n';
+        std::cout << "Usage: eris [script]" << '\n';
     }
     else
     {
@@ -44,7 +36,7 @@ int main(int argc, char **argv)
         }
         catch (std::string e)
         {
-            std::cerr << e << '\n';
+            std::cerr << filename << ":" << e << '\n';
             return 1;
         }
     }
