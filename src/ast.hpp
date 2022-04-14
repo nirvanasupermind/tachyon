@@ -8,15 +8,12 @@
 
 namespace eris
 {
-    /// AST - Base class for all nodes.
-    class AST
-    {
+    class AST {
     public:
         virtual ~AST() {}
         virtual std::string str() = 0;
     };
 
-    /// NumericLiteralAST - Class for numeric literals like '1.0'.
     class NumericLiteralAST : public AST
     {
     public:
@@ -30,7 +27,6 @@ namespace eris
         }
     };
 
-    /// NumericLiteralAST - Class for numeric literals like '1.0'.
     class StringLiteralAST : public AST
     {
     public:
@@ -44,6 +40,47 @@ namespace eris
         }
     };
 
+    class StatementListAST : public AST
+    {
+    public:
+        std::vector<std::shared_ptr<AST> > statementList;
+
+        StatementListAST(const std::vector<std::shared_ptr<AST> > &statementList)
+            : statementList(statementList)
+        {
+        }
+
+        std::string str()
+        {
+            std::string result = "StatementList(";
+            for(std::size_t i = 0; i < statementList.size(); i++) 
+            {
+                result += statementList.at(i)->str() + ",";
+            }
+
+            result.pop_back();
+
+            result += ")";
+
+            return result;
+        }
+    };
+
+    class ExpressionStatementAST : public AST
+    {
+    public:
+        std::shared_ptr<AST> expression;
+
+        ExpressionStatementAST(std::shared_ptr<AST> expression)
+            : expression(expression)
+        {
+        }
+
+        std::string str()
+        {
+            return "ExpressionStatement(" + expression->str() + ")";
+        }
+    };
 }
 
 #endif

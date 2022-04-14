@@ -48,15 +48,73 @@ namespace eris
         /**
          * Main entry point.
          *
-         * Program = Literal;
+         * Program
+         *  :
+         *  StatementList
+         *  ;
          */
         std::shared_ptr<AST> Program()
         {
-            return Literal();
+            return this->StatementList();
         }
 
         /**
-         * Literal = NumericLiteral | StringLiteral;
+         * StatementList
+         *  : Statement
+         *  | StatementList Statement
+         *  ;
+         */
+        std::shared_ptr<AST> StatementList()
+        {
+            std::vector<std::shared_ptr<AST> > statementList { Statement() };
+
+            while (this->lookahead.type != "EOF") 
+            {
+                statementList.push_back(this->Statement());
+            }
+            
+            return std::shared_ptr<StatementListAST>(new StatementListAST(statementList));
+        }
+
+        /**
+         * Statement
+         *  : ExpressionStatement
+         *  ;
+         */
+        std::shared_ptr<AST> Statement() 
+        {
+            return this->ExpressionStatement();
+        }
+
+        /**
+         * ExpressionStatement
+         *  : Expression ';'
+         *  ;
+         */
+        std::shared_ptr<AST> ExpressionStatement() 
+        {
+            std::shared_ptr<AST> expression = this->Expression();
+
+            eat(";");
+
+            return std::shared_ptr<ExpressionStatementAST>(new ExpressionStatementAST(expression));
+        }
+
+        /**
+         * Expression
+         *  : Literal
+         *  ;
+         */
+        std::shared_ptr<AST> Expression() 
+        {
+            return Literal();                
+        }
+
+        /**
+         * Literal 
+         *  : NumericLiteral
+         *  | StringLiteral
+         *  ;
          */
         std::shared_ptr<AST> Literal()
         {
@@ -71,7 +129,10 @@ namespace eris
         }
 
         /**
-         * NumericLiteral = NUMBER;
+         * NumericLiteral
+         *  :
+         *  NUMBER
+         *  ;
          */
         std::shared_ptr<AST> NumericLiteral()
         {
@@ -81,7 +142,10 @@ namespace eris
         }
         
         /**
-         * StringLiteral = STRING;
+         * StringLiteral 
+         *  :
+         *  STRING
+         *  ;
          */
         std::shared_ptr<AST> StringLiteral()
         {
@@ -100,7 +164,7 @@ namespace eris
 
             if (token.type == "EOF")
             {
-                error("unexpected end of input, expected: '" + tokenType + "'");
+                error("unexpected end of input, expected: \"" + tokenType + "\"");
                 return Token();
             }
 

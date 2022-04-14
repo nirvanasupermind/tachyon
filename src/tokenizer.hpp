@@ -32,6 +32,11 @@ namespace eris
         {"^/\\*[\\s\\S]*?\\*/", "SKIP"},
 
         // --------------------------------------------
+        // Symbols, operators:
+
+        {"^;", ";"},
+
+        // --------------------------------------------
         // Numbers:
 
         {"^\\d+", "NUMBER"},
@@ -107,7 +112,7 @@ namespace eris
                 }
 
                 // Should skip token, e.g. whitespace.
-                if (tokenType == "SKIP") 
+                if (tokenType == "SKIP")
                 {
                     return getNextToken();
                 }
@@ -115,7 +120,7 @@ namespace eris
                 return Token(tokenType, lexeme);
             }
 
-            throw std::string(std::to_string(line) + ": unexpected token: \"" + string[0] + "\"");
+            throw std::string(std::to_string(line) + ": unexpected token: \"" + string.at(0) + "\"");
             return Token();
         }
 
