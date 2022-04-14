@@ -17,7 +17,7 @@ class Point {
     }
 }
 
-var p = { :x => 10, :y => 20, :proto => Point };
+let p = new Point(10, 20);
 
 print(p.calc());
 ```

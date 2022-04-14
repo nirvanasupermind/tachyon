@@ -5,11 +5,14 @@
 #include <vector>
 
 #include "parser.hpp"
+#include "interpreter.hpp"
 
 void run(std::string filename, std::string text)
 {
     eris::Parser parser;
-    std::cout << parser.parse(text)->str() << '\n';
+    eris::Interpreter interpreter;
+
+    std::cout << interpreter.eval(parser.parse(text))->str() << '\n';
  }
 
 int main(int argc, char **argv)
@@ -18,6 +21,7 @@ int main(int argc, char **argv)
     {
         std::cout << "Usage: eris [script]" << '\n';
     }
+    
     else
     {
         std::string filename(argv[1]);

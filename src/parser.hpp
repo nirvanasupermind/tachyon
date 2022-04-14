@@ -1,6 +1,7 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+#include "tokens.hpp"
 #include "tokenizer.hpp"
 #include "ast.hpp"
 
@@ -151,7 +152,7 @@ namespace eris
         {
             Token token = eat("STRING");
 
-            return std::shared_ptr<StringLiteralAST>(new StringLiteralAST(token.lexeme));
+            return std::shared_ptr<StringLiteralAST>(new StringLiteralAST(token.lexeme.substr(1, token.lexeme.size() - 2)));
         }
 
         /**
