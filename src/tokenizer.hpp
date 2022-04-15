@@ -124,7 +124,7 @@ namespace eris
                 return Token(tokenType, lexeme);
             }
 
-            throw std::string(std::to_string(line) + ": unexpected token: \"" + string.at(0) + "\"");
+            throw std::string(std::to_string(line) + ": syntax error: unexpected token: \"" + string.at(0) + "\"");
             return Token();
         }
 

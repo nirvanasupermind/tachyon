@@ -27,7 +27,7 @@ namespace eris
 
         void error(const std::string &message) const
         {
-            throw std::string(std::to_string(tokenizer.line) + ": " + message);
+            throw std::string(std::to_string(tokenizer.line) + ": syntax error: " + message);
         }
 
         /**
