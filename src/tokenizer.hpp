@@ -36,9 +36,11 @@ namespace eris
 
         {"^;", ";"},
         {"^[+\\-]", "ADDITIVE_OPERATOR"},
-        {"^[\\*/]", "MULTIPLICATVE_OPERATOR"},
+        {"^[\\*/]", "MULTIPLICATIVE_OPERATOR"},
         {"^\\{", "{"},
         {"^\\}", "}"},
+        {"^\\(", "("},
+        {"^\\)", ")"},
 
         // --------------------------------------------
         // Numbers:

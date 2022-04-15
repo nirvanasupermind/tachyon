@@ -13,6 +13,8 @@ void run(std::string filename, std::string text)
     eris::Parser parser;
     eris::Interpreter interpreter;
 
+    // std::cout << parser.parse(text).at(0)->str() << '\n';
+
     std::cout << interpreter.eval(parser.parse(text), interpreter.global)->str() << '\n';
  }
 
@@ -22,7 +24,6 @@ int main(int argc, char **argv)
     {
         std::cout << "Usage: eris [script]" << '\n';
     }
-    
     else
     {
         std::string filename(argv[1]);

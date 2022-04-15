@@ -20,7 +20,6 @@ namespace eris
         StringLiteral
     };
 
-
     class AST
     {
     public:

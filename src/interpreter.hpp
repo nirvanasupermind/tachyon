@@ -21,6 +21,11 @@ namespace eris
         {
         }
 
+        void error(int line, const std::string &message) const
+        {
+            throw std::string(std::to_string(line) + ": runtime error: "+ message);
+        }
+
         sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
         {
             return eval(exp.get(), env);
@@ -36,6 +41,8 @@ namespace eris
                 return eval(dynamic_cast<BlockStatementAST *>(exp), env);
             case ASTType::ExpressionStatement:
                 return eval(dynamic_cast<ExpressionStatementAST *>(exp), env);
+            case ASTType::BinaryExpression:
+                return eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
             case ASTType::NumericLiteral:
                 return eval(dynamic_cast<NumericLiteralAST *>(exp), env);
             case ASTType::StringLiteral:
@@ -72,6 +79,47 @@ namespace eris
         sh_ptr<Value> eval(ExpressionStatementAST *exp, sh_ptr<Environment> env)
         {
             return eval(exp->expression, env);
+        }
+
+        sh_ptr<Value> eval(BinaryExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(eval(exp->left, env));
+            sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(eval(exp->right, env));
+
+            if(!left) 
+            {
+                error(exp->left->line, "invalid argument #1 for binary operator \""+exp->op+"\"");
+                return sh_ptr<Value>();
+            }
+
+            if(!right) 
+            {
+                error(exp->right->line, "invalid argument #2 for binary operator \""+exp->op+"\"");
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "+")
+            {
+                return sh_ptr<Number>(new Number(left->value + right->value));
+            }
+
+            if (exp->op == "-")
+            {
+                return sh_ptr<Number>(new Number(left->value - right->value));
+            }
+
+            if (exp->op == "*")
+            {
+                return sh_ptr<Number>(new Number(left->value * right->value));
+            }
+
+            if (exp->op == "/")
+            {
+                return sh_ptr<Number>(new Number(left->value / right->value));
+            }
+
+
+            return sh_ptr<Value>();
         }
 
         sh_ptr<Value> eval(NumericLiteralAST *exp, sh_ptr<Environment> env)

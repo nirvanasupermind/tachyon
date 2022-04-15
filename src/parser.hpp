@@ -27,7 +27,7 @@ namespace eris
 
         void error(const std::string &message) const
         {
-            throw std::string(std::to_string(tokenizer.line) + ": syntax error: " + message);
+            throw std::string(std::to_string(tokenizer.line) + ": syntax error: "+ message);
         }
 
         /**
@@ -173,7 +173,7 @@ namespace eris
         {
             int line = this->tokenizer.line;
 
-            sh_ptr<AST> left = PrimaryExpression();
+            sh_ptr<AST> left = this->MultiplicativeExpression();
 
             while(this->lookahead.type == "ADDITIVE_OPERATOR")
             {
@@ -183,23 +183,66 @@ namespace eris
 
                 this->eat("ADDITIVE_OPERATOR");
 
-                sh_ptr<AST> right = PrimaryExpression();
+                sh_ptr<AST> right = this->MultiplicativeExpression();
 
                 left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
             }
 
             return left;
         }
-        
+
+        /**
+         * MultiplicativeExpression
+         *  : Literal
+         *  | MultiplicativeExpression MULTIPLICATIVE_OPERATOR Literal
+         *  ;
+         */
+        sh_ptr<AST> MultiplicativeExpression()
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = this->PrimaryExpression();
+
+            while(this->lookahead.type == "MULTIPLICATIVE_OPERATOR")
+            {
+                // Operator: *, /
+                
+                std::string op = this->lookahead.lexeme;
+
+                this->eat("MULTIPLICATIVE_OPERATOR");
+
+                sh_ptr<AST> right = this->PrimaryExpression();
+
+                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
+            }
+            
+            return left;
+        }
 
         /**
          * PrimaryExpression
          *  : Literal
+         *  | ParenthesizedExpression
          *  ;
          */
         sh_ptr<AST> PrimaryExpression() 
         {
+            if(this->lookahead.type == "(") {
+                return ParenthesizedExpression();
+            }
+
             return Literal();                
+        }
+
+        sh_ptr<AST> ParenthesizedExpression()
+        {
+            eat("(");
+
+            sh_ptr<AST> result = Expression();
+
+            eat(")");
+
+            return result;
         }
 
         /**
