@@ -35,6 +35,8 @@ namespace eris
         // Symbols, operators:
 
         {"^;", ";"},
+        {"^[+\\-]", "ADDITIVE_OPERATOR"},
+        {"^[\\*/]", "MULTIPLICATVE_OPERATOR"},
         {"^\\{", "{"},
         {"^\\}", "}"},
 

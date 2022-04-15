@@ -155,10 +155,49 @@ namespace eris
 
         /**
          * Expression
-         *  : Literal
+         *  : AdditiveExpression
          *  ;
          */
         sh_ptr<AST> Expression() 
+        {
+            return AdditiveExpression();                
+        }
+
+        /**
+         * AdditiveExpression
+         *  : Literal
+         *  | AdditiveExpression ADDITIVE_OPERATOR Literal
+         *  ;
+         */
+        sh_ptr<AST> AdditiveExpression()
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = PrimaryExpression();
+
+            while(this->lookahead.type == "ADDITIVE_OPERATOR")
+            {
+                // Operator: +, -
+                
+                std::string op = this->lookahead.lexeme;
+
+                this->eat("ADDITIVE_OPERATOR");
+
+                sh_ptr<AST> right = PrimaryExpression();
+
+                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
+            }
+
+            return left;
+        }
+        
+
+        /**
+         * PrimaryExpression
+         *  : Literal
+         *  ;
+         */
+        sh_ptr<AST> PrimaryExpression() 
         {
             return Literal();                
         }

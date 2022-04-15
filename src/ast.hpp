@@ -15,6 +15,7 @@ namespace eris
         EmptyStatement,
         BlockStatement,
         ExpressionStatement,
+        BinaryExpression,
         NumericLiteral,
         StringLiteral
     };
@@ -28,7 +29,6 @@ namespace eris
         virtual ASTType type() const = 0;
         virtual std::string str() = 0;
     };
-
 
     class EmptyStatementAST : public AST
     {
@@ -101,6 +101,33 @@ namespace eris
         std::string str()
         {
             return "ExpressionStatement(" + expression->str() + ")";
+        }
+    };
+
+
+    class BinaryExpressionAST : public AST
+    {
+    public:
+        std::string op;
+        std::shared_ptr<AST> left;
+        std::shared_ptr<AST> right;
+
+        BinaryExpressionAST(int line, const std::string &op, std::shared_ptr<AST> left, std::shared_ptr<AST> right)
+        {
+            this->line = line;
+            this->op = op;
+            this->left = left;
+            this->right = right;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::BinaryExpression;
+        }
+
+        std::string str()
+        {
+            return "BinaryExpression("+op+","+left->str()+","+right->str()+")";
         }
     };
 
