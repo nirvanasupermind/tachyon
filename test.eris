@@ -1,2 +1,4 @@
-"Hello";
-42;
+{
+    "Hello world!";
+    42;
+}

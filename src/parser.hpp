@@ -4,6 +4,7 @@
 #include "tokens.hpp"
 #include "tokenizer.hpp"
 #include "ast.hpp"
+#include "aliases.hpp"
 
 namespace eris
 {
@@ -32,7 +33,7 @@ namespace eris
         /**
          * Parses a string.
          */
-        std::shared_ptr<AST> parse(const std::string &string)
+        std::vector<sh_ptr<AST> > parse(const std::string &string)
         {
             this->string = string;
             this->tokenizer.init(string);
@@ -54,7 +55,7 @@ namespace eris
          *  StatementList
          *  ;
          */
-        std::shared_ptr<AST> Program()
+        std::vector<sh_ptr<AST> > Program()
         {
             return this->StatementList();
         }
@@ -65,26 +66,53 @@ namespace eris
          *  | StatementList Statement
          *  ;
          */
-        std::shared_ptr<AST> StatementList()
+        std::vector<sh_ptr<AST> > StatementList(const std::string &stopLookahead = "EOF")
         {
-            std::vector<std::shared_ptr<AST> > statementList { Statement() };
+            std::vector<sh_ptr<AST> > statementList { Statement() };
 
-            while (this->lookahead.type != "EOF") 
+            while (this->lookahead.type != stopLookahead) 
             {
                 statementList.push_back(this->Statement());
             }
             
-            return std::shared_ptr<StatementListAST>(new StatementListAST(statementList));
+            return statementList;
         }
 
         /**
          * Statement
          *  : ExpressionStatement
+         *  | BlockStatement
          *  ;
          */
-        std::shared_ptr<AST> Statement() 
+        sh_ptr<AST> Statement() 
         {
+            if (this->lookahead.type == "{") 
+            {
+                return BlockStatement();
+            }
+
             return this->ExpressionStatement();
+        }
+        
+        /**
+         * BlockStatement
+         *  : '{' OptStatementList '}' 
+         *  ;
+         */
+        
+        sh_ptr<AST> BlockStatement() 
+        {
+            this->eat("{");
+
+            // OptStatementList
+            std::vector<sh_ptr<AST> > body; 
+
+            if(this->lookahead.type != "}")
+                body = this->StatementList("}");
+
+            this->eat("}");
+            
+            return sh_ptr<AST>(new BlockStatementAST(body));
         }
 
         /**
@@ -92,13 +120,13 @@ namespace eris
          *  : Expression ';'
          *  ;
          */
-        std::shared_ptr<AST> ExpressionStatement() 
+        sh_ptr<AST> ExpressionStatement() 
         {
-            std::shared_ptr<AST> expression = this->Expression();
+            sh_ptr<AST> expression = this->Expression();
 
             eat(";");
 
-            return std::shared_ptr<ExpressionStatementAST>(new ExpressionStatementAST(expression));
+            return sh_ptr<ExpressionStatementAST>(new ExpressionStatementAST(expression));
         }
 
         /**
@@ -106,7 +134,7 @@ namespace eris
          *  : Literal
          *  ;
          */
-        std::shared_ptr<AST> Expression() 
+        sh_ptr<AST> Expression() 
         {
             return Literal();                
         }
@@ -117,7 +145,7 @@ namespace eris
          *  | StringLiteral
          *  ;
          */
-        std::shared_ptr<AST> Literal()
+        sh_ptr<AST> Literal()
         {
             if (lookahead.type == "NUMBER")
                 return NumericLiteral();
@@ -126,7 +154,7 @@ namespace eris
                 return StringLiteral();
 
             error("unexpected literal production");
-            return std::shared_ptr<AST>();
+            return sh_ptr<AST>();
         }
 
         /**
@@ -135,11 +163,11 @@ namespace eris
          *  NUMBER
          *  ;
          */
-        std::shared_ptr<AST> NumericLiteral()
+        sh_ptr<AST> NumericLiteral()
         {
             Token token = eat("NUMBER");
 
-            return std::shared_ptr<NumericLiteralAST>(new NumericLiteralAST(std::stod(token.lexeme)));
+            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(std::stod(token.lexeme)));
         }
         
         /**
@@ -148,11 +176,11 @@ namespace eris
          *  STRING
          *  ;
          */
-        std::shared_ptr<AST> StringLiteral()
+        sh_ptr<AST> StringLiteral()
         {
             Token token = eat("STRING");
 
-            return std::shared_ptr<StringLiteralAST>(new StringLiteralAST(token.lexeme.substr(1, token.lexeme.size() - 2)));
+            return sh_ptr<StringLiteralAST>(new StringLiteralAST(token.lexeme.substr(1, token.lexeme.size() - 2)));
         }
 
         /**

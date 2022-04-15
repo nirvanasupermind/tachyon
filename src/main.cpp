@@ -6,13 +6,14 @@
 
 #include "parser.hpp"
 #include "interpreter.hpp"
+#include "aliases.hpp"
 
 void run(std::string filename, std::string text)
 {
     eris::Parser parser;
     eris::Interpreter interpreter;
 
-    std::cout << interpreter.eval(parser.parse(text))->str() << '\n';
+    std::cout << interpreter.eval(parser.parse(text), interpreter.global)->str() << '\n';
  }
 
 int main(int argc, char **argv)

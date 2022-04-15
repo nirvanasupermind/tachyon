@@ -3,6 +3,8 @@
 
 #include "ast.hpp"
 #include "values.hpp"
+#include "environment.hpp"
+#include "aliases.hpp"
 
 namespace eris
 {
@@ -12,52 +14,67 @@ namespace eris
     class Interpreter
     {
     public:
-        std::shared_ptr<Value> eval(std::shared_ptr<AST> exp)
+        sh_ptr<Environment> global;
+
+        Interpreter(sh_ptr<Environment> global = sh_ptr<Environment>())
+            : global(global)
         {
-            return eval(exp.get());
         }
 
-        std::shared_ptr<Value> eval(AST *exp)
+        sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
+        {
+            return eval(exp.get(), env);
+        }
+
+        sh_ptr<Value> eval(AST *exp, sh_ptr<Environment> env)
         {
             switch (exp->type())
             {
-            case ASTType::StatementList:
-                return eval(dynamic_cast<StatementListAST *>(exp));
+            case ASTType::BlockStatement:
+                return eval(dynamic_cast<BlockStatementAST *>(exp), env);
             case ASTType::ExpressionStatement:
-                return eval(dynamic_cast<ExpressionStatementAST *>(exp));
+                return eval(dynamic_cast<ExpressionStatementAST *>(exp), env);
             case ASTType::NumericLiteral:
-                return eval(dynamic_cast<NumericLiteralAST *>(exp));
+                return eval(dynamic_cast<NumericLiteralAST *>(exp), env);
             case ASTType::StringLiteral:
-                return eval(dynamic_cast<StringLiteralAST *>(exp));
+                return eval(dynamic_cast<StringLiteralAST *>(exp), env);
             default:
                 throw std::string("Unimplemented");
-                return std::shared_ptr<Value>();
+                return sh_ptr<Value>();
             }
         }
 
-        std::shared_ptr<Value> eval(StatementListAST *exp)
+        sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env)
         {
-            for (std::size_t i = 0; i < exp->statementList.size() - 1; i++)
+            for (std::size_t i = 0; i < statementList.size(); i++)
             {
-                eval(exp->statementList.at(i));
+                eval(statementList.at(i), env);
             }
 
-            return eval(exp->statementList.back());
+            return eval(statementList.back(), env);
         }
 
-        std::shared_ptr<Value> eval(ExpressionStatementAST *exp)
+        sh_ptr<Value> eval(BlockStatementAST *exp, sh_ptr<Environment> env)
         {
-            return eval(exp->expression);
+            sh_ptr<Environment> child_env(new Environment());
+            child_env->parent = env;
+
+            return eval(exp->body, child_env);
         }
 
-        std::shared_ptr<Value> eval(NumericLiteralAST *exp)
+        sh_ptr<Value> eval(ExpressionStatementAST *exp, sh_ptr<Environment> env)
         {
-            return std::shared_ptr<Number>(new Number(exp->value));
+            return eval(exp->expression, env);
         }
 
-        std::shared_ptr<Value> eval(StringLiteralAST *exp)
+        sh_ptr<Value> eval(NumericLiteralAST *exp, sh_ptr<Environment> env)
         {
-            return std::shared_ptr<String>(new String(exp->string));
+            return sh_ptr<Number>(new Number(exp->value));
+        }
+
+        sh_ptr<Value> eval(StringLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<String>(new String(exp->string));
         }
     };
 }

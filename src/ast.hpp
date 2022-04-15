@@ -6,19 +6,22 @@
 #include <string>
 #include <vector>
 
+#include "aliases.hpp"
+
 namespace eris
-{
+{   
     enum class ASTType
     {
         NumericLiteral,
         StringLiteral,
-        StatementList,
+        BlockStatement,
         ExpressionStatement,
     };
 
     class AST
     {
     public:
+        int line;
         virtual ~AST() = default;
         virtual ASTType type() const = 0;
         virtual std::string str() = 0;
@@ -60,27 +63,27 @@ namespace eris
         }
     };
 
-    class StatementListAST : public AST
+    class BlockStatementAST : public AST
     {
     public:
-        std::vector<std::shared_ptr<AST> > statementList;
+        std::vector<sh_ptr<AST> > body;
 
-        StatementListAST(const std::vector<std::shared_ptr<AST> > &statementList)
-            : statementList(statementList)
+        BlockStatementAST(const std::vector<sh_ptr<AST> > &body)
+            : body(body)
         {
         }
 
         ASTType type() const
         {
-            return ASTType::StatementList;
+            return ASTType::BlockStatement;
         }
 
         std::string str()
         {
-            std::string result = "StatementList(";
-            for (std::size_t i = 0; i < statementList.size(); i++)
+            std::string result = "BlockStatement(";
+            for (std::size_t i = 0; i < body.size(); i++)
             {
-                result += statementList.at(i)->str() + ",";
+                result += body.at(i)->str() + ",";
             }
 
             result.pop_back();
@@ -94,9 +97,9 @@ namespace eris
     class ExpressionStatementAST : public AST
     {
     public:
-        std::shared_ptr<AST> expression;
+        sh_ptr<AST> expression;
 
-        ExpressionStatementAST(std::shared_ptr<AST> expression)
+        ExpressionStatementAST(sh_ptr<AST> expression)
             : expression(expression)
         {
         }
