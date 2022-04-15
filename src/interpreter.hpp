@@ -30,6 +30,8 @@ namespace eris
         {
             switch (exp->type())
             {
+            case ASTType::EmptyStatement:
+                return sh_ptr<None>(new None());
             case ASTType::BlockStatement:
                 return eval(dynamic_cast<BlockStatementAST *>(exp), env);
             case ASTType::ExpressionStatement:
@@ -46,6 +48,11 @@ namespace eris
 
         sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env)
         {
+            if(statementList.size() == 0) 
+            {
+                return sh_ptr<None>(new None());
+            }
+
             for (std::size_t i = 0; i < statementList.size(); i++)
             {
                 eval(statementList.at(i), env);

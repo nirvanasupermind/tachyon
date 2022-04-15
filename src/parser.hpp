@@ -86,6 +86,11 @@ namespace eris
          */
         sh_ptr<AST> Statement() 
         {
+            if (this->lookahead.type == ";") 
+            {
+                return EmptyStatement();
+            }
+
             if (this->lookahead.type == "{") 
             {
                 return BlockStatement();
@@ -93,7 +98,22 @@ namespace eris
 
             return this->ExpressionStatement();
         }
+
+        /**
+         * EmptyStatement
+         *  : ';'
+         *  ;
+         */
         
+        sh_ptr<AST> EmptyStatement() 
+        {
+            int line = this->tokenizer.line;
+
+            this->eat(";");
+            
+            return sh_ptr<AST>(new EmptyStatementAST(line));
+        }
+
         /**
          * BlockStatement
          *  : '{' OptStatementList '}' 
@@ -102,6 +122,8 @@ namespace eris
         
         sh_ptr<AST> BlockStatement() 
         {
+            int line = this->tokenizer.line;
+
             this->eat("{");
 
             // OptStatementList
@@ -112,7 +134,7 @@ namespace eris
 
             this->eat("}");
             
-            return sh_ptr<AST>(new BlockStatementAST(body));
+            return sh_ptr<BlockStatementAST>(new BlockStatementAST(line, body));
         }
 
         /**
@@ -122,11 +144,13 @@ namespace eris
          */
         sh_ptr<AST> ExpressionStatement() 
         {
+            int line = this->tokenizer.line;
+
             sh_ptr<AST> expression = this->Expression();
 
-            eat(";");
+            this->eat(";");
 
-            return sh_ptr<ExpressionStatementAST>(new ExpressionStatementAST(expression));
+            return sh_ptr<ExpressionStatementAST>(new ExpressionStatementAST(line, expression));
         }
 
         /**
@@ -165,9 +189,11 @@ namespace eris
          */
         sh_ptr<AST> NumericLiteral()
         {
-            Token token = eat("NUMBER");
+            int line = this->tokenizer.line;
 
-            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(std::stod(token.lexeme)));
+            Token token = this->eat("NUMBER");
+
+            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.lexeme)));
         }
         
         /**
@@ -178,9 +204,11 @@ namespace eris
          */
         sh_ptr<AST> StringLiteral()
         {
-            Token token = eat("STRING");
+            int line = this->tokenizer.line;
 
-            return sh_ptr<StringLiteralAST>(new StringLiteralAST(token.lexeme.substr(1, token.lexeme.size() - 2)));
+            Token token = this->eat("STRING");
+
+            return sh_ptr<StringLiteralAST>(new StringLiteralAST(line, token.lexeme.substr(1, token.lexeme.size() - 2)));
         }
 
         /**
@@ -190,12 +218,6 @@ namespace eris
         Token eat(const std::string &tokenType)
         {
             Token token = this->lookahead;
-
-            if (token.type == "EOF")
-            {
-                error("unexpected end of input, expected: \"" + tokenType + "\"");
-                return Token();
-            }
 
             if (token.type == "EOF")
             {

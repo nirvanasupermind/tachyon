@@ -10,6 +10,15 @@ namespace eris
         virtual std::string str() const = 0;
     };
 
+    class None: public Value
+    {
+    public:
+        std::string str() const 
+        {
+            return "none";
+        }
+    };
+
     class Number : public Value
     {
     public:
