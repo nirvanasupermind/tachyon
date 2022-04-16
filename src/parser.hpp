@@ -212,7 +212,7 @@ namespace eris
          */
         sh_ptr<AST> MultiplicativeExpression()
         {
-            return this->BinaryExpression(&Parser::PrimaryExpression, "ADDITIVE_OPERATOR");
+            return this->BinaryExpression(&Parser::PrimaryExpression, "MULTIPLICATIVE_OPERATOR");
         }
 
         /**
