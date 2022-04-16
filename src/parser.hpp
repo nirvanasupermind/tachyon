@@ -1,6 +1,11 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+// #include <functional>
+#include <string>
+#include <memory>
+#include <vector>
+
 #include "tokens.hpp"
 #include "tokenizer.hpp"
 #include "ast.hpp"
@@ -19,6 +24,31 @@ namespace eris
         Tokenizer tokenizer;
         Token lookahead;
 
+        /**
+         * Generic binary expression.
+         */
+        sh_ptr<AST> BinaryExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = (this->*builder)();
+
+            while (this->lookahead.type == operatorToken)
+            {
+                // Operator: *, /
+
+                std::string op = this->lookahead.lexeme;
+
+                this->eat(operatorToken);
+
+                sh_ptr<AST> right = (this->*builder)();
+
+                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
+            }
+
+            return left;
+        }
+
     public:
         /**
          * Initializes the parser.
@@ -27,7 +57,7 @@ namespace eris
 
         void error(const std::string &message) const
         {
-            throw std::string(std::to_string(tokenizer.line) + ": syntax error: "+ message);
+            throw std::string(std::to_string(this->tokenizer.line) + ": syntax error: " + message);
         }
 
         /**
@@ -68,13 +98,13 @@ namespace eris
          */
         std::vector<sh_ptr<AST> > StatementList(const std::string &stopLookahead = "EOF")
         {
-            std::vector<sh_ptr<AST> > statementList { Statement() };
+            std::vector<sh_ptr<AST> > statementList{this->Statement()};
 
-            while (this->lookahead.type != stopLookahead) 
+            while (this->lookahead.type != stopLookahead)
             {
                 statementList.push_back(this->Statement());
             }
-            
+
             return statementList;
         }
 
@@ -84,16 +114,16 @@ namespace eris
          *  | BlockStatement
          *  ;
          */
-        sh_ptr<AST> Statement() 
+        sh_ptr<AST> Statement()
         {
-            if (this->lookahead.type == ";") 
+            if (this->lookahead.type == ";")
             {
-                return EmptyStatement();
+                return this->EmptyStatement();
             }
 
-            if (this->lookahead.type == "{") 
+            if (this->lookahead.type == "{")
             {
-                return BlockStatement();
+                return this->BlockStatement();
             }
 
             return this->ExpressionStatement();
@@ -104,36 +134,36 @@ namespace eris
          *  : ';'
          *  ;
          */
-        
-        sh_ptr<AST> EmptyStatement() 
+
+        sh_ptr<AST> EmptyStatement()
         {
             int line = this->tokenizer.line;
 
             this->eat(";");
-            
+
             return sh_ptr<AST>(new EmptyStatementAST(line));
         }
 
         /**
          * BlockStatement
-         *  : '{' OptStatementList '}' 
+         *  : '{' OptStatementList '}'
          *  ;
          */
-        
-        sh_ptr<AST> BlockStatement() 
+
+        sh_ptr<AST> BlockStatement()
         {
             int line = this->tokenizer.line;
 
             this->eat("{");
 
             // OptStatementList
-            std::vector<sh_ptr<AST> > body; 
+            std::vector<sh_ptr<AST> > body;
 
-            if(this->lookahead.type != "}")
+            if (this->lookahead.type != "}")
                 body = this->StatementList("}");
 
             this->eat("}");
-            
+
             return sh_ptr<BlockStatementAST>(new BlockStatementAST(line, body));
         }
 
@@ -142,7 +172,7 @@ namespace eris
          *  : Expression ';'
          *  ;
          */
-        sh_ptr<AST> ExpressionStatement() 
+        sh_ptr<AST> ExpressionStatement()
         {
             int line = this->tokenizer.line;
 
@@ -158,9 +188,9 @@ namespace eris
          *  : AdditiveExpression
          *  ;
          */
-        sh_ptr<AST> Expression() 
+        sh_ptr<AST> Expression()
         {
-            return AdditiveExpression();                
+            return AdditiveExpression();
         }
 
         /**
@@ -171,24 +201,7 @@ namespace eris
          */
         sh_ptr<AST> AdditiveExpression()
         {
-            int line = this->tokenizer.line;
-
-            sh_ptr<AST> left = this->MultiplicativeExpression();
-
-            while(this->lookahead.type == "ADDITIVE_OPERATOR")
-            {
-                // Operator: +, -
-                
-                std::string op = this->lookahead.lexeme;
-
-                this->eat("ADDITIVE_OPERATOR");
-
-                sh_ptr<AST> right = this->MultiplicativeExpression();
-
-                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
-            }
-
-            return left;
+            return this->BinaryExpression(&Parser::MultiplicativeExpression, "ADDITIVE_OPERATOR");
         }
 
         /**
@@ -199,24 +212,7 @@ namespace eris
          */
         sh_ptr<AST> MultiplicativeExpression()
         {
-            int line = this->tokenizer.line;
-
-            sh_ptr<AST> left = this->PrimaryExpression();
-
-            while(this->lookahead.type == "MULTIPLICATIVE_OPERATOR")
-            {
-                // Operator: *, /
-                
-                std::string op = this->lookahead.lexeme;
-
-                this->eat("MULTIPLICATIVE_OPERATOR");
-
-                sh_ptr<AST> right = this->PrimaryExpression();
-
-                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
-            }
-            
-            return left;
+            return this->BinaryExpression(&Parser::PrimaryExpression, "ADDITIVE_OPERATOR");
         }
 
         /**
@@ -225,28 +221,29 @@ namespace eris
          *  | ParenthesizedExpression
          *  ;
          */
-        sh_ptr<AST> PrimaryExpression() 
+        sh_ptr<AST> PrimaryExpression()
         {
-            if(this->lookahead.type == "(") {
-                return ParenthesizedExpression();
+            if (this->lookahead.type == "(")
+            {
+                return this->ParenthesizedExpression();
             }
 
-            return Literal();                
+            return this->Literal();
         }
 
         sh_ptr<AST> ParenthesizedExpression()
         {
             eat("(");
 
-            sh_ptr<AST> result = Expression();
+            sh_ptr<AST> expression = this->Expression();
 
             eat(")");
 
-            return result;
+            return expression;
         }
 
         /**
-         * Literal 
+         * Literal
          *  : NumericLiteral
          *  | StringLiteral
          *  ;
@@ -254,10 +251,10 @@ namespace eris
         sh_ptr<AST> Literal()
         {
             if (lookahead.type == "NUMBER")
-                return NumericLiteral();
-            
+                return this->NumericLiteral();
+
             if (lookahead.type == "STRING")
-                return StringLiteral();
+                return this->StringLiteral();
 
             error("unexpected literal production");
             return sh_ptr<AST>();
@@ -277,9 +274,9 @@ namespace eris
 
             return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.lexeme)));
         }
-        
+
         /**
-         * StringLiteral 
+         * StringLiteral
          *  :
          *  STRING
          *  ;

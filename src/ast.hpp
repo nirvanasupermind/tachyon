@@ -103,7 +103,6 @@ namespace eris
         }
     };
 
-
     class BinaryExpressionAST : public AST
     {
     public:
