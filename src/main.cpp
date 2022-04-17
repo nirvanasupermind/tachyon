@@ -8,21 +8,44 @@
 #include "interpreter.hpp"
 #include "aliases.hpp"
 
-void run(std::string filename, std::string text)
+void run(const std::string &text)
 {
     eris::Parser parser;
     eris::Interpreter interpreter;
 
-    // std::cout << parser.parse(text).at(0)->str() << '\n';
-
     std::cout << interpreter.eval(parser.parse(text), interpreter.global)->str() << '\n';
- }
+}
 
 int main(int argc, char **argv)
 {
-    if (argc != 2)
+    if (argc < 2)
     {
-        std::cout << "Usage: eris [script]" << '\n';
+        std::string text;
+
+        while (true)
+        {
+            try
+            {
+                std::cout << "> " << std::flush;
+                std::getline(std::cin, text);
+
+                if (std::cin.bad())
+                {
+                    std::cerr << "IO error\n";
+                    break;
+                }
+                else if (std::cin.eof())
+                {
+                    break;
+                }
+
+                run(text);
+            }
+            catch (const std::string &e)
+            {
+                std::cerr << "stdin:" << e << '\n';
+            }
+        }
     }
     else
     {
@@ -38,7 +61,7 @@ int main(int argc, char **argv)
 
         try
         {
-            run(filename, text);
+            run(text);
         }
         catch (std::string e)
         {
