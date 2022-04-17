@@ -15,6 +15,8 @@ namespace eris
         EmptyStatement,
         BlockStatement,
         ExpressionStatement,
+        AssignmentExpression,
+        Identifier,
         BinaryExpression,
         NumericLiteral,
         StringLiteral
@@ -103,6 +105,53 @@ namespace eris
         }
     };
 
+    class AssignmentExpressionAST : public AST
+    {
+    public:
+        std::string op;
+        std::shared_ptr<AST> left;
+        std::shared_ptr<AST> right;
+
+        AssignmentExpressionAST(int line, const std::string &op, std::shared_ptr<AST> left, std::shared_ptr<AST> right)
+            : op(op), left(left), right(right)
+        {
+            this->line = line;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::AssignmentExpression;
+        }
+
+        std::string str()
+        {
+            return "BinaryExpression("+op+","+left->str()+","+right->str()+")";
+        }
+    };
+
+    class IdentifierAST : public AST
+    {
+    public:
+        std::string name;
+
+        IdentifierAST(int line, const std::string &name)
+            : name(name)
+        {
+            this->line = line;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::Identifier;
+        }
+
+        std::string str()
+        {
+            return "Identifier("+name+")";
+        }
+    };
+
+
     class BinaryExpressionAST : public AST
     {
     public:
@@ -111,11 +160,9 @@ namespace eris
         std::shared_ptr<AST> right;
 
         BinaryExpressionAST(int line, const std::string &op, std::shared_ptr<AST> left, std::shared_ptr<AST> right)
+            : op(op), left(left), right(right)
         {
             this->line = line;
-            this->op = op;
-            this->left = left;
-            this->right = right;
         }
 
         ASTType type() const

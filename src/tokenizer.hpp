@@ -19,12 +19,11 @@ namespace eris
     std::vector<std::pair<std::string, std::string> > Spec{
         // --------------------------------------------
         // Whitespace:
-
         {"^\\s+", "SKIP"},
 
         // --------------------------------------------
         // Comments:
-
+        
         // Skip single-line comments:
         {"^//.*", "SKIP"},
 
@@ -32,11 +31,9 @@ namespace eris
         {"^/\\*[\\s\\S]*?\\*/", "SKIP"},
 
         // --------------------------------------------
-        // Symbols, operators:
+        // Symbols, delimiters:
 
         {"^;", ";"},
-        {"^[+\\-]", "ADDITIVE_OPERATOR"},
-        {"^[\\*/]", "MULTIPLICATIVE_OPERATOR"},
         {"^\\{", "{"},
         {"^\\}", "}"},
         {"^\\(", "("},
@@ -46,6 +43,23 @@ namespace eris
         // Numbers:
 
         {"^\\d+", "NUMBER"},
+
+        // --------------------------------------------
+        // Identifiers:
+
+        {"^\\w+", "IDENTIFIER"},
+
+        // --------------------------------------------
+        // Assignment operators: =, *=, /=, +=, -=
+        
+        {"^=", "SIMPLE_ASSIGN"},
+        {"^[\\*/\\+\\-]=", "COMPLEX_ASSIGN"},
+
+        // --------------------------------------------
+        // Math operators: +, -, *, /
+
+        {"^[+\\-]", "ADDITIVE_OPERATOR"},
+        {"^[\\*/]", "MULTIPLICATIVE_OPERATOR"},
 
         // --------------------------------------------
         // Strings:
@@ -109,10 +123,10 @@ namespace eris
                 std::regex regex(Spec.at(i).first);
                 std::string tokenType = Spec.at(i).second;
 
-                std::string lexeme = match(regex, string);
+                std::string value = match(regex, string);
 
                 // Couldn't match this rule, continue.
-                if (lexeme == "")
+                if (value == "")
                 {
                     continue;
                 }
@@ -123,7 +137,7 @@ namespace eris
                     return getNextToken();
                 }
 
-                return Token(tokenType, lexeme);
+                return Token(tokenType, value);
             }
 
             throw std::string(std::to_string(line) + ": syntax error: unexpected token: \"" + string.at(0) + "\"");

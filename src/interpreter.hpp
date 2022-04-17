@@ -48,7 +48,7 @@ namespace eris
             case ASTType::StringLiteral:
                 return eval(dynamic_cast<StringLiteralAST *>(exp), env);
             default:
-                throw std::string("Unimplemented");
+                error(exp->line, "unimplemented");
                 return sh_ptr<Value>();
             }
         }

@@ -37,7 +37,7 @@ namespace eris
             {
                 // Operator: *, /
 
-                std::string op = this->lookahead.lexeme;
+                std::string op = this->lookahead.value;
 
                 this->eat(operatorToken);
 
@@ -47,6 +47,33 @@ namespace eris
             }
 
             return left;
+        }
+
+        sh_ptr<AST> checkValidAssignmentTarget(sh_ptr<AST> node)
+        {
+            if (node->type() == ASTType::Identifier)
+            {
+                return node;
+            }
+
+            error("invalid left-hand side in assignment expression");
+            return sh_ptr<AST>();
+        }
+
+        /**
+         * Whether the token type is an assignment operator.
+         */
+        bool isAssignmentOperator(const std::string &tokenType)
+        {
+            return tokenType == "SIMPLE_ASSIGN" || tokenType == "COMPLEX_ASSIGN";
+        }
+
+        /**
+         * Whether the token is a literal.
+         */
+        bool isLiteral(const std::string &tokenType)
+        {
+            return tokenType == "NUMBER" || tokenType == "STRING";
         }
 
     public:
@@ -185,12 +212,76 @@ namespace eris
 
         /**
          * Expression
-         *  : AdditiveExpression
+         *  : AssignmentExpression
          *  ;
          */
         sh_ptr<AST> Expression()
         {
-            return AdditiveExpression();
+            return this->AssignmentExpression();
+        }
+
+        /**
+         * Expression
+         *  : AssignmentExpression
+         *  ;
+         */
+        sh_ptr<AST> AssignmentExpression()
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = this->AdditiveExpression();
+
+            if(!this->isAssignmentOperator(this->lookahead.type))
+            {
+                return left;
+            }
+
+            return sh_ptr<AssignmentExpressionAST>(new AssignmentExpressionAST(
+                line,
+                this->AssignmentOperator().value,
+                this->checkValidAssignmentTarget(left),
+                AssignmentExpression()
+            ));
+        }
+
+        /**
+         * AssignmentOperator
+         *  : SIMPLE_ASSIGN
+         *  | COMPLEX_ASSIGN
+         *  ;
+         */
+        Token AssignmentOperator() 
+        {
+            if (this->lookahead.type == "SIMPLE_ASSIGN")
+            {
+                return this->eat("SIMPLE_ASSIGN");
+            }
+
+            return this->eat("COMPLEX_ASSIGN");
+        }
+
+        /**
+         * LeftHandSideExpression
+         *  : Identifier    
+         *  ;
+         */
+        sh_ptr<AST> LeftHandSideExpression()
+        {
+            return Identifier();
+        }
+
+        /**
+         * Identifier
+         *  : IDENTIFIER    
+         *  ;
+         */
+        sh_ptr<AST> Identifier()
+        {
+            int line = this->tokenizer.line;
+
+            std::string name = this->eat("IDENTIFIER").value;
+
+            return sh_ptr<IdentifierAST>(new IdentifierAST(line, name));
         }
 
         /**
@@ -219,16 +310,22 @@ namespace eris
          * PrimaryExpression
          *  : Literal
          *  | ParenthesizedExpression
+         *  | LeftHandSideExpression
          *  ;
          */
         sh_ptr<AST> PrimaryExpression()
         {
+            if (this->isLiteral(this->lookahead.type)) 
+            {
+                return this->Literal();
+            }
+
             if (this->lookahead.type == "(")
             {
                 return this->ParenthesizedExpression();
             }
 
-            return this->Literal();
+            return this->LeftHandSideExpression();
         }
 
         sh_ptr<AST> ParenthesizedExpression()
@@ -272,7 +369,7 @@ namespace eris
 
             Token token = this->eat("NUMBER");
 
-            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.lexeme)));
+            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.value)));
         }
 
         /**
@@ -287,7 +384,7 @@ namespace eris
 
             Token token = this->eat("STRING");
 
-            return sh_ptr<StringLiteralAST>(new StringLiteralAST(line, token.lexeme.substr(1, token.lexeme.size() - 2)));
+            return sh_ptr<StringLiteralAST>(new StringLiteralAST(line, token.value.substr(1, token.value.size() - 2)));
         }
 
         /**
@@ -306,7 +403,7 @@ namespace eris
 
             if (token.type != tokenType)
             {
-                error("unexpected token: \"" + token.lexeme + "\", expected: " + tokenType);
+                error("unexpected token: \"" + token.value + "\", expected: " + tokenType);
                 return Token();
             }
 

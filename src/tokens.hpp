@@ -9,14 +9,14 @@ namespace eris
     {
     public:
         std::string type;
-        std::string lexeme;
+        std::string value;
 
         Token() = default;
-        Token(const std::string &type, const std::string &lexeme) : type(type), lexeme(lexeme) {}
+        Token(const std::string &type, const std::string &value) : type(type), value(value) {}
 
         std::string str() const
         {
-            return "[" + this->type + ":" + this->lexeme + "]";
+            return "[" + this->type + ":" + this->value + "]";
         }
     };
 }

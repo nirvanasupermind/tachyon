@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "*.pluto": "coffeescript",
-        "*.punylisp": "lisp",
-        "memory": "cpp",
-        "vector": "cpp"
-    }
-}
