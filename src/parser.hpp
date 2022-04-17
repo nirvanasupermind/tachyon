@@ -397,7 +397,7 @@ namespace eris
 
             if (token.type == "EOF")
             {
-                error("unexpected end of input, expected: \"" + tokenType + "\"");
+                error("unexpected end of input, expected: " + tokenType);
                 return Token();
             }
 

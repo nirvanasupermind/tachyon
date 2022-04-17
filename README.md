@@ -19,5 +19,5 @@ class Point {
 
 let p = new Point(10, 20);
 
-print(p.calc());
+print(p.calc()); // 30
 ```
