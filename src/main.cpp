@@ -20,7 +20,7 @@ void run(const std::string &filename, const std::string &text)
     }
     catch (const std::string &e)
     {
-        std::cerr << filename << ":" << e;
+        std::cerr << filename << ":" << e << '\n';
 
         std::exit(1); 
     }
@@ -62,15 +62,7 @@ int main(int argc, char **argv)
 
         std::string text = strStream.str();
 
-        try
-        {
-            run(filename, text);
-        }
-        catch (std::string e)
-        {
-            std::cerr << filename << ":" << e << '\n';
-            return 1;
-        }
+        run(filename, text);
     }
 
     return 0;
