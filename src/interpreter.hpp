@@ -3,7 +3,6 @@
 
 #include "ast.hpp"
 #include "values.hpp"
-// #include "environment.hpp"
 #include "aliases.hpp"
 
 namespace eris
@@ -23,7 +22,7 @@ namespace eris
 
         void error(int line, const std::string &message) const
         {
-            throw std::string(std::to_string(line) + ": runtime error: "+ message);
+            throw std::string(std::to_string(line) + ": runtime error: " + message);
         }
 
         sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
@@ -35,8 +34,8 @@ namespace eris
         {
             switch (exp->type())
             {
-            // --------------------------------------------
-            // Statements:
+                // --------------------------------------------
+                // Statements:
 
             case ASTType::EmptyStatement:
                 return sh_ptr<None>(new None());
@@ -47,24 +46,26 @@ namespace eris
             case ASTType::ExpressionStatement:
                 return eval(dynamic_cast<ExpressionStatementAST *>(exp), env);
 
-            // --------------------------------------------
-            // Expressions:
+                // --------------------------------------------
+                // Expressions:
 
+            case ASTType::AssignmentExpression:
+                return eval(dynamic_cast<AssignmentExpressionAST *>(exp), env);
             case ASTType::Identifier:
                 return eval(dynamic_cast<IdentifierAST *>(exp), env);
             case ASTType::BinaryExpression:
                 return eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
 
-            // --------------------------------------------
-            // Literals:
+                // --------------------------------------------
+                // Literals:
 
             case ASTType::NumericLiteral:
                 return eval(dynamic_cast<NumericLiteralAST *>(exp), env);
             case ASTType::StringLiteral:
                 return eval(dynamic_cast<StringLiteralAST *>(exp), env);
 
-            // --------------------------------------------
-            // Unimplemented:
+                // --------------------------------------------
+                // Unimplemented:
 
             default:
                 error(exp->line, "unimplemented: " + exp->str());
@@ -74,7 +75,7 @@ namespace eris
 
         sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env)
         {
-            if(statementList.size() == 0) 
+            if (statementList.size() == 0)
             {
                 return sh_ptr<None>(new None());
             }
@@ -93,7 +94,7 @@ namespace eris
 
             env->define(exp->name, this->eval(exp->value, env));
 
-            return value;
+            return sh_ptr<Value>();
         }
 
         sh_ptr<Value> eval(BlockStatementAST *exp, sh_ptr<Environment> env)
@@ -109,17 +110,91 @@ namespace eris
             return eval(exp->expression, env);
         }
 
+        sh_ptr<Value> eval(AssignmentExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            std::string name = std::dynamic_pointer_cast<IdentifierAST>(exp->left)->name;
+            sh_ptr<Number> value = std::dynamic_pointer_cast<Number>(eval(exp->right, env));
+
+            if (exp->op == "=")
+            {
+                env->assign(name, value);
+
+                return sh_ptr<Value>();
+            }
+
+            sh_ptr<Number> currentValue;
+
+            try
+            {
+                currentValue = std::dynamic_pointer_cast<Number>(env->lookup(name));
+            }
+            catch (const std::string &e)
+            {
+                // Error messages thrown from outside of interpreter don't have a line number
+                // so insert one here
+
+                error(exp->line, e);
+                return sh_ptr<Value>();
+            }
+
+            if (!currentValue)
+            {
+                error(exp->right->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
+                return sh_ptr<Value>();
+            }
+
+            if (!value)
+            {
+                error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
+                return sh_ptr<Value>();
+            }
+
+
+            if (exp->op == "+=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value + value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "-=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value - value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "*=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value * value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "/=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value / value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            return sh_ptr<Value>();
+        }
+
         sh_ptr<Value> eval(IdentifierAST *exp, sh_ptr<Environment> env)
         {
             try
             {
                 return env->lookup(exp->name);
             }
-            catch(const std::string &s)
+            catch (const std::string &e)
             {
-                error(exp->line, s);
+                // Error messages thrown from outside of interpreter don't have a line number
+                // so insert one here
+
+                error(exp->line, e);
                 return sh_ptr<Value>();
-            }            
+            }
         }
 
         sh_ptr<Value> eval(BinaryExpressionAST *exp, sh_ptr<Environment> env)
@@ -127,15 +202,15 @@ namespace eris
             sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(eval(exp->left, env));
             sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(eval(exp->right, env));
 
-            if(!left) 
+            if (!left)
             {
-                error(exp->left->line, "invalid argument #1 for binary operator \""+exp->op+"\"");
+                error(exp->left->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
                 return sh_ptr<Value>();
             }
 
-            if(!right) 
+            if (!right)
             {
-                error(exp->right->line, "invalid argument #2 for binary operator \""+exp->op+"\"");
+                error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
                 return sh_ptr<Value>();
             }
 
@@ -158,7 +233,6 @@ namespace eris
             {
                 return sh_ptr<Number>(new Number(left->value / right->value));
             }
-
 
             return sh_ptr<Value>();
         }

@@ -1,1 +1,3 @@
-"Hello world!";
+let x = 42;
+x += 1;
+x;

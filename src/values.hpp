@@ -34,7 +34,7 @@ namespace eris
         }
     };
 
-    class Environment
+    class Environment: public std::enable_shared_from_this<Environment>
     {
     public:
         std::map<std::string, sh_ptr<Value> > record;
@@ -55,30 +55,49 @@ namespace eris
         }
 
         /**
+         * Updates an existing variable.
+         */
+        void assign(const std::string &name, sh_ptr<Value> value)
+        {
+            this->resolve(name)->record[name] = value;
+        }
+
+        /**
          * Returns the value of a defined variable, or null pointer
          * if the variable is not defined.
          */
         sh_ptr<Value> lookup(const std::string &name)
         {
-            if(this->record.count(name) == 0)
+            return this->resolve(name)->record.at(name);
+        }
+
+        /**
+         * Returns the value of a defined variable, or null pointer
+         * if the variable is not defined.
+         */
+        sh_ptr<Environment> resolve(const std::string &name)
+        {
+            if(this->record.count(name) == 1)
             {
-                if(this->parent)
-                {
-                    return this->parent->lookup(name);
-                }
-                
-                throw std::string("variable \""+name+"\" is not defined");
-                return sh_ptr<Value>();
+                return shared_from_this();
             }
 
-            return this->record.at(name);
+            if(this->parent)
+            {
+                return this->parent;
+            }
+                    
+            throw std::string("variable \""+name+"\" is not defined");
+            return sh_ptr<Environment>();
         }
     };
     
     class Object : public Value
     {
     public:
-        sh_ptr<Environment> environment;
+        sh_ptr<Environment> env;
+
+        Object(sh_ptr<Environment> env) : env(env) {}
 
         std::string str() const
         {

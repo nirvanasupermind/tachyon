@@ -3,17 +3,27 @@
 #include <sstream> //std::stringstream
 #include <string>
 #include <vector>
+#include <cctype>
 
 #include "parser.hpp"
 #include "interpreter.hpp"
 #include "aliases.hpp"
 
-void run(const std::string &text)
+void run(const std::string &filename, const std::string &text)
 {
     eris::Parser parser;
     eris::Interpreter interpreter;
 
-    std::cout << interpreter.eval(parser.parse(text), interpreter.global)->str() << '\n';
+    try
+    {
+        std::cout << interpreter.eval(parser.parse(text), interpreter.global)->str() << '\n';
+    }
+    catch (const std::string &e)
+    {
+        std::cerr << filename << ":" << e;
+
+        std::exit(1); 
+    }
 }
 
 int main(int argc, char **argv)
@@ -24,27 +34,20 @@ int main(int argc, char **argv)
 
         while (true)
         {
-            try
-            {
-                std::cout << "> " << std::flush;
-                std::getline(std::cin, text);
+            std::cout << "> " << std::flush;
+            std::getline(std::cin, text);
 
-                if (std::cin.bad())
-                {
-                    std::cerr << "IO error\n";
-                    break;
-                }
-                else if (std::cin.eof())
-                {
-                    break;
-                }
-
-                run(text);
-            }
-            catch (const std::string &e)
+            if (std::cin.bad())
             {
-                std::cerr << "stdin:" << e << '\n';
+                std::cerr << "IO error\n";
+                break;
             }
+            else if (std::cin.eof())
+            {
+                break;
+            }
+
+            run("stdin", text);
         }
     }
     else
@@ -61,7 +64,7 @@ int main(int argc, char **argv)
 
         try
         {
-            run(text);
+            run(filename, text);
         }
         catch (std::string e)
         {
