@@ -3,7 +3,7 @@
 
 #include "ast.hpp"
 #include "values.hpp"
-#include "environment.hpp"
+// #include "environment.hpp"
 #include "aliases.hpp"
 
 namespace eris

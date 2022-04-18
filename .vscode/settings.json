@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.pluto": "coffeescript",
+        "*.punylisp": "lisp",
+        "iosfwd": "cpp"
+    }
+}
