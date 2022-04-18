@@ -12,6 +12,7 @@ namespace eris
 {
     enum class ASTType
     {
+        VariableStatement,
         EmptyStatement,
         BlockStatement,
         ExpressionStatement,
@@ -30,6 +31,30 @@ namespace eris
         virtual ASTType type() const = 0;
         virtual std::string str() = 0;
     };
+
+    class VariableStatementAST : public AST
+    {
+    public:
+        std::string name;
+        sh_ptr<AST> value;
+
+        VariableStatementAST(int line, const std::string &name, sh_ptr<AST> value)
+            : name(name), value(value)
+        {
+            this->line = line;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::VariableStatement;
+        }
+
+        std::string str()
+        {
+            return "VariableStatement(" + name + "," + value->str() + ")";
+        }
+    };
+
 
     class EmptyStatementAST : public AST
     {
@@ -150,7 +175,6 @@ namespace eris
             return "Identifier("+name+")";
         }
     };
-
 
     class BinaryExpressionAST : public AST
     {

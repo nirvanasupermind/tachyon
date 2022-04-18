@@ -139,6 +139,7 @@ namespace eris
          * Statement
          *  : ExpressionStatement
          *  | BlockStatement
+         *  | VariableStatement
          *  ;
          */
         sh_ptr<AST> Statement()
@@ -153,8 +154,46 @@ namespace eris
                 return this->BlockStatement();
             }
 
+            if (this->lookahead.type == "let")
+            {
+                return this->VariableStatement();
+            }
+
             return this->ExpressionStatement();
         }
+
+        /**
+         * VariableStatement
+         *  : 'let' Identifier OptVariableDeclaration ';'
+         *  ;
+         */
+        sh_ptr<AST> VariableStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("let");
+
+            std::string name = this->eat("IDENTIFIER").value;
+            
+            sh_ptr<AST> value = this->lookahead.type == "SIMPLE_ASSIGN" ? VariableDeclaration() : sh_ptr<AST>();
+
+            this->eat(";");
+
+            return sh_ptr<VariableStatementAST>(new VariableStatementAST(line, name, value));
+        }
+
+        /**
+         * VariableDeclaration
+         *  : SIMPLE_ASSIGN Expression 
+         *  ;
+         */
+        sh_ptr<AST> VariableDeclaration()
+        {
+            eat("SIMPLE_ASSIGN");
+
+            return Expression();
+        }
+        
 
         /**
          * EmptyStatement

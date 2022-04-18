@@ -25,6 +25,26 @@ namespace eris
         {
             this->record[name] = value;
         }
+
+        /**
+         * Returns the value of a defined variable, or null pointer
+         * if the variable is not defined.
+         */
+        sh_ptr<Value> lookup(const std::string &name)
+        {
+            if(this->record.count(name) == 0)
+            {
+                if(this->parent)
+                {
+                    return this->parent->lookup(name);
+                }
+                
+                throw std::string("variable \""+name+"\" is not defined");
+                return sh_ptr<Value>();
+            }
+
+            return this->record.at(name);
+        }
     };
 }
 
