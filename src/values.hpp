@@ -43,6 +43,24 @@ namespace eris
         }
     };
 
+    class Bool : public Value
+    {
+    public:
+        bool value;
+
+        Bool(bool value) : value(value) {}
+
+        bool truthy()
+        {
+            return value;
+        }
+
+        std::string str() const
+        {
+            return value ? "true" : "false";
+        }
+    };
+
     class Environment: public std::enable_shared_from_this<Environment>
     {
     public:

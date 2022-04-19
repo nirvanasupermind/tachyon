@@ -35,7 +35,6 @@ namespace eris
 
             while (this->lookahead.type == operatorToken)
             {
-                // Operator: *, /
 
                 std::string op = this->lookahead.value;
 
@@ -293,15 +292,16 @@ namespace eris
         }
 
         /**
-         * Expression
-         *  : AssignmentExpression
+         * AssingmentExpression
+         *  : RelationalExpression
+         *  | LeftHandSideExpression AssignmentOperator RelationalExpression
          *  ;
          */
         sh_ptr<AST> AssignmentExpression()
         {
             int line = this->tokenizer.line;
 
-            sh_ptr<AST> left = this->AdditiveExpression();
+            sh_ptr<AST> left = this->RelationalExpression();
 
             if(!this->isAssignmentOperator(this->lookahead.type))
             {
@@ -330,6 +330,17 @@ namespace eris
             }
 
             return this->eat("COMPLEX_ASSIGN");
+        }
+
+        /**
+         * RelationalExpression
+         *  : AdditiveExpression
+         *  | AdditiveExpression RELATIONAL_OPERATOR RelationalExpression
+         *  ;
+         */
+        sh_ptr<AST> RelationalExpression() 
+        {
+            return this->BinaryExpression(&Parser::AdditiveExpression, "RELATIONAL_OPERATOR");
         }
 
         /**

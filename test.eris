@@ -1,8 +1,7 @@
-let x;
-
-if(x)
-    x = 5;
-else
-    x = 6;
-
-x; // none
+let x = 2;
+if(x < 3) {
+    x = 0;
+} else {
+    x = 1;
+}
+x; // 0.0

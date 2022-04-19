@@ -260,6 +260,26 @@ namespace eris
                 return sh_ptr<Number>(new Number(left->value / right->value));
             }
 
+            if (exp->op == ">")
+            {
+                return sh_ptr<Bool>(new Bool(left->value > right->value));
+            }
+
+            if (exp->op == ">=")
+            {
+                return sh_ptr<Bool>(new Bool(left->value >= right->value));
+            }
+
+            if (exp->op == "<")
+            {
+                return sh_ptr<Bool>(new Bool(left->value < right->value));
+            }
+
+            if (exp->op == "<=")
+            {
+                return sh_ptr<Bool>(new Bool(left->value <= right->value));
+            }
+
             return sh_ptr<Value>();
         }
 
