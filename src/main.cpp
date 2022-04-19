@@ -21,8 +21,6 @@ void run(const std::string &filename, const std::string &text)
     catch (const std::string &e)
     {
         std::cerr << filename << ":" << e << '\n';
-
-        std::exit(1); 
     }
 }
 

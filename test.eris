@@ -1,8 +1,8 @@
 let x;
-if (x == null) {
 
-} else {
+if(x)
     x = 5;
-}
+else
+    x = 6;
 
-x;
+x; // none
