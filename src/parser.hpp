@@ -73,7 +73,7 @@ namespace eris
          */
         bool isLiteral(const std::string &tokenType)
         {
-            return tokenType == "NUMBER" || tokenType == "STRING";
+            return tokenType == "NUMBER" || tokenType == "HEX" || tokenType == "STRING";
         }
 
     public:
@@ -154,12 +154,45 @@ namespace eris
                 return this->BlockStatement();
             }
 
+           if (this->lookahead.type == "if")
+            {
+                return this->IfStatement();
+            }
+
             if (this->lookahead.type == "let")
             {
                 return this->VariableStatement();
             }
 
             return this->ExpressionStatement();
+        }
+
+        /**
+         * IfStatement
+         *  : 'if' '(' Expression ')' Statement
+         *  | 'if' '(' Expression ')' Statement 'else' Statement
+         */
+        sh_ptr<AST> IfStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("if");
+
+            this->eat("(");
+            sh_ptr<AST> test = this->Expression();
+            this->eat(")");
+
+            sh_ptr<AST> consequent = this->Statement();
+
+            sh_ptr<AST> alternate;
+
+            if(this->lookahead.type == "else")
+            {
+                eat("else");
+                alternate = this->Statement();
+            }   
+            
+            return sh_ptr<IfStatementAST>(new IfStatementAST(line, test, consequent, alternate));
         }
 
         /**
@@ -172,7 +205,7 @@ namespace eris
             int line = this->tokenizer.line;
 
             this->eat("let");
-
+                        
             std::string name = this->eat("IDENTIFIER").value;
             
             sh_ptr<AST> value = this->lookahead.type == "SIMPLE_ASSIGN" ? VariableDeclaration() : sh_ptr<AST>();
@@ -193,7 +226,7 @@ namespace eris
 
             return Expression();
         }
-        
+    
 
         /**
          * EmptyStatement
@@ -382,6 +415,7 @@ namespace eris
          * Literal
          *  : NumericLiteral
          *  | StringLiteral
+         *  | HexLiteral
          *  ;
          */
         sh_ptr<AST> Literal()
@@ -389,9 +423,12 @@ namespace eris
             if (lookahead.type == "NUMBER")
                 return this->NumericLiteral();
 
+            if (lookahead.type == "HEX")
+                return this->HexLiteral();
+
             if (lookahead.type == "STRING")
                 return this->StringLiteral();
-
+                
             error("unexpected literal production");
             return sh_ptr<AST>();
         }
@@ -409,6 +446,22 @@ namespace eris
             Token token = this->eat("NUMBER");
 
             return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.value)));
+        }
+
+
+        /**
+         * HexLiteral
+         *  :
+         *  HEX
+         *  ;
+         */
+        sh_ptr<AST> HexLiteral()
+        {
+            int line = this->tokenizer.line;
+
+            Token token = this->eat("HEX");
+            
+            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stol(token.value, 0, 16)));
         }
 
         /**

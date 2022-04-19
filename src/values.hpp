@@ -10,6 +10,10 @@ namespace eris
     public:
         virtual ~Value() = default;
         virtual std::string str() const = 0;
+        virtual bool truthy()
+        {
+            return true;
+        }
     };
 
     class None: public Value
@@ -18,6 +22,11 @@ namespace eris
         std::string str() const 
         {
             return "none";
+        }
+
+        bool truthy()
+        {
+            return false;
         }
     };
 
@@ -97,6 +106,8 @@ namespace eris
     public:
         sh_ptr<Environment> env;
 
+        Object() = default;
+
         Object(sh_ptr<Environment> env) : env(env) {}
 
         std::string str() const
@@ -105,7 +116,7 @@ namespace eris
         }
     };
 
-    class String : public Value
+    class String : public Object
     {
     public:
         std::string string;

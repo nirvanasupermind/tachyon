@@ -25,54 +25,6 @@ namespace eris
             throw std::string(std::to_string(line) + ": runtime error: " + message);
         }
 
-        sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
-        {
-            return eval(exp.get(), env);
-        }
-
-        sh_ptr<Value> eval(AST *exp, sh_ptr<Environment> env)
-        {
-            switch (exp->type())
-            {
-                // --------------------------------------------
-                // Statements:
-
-            case ASTType::EmptyStatement:
-                return sh_ptr<None>(new None());
-            case ASTType::VariableStatement:
-                return eval(dynamic_cast<VariableStatementAST *>(exp), env);
-            case ASTType::BlockStatement:
-                return eval(dynamic_cast<BlockStatementAST *>(exp), env);
-            case ASTType::ExpressionStatement:
-                return eval(dynamic_cast<ExpressionStatementAST *>(exp), env);
-
-                // --------------------------------------------
-                // Expressions:
-
-            case ASTType::AssignmentExpression:
-                return eval(dynamic_cast<AssignmentExpressionAST *>(exp), env);
-            case ASTType::Identifier:
-                return eval(dynamic_cast<IdentifierAST *>(exp), env);
-            case ASTType::BinaryExpression:
-                return eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
-
-                // --------------------------------------------
-                // Literals:
-
-            case ASTType::NumericLiteral:
-                return eval(dynamic_cast<NumericLiteralAST *>(exp), env);
-            case ASTType::StringLiteral:
-                return eval(dynamic_cast<StringLiteralAST *>(exp), env);
-
-                // --------------------------------------------
-                // Unimplemented:
-
-            default:
-                error(exp->line, "unimplemented: " + exp->str());
-                return sh_ptr<Value>();
-            }
-        }
-
         sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env)
         {
             if (statementList.size() == 0)
@@ -88,11 +40,86 @@ namespace eris
             return eval(statementList.back(), env);
         }
 
+        sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
+        {
+            return eval(exp.get(), env);
+        }
+
+        sh_ptr<Value> eval(AST *exp, sh_ptr<Environment> env)
+        {
+            switch (exp->type())
+            {
+            // --------------------------------------------
+            // Statements:
+
+            case ASTType::IfStatement:
+                return eval(dynamic_cast<IfStatementAST *>(exp), env);
+            case ASTType::EmptyStatement:
+                return sh_ptr<None>(new None());
+            case ASTType::VariableStatement:
+                return eval(dynamic_cast<VariableStatementAST *>(exp), env);
+            case ASTType::BlockStatement:
+                return eval(dynamic_cast<BlockStatementAST *>(exp), env);
+            case ASTType::ExpressionStatement:
+                return eval(dynamic_cast<ExpressionStatementAST *>(exp), env);
+
+            // --------------------------------------------
+            // Expressions:
+
+            case ASTType::AssignmentExpression:
+                return eval(dynamic_cast<AssignmentExpressionAST *>(exp), env);
+            case ASTType::Identifier:
+                return eval(dynamic_cast<IdentifierAST *>(exp), env);
+            case ASTType::BinaryExpression:
+                return eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
+
+            // --------------------------------------------
+            // Literals:
+
+            case ASTType::NumericLiteral:
+                return eval(dynamic_cast<NumericLiteralAST *>(exp), env);
+            case ASTType::StringLiteral:
+                return eval(dynamic_cast<StringLiteralAST *>(exp), env);
+
+            // --------------------------------------------
+            // Unimplemented:
+
+            default:
+                error(exp->line, "unimplemented: " + exp->str());
+                return sh_ptr<Value>();
+            }
+        }
+
+        sh_ptr<Value> eval(IfStatementAST *exp, sh_ptr<Environment> env)
+        {
+            if (this->eval(exp->test, env)->truthy())
+            {
+                this->eval(exp->consequent, env);
+            } 
+            else
+            {            
+                if(exp->alternate) 
+                {
+                    return this->eval(exp->alternate, env);
+                }
+            }
+            
+            return sh_ptr<Value>();
+        }
+
         sh_ptr<Value> eval(VariableStatementAST *exp, sh_ptr<Environment> env)
         {
-            sh_ptr<Value> value = this->eval(exp->value, env);
+            sh_ptr<Value> value;
+            if (exp->value)
+            {
+                value = this->eval(exp->value, env);
+            }
+            else
+            {
+                value = sh_ptr<None>(new None());
+            }
 
-            env->define(exp->name, this->eval(exp->value, env));
+            env->define(exp->name, value);
 
             return sh_ptr<Value>();
         }
@@ -148,7 +175,6 @@ namespace eris
                 error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
                 return sh_ptr<Value>();
             }
-
 
             if (exp->op == "+=")
             {

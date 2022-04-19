@@ -1,7 +1,8 @@
-let x = 42;
-{
-    let y = 50;
+let x;
+if (x == null) {
+
+} else {
+    x = 5;
 }
-x 
-+
-y;
+
+x;

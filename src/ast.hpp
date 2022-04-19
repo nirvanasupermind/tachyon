@@ -12,6 +12,7 @@ namespace eris
 {
     enum class ASTType
     {
+        IfStatement,
         VariableStatement,
         EmptyStatement,
         BlockStatement,
@@ -30,6 +31,30 @@ namespace eris
         virtual ~AST() = default;
         virtual ASTType type() const = 0;
         virtual std::string str() = 0;
+    };
+
+    class IfStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> test;
+        sh_ptr<AST> consequent;
+        sh_ptr<AST> alternate;
+
+        IfStatementAST(int line, sh_ptr<AST> test, sh_ptr<AST> consequent, sh_ptr<AST> alternate)
+            : test(test), consequent(consequent), alternate(alternate)
+        {
+            this->line = line;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::IfStatement;
+        }
+
+        std::string str()
+        {
+            return "IfStatement(" + test->str() + "," + consequent->str() + (alternate ? "," + alternate->str() : "") + ")";
+        }
     };
 
     class VariableStatementAST : public AST
@@ -74,7 +99,6 @@ namespace eris
             return "EmptyStatement()";
         }
     };
-
 
     class BlockStatementAST : public AST
     {
@@ -150,7 +174,7 @@ namespace eris
 
         std::string str()
         {
-            return "BinaryExpression("+op+","+left->str()+","+right->str()+")";
+            return "AssignmentExpression("+op+","+left->str()+","+right->str()+")";
         }
     };
 
@@ -172,7 +196,7 @@ namespace eris
 
         std::string str()
         {
-            return "Identifier("+name+")";
+            return name;
         }
     };
 
