@@ -16,12 +16,12 @@ namespace eris
         }
     };
 
-    class None: public Value
+    class Null: public Value
     {
     public:
         std::string str() const 
         {
-            return "none";
+            return "null";
         }
 
         bool truthy()
@@ -43,12 +43,12 @@ namespace eris
         }
     };
 
-    class Bool : public Value
+    class Boolean : public Value
     {
     public:
         bool value;
 
-        Bool(bool value) : value(value) {}
+        Boolean(bool value) : value(value) {}
 
         bool truthy()
         {

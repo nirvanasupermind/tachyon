@@ -9,6 +9,8 @@
 #include "interpreter.hpp"
 #include "aliases.hpp"
 
+eris::sh_ptr<eris::Environment> global(new eris::Environment());
+
 void run(const std::string &filename, const std::string &text)
 {
     eris::Parser parser;
@@ -16,7 +18,7 @@ void run(const std::string &filename, const std::string &text)
 
     try
     {
-        std::cout << interpreter.eval(parser.parse(text), interpreter.global)->str() << '\n';
+        std::cout << interpreter.eval(parser.parse(text), global)->str() << '\n';
     }
     catch (const std::string &e)
     {

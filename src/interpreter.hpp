@@ -29,7 +29,7 @@ namespace eris
         {
             if (statementList.size() == 0)
             {
-                return sh_ptr<None>(new None());
+                return sh_ptr<Null>(new Null());
             }
 
             for (std::size_t i = 0; i < statementList.size(); i++)
@@ -55,7 +55,7 @@ namespace eris
             case ASTType::IfStatement:
                 return eval(dynamic_cast<IfStatementAST *>(exp), env);
             case ASTType::EmptyStatement:
-                return sh_ptr<None>(new None());
+                return sh_ptr<Null>(new Null());
             case ASTType::VariableStatement:
                 return eval(dynamic_cast<VariableStatementAST *>(exp), env);
             case ASTType::BlockStatement:
@@ -80,6 +80,10 @@ namespace eris
                 return eval(dynamic_cast<NumericLiteralAST *>(exp), env);
             case ASTType::StringLiteral:
                 return eval(dynamic_cast<StringLiteralAST *>(exp), env);
+            case ASTType::BooleanLiteral:
+                return eval(dynamic_cast<BooleanLiteralAST *>(exp), env);
+            case ASTType::NullLiteral:
+                return eval(dynamic_cast<NullLiteralAST *>(exp), env);
 
             // --------------------------------------------
             // Unimplemented:
@@ -104,7 +108,7 @@ namespace eris
                 }
             }
             
-            return sh_ptr<Value>();
+            return sh_ptr<Null>(new Null());
         }
 
         sh_ptr<Value> eval(VariableStatementAST *exp, sh_ptr<Environment> env)
@@ -116,12 +120,12 @@ namespace eris
             }
             else
             {
-                value = sh_ptr<None>(new None());
+                value = sh_ptr<Null>(new Null());
             }
 
             env->define(exp->name, value);
 
-            return sh_ptr<Value>();
+            return sh_ptr<Null>(new Null());
         }
 
         sh_ptr<Value> eval(BlockStatementAST *exp, sh_ptr<Environment> env)
@@ -204,7 +208,7 @@ namespace eris
                 return sh_ptr<Value>();
             }
 
-            return sh_ptr<Value>();
+            return sh_ptr<Null>(new Null());
         }
 
         sh_ptr<Value> eval(IdentifierAST *exp, sh_ptr<Environment> env)
@@ -262,25 +266,35 @@ namespace eris
 
             if (exp->op == ">")
             {
-                return sh_ptr<Bool>(new Bool(left->value > right->value));
+                return sh_ptr<Boolean>(new Boolean(left->value > right->value));
             }
 
             if (exp->op == ">=")
             {
-                return sh_ptr<Bool>(new Bool(left->value >= right->value));
+                return sh_ptr<Boolean>(new Boolean(left->value >= right->value));
             }
 
             if (exp->op == "<")
             {
-                return sh_ptr<Bool>(new Bool(left->value < right->value));
+                return sh_ptr<Boolean>(new Boolean(left->value < right->value));
             }
 
             if (exp->op == "<=")
             {
-                return sh_ptr<Bool>(new Bool(left->value <= right->value));
+                return sh_ptr<Boolean>(new Boolean(left->value <= right->value));
             }
 
-            return sh_ptr<Value>();
+            if (exp->op == "==")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value == right->value));
+            }
+
+            if (exp->op == "!=")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value != right->value));
+            }
+
+            return sh_ptr<Null>(new Null());
         }
 
         sh_ptr<Value> eval(NumericLiteralAST *exp, sh_ptr<Environment> env)
@@ -291,6 +305,16 @@ namespace eris
         sh_ptr<Value> eval(StringLiteralAST *exp, sh_ptr<Environment> env)
         {
             return sh_ptr<String>(new String(exp->string));
+        }
+
+        sh_ptr<Value> eval(BooleanLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<Boolean>(new Boolean(exp->value));
+        }
+
+        sh_ptr<Value> eval(NullLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<Null>(new Null());
         }
     };
 }

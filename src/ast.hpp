@@ -19,9 +19,12 @@ namespace eris
         ExpressionStatement,
         AssignmentExpression,
         Identifier,
+        LogicalExpression,
         BinaryExpression,
         NumericLiteral,
-        StringLiteral
+        StringLiteral,
+        BooleanLiteral,
+        NullLiteral
     };
 
     class AST
@@ -79,7 +82,6 @@ namespace eris
             return "VariableStatement(" + name + "," + value->str() + ")";
         }
     };
-
 
     class EmptyStatementAST : public AST
     {
@@ -200,6 +202,31 @@ namespace eris
         }
     };
 
+
+    class LogicalExpressionAST : public AST
+    {
+    public:
+        std::string op;
+        std::shared_ptr<AST> left;
+        std::shared_ptr<AST> right;
+
+        LogicalExpressionAST(int line, const std::string &op, std::shared_ptr<AST> left, std::shared_ptr<AST> right)
+            : op(op), left(left), right(right)
+        {
+            this->line = line;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::LogicalExpression;
+        }
+
+        std::string str()
+        {
+            return "LogicalExpression("+op+","+left->str()+","+right->str()+")";
+        }
+    };
+    
     class BinaryExpressionAST : public AST
     {
     public:
@@ -267,6 +294,49 @@ namespace eris
             return string;
         }
     };
+
+    class BooleanLiteralAST : public AST
+    {
+    public:
+        bool value;
+
+        BooleanLiteralAST(int line, bool value)
+            : value(value)
+        {
+            this->line = line;
+            this->value = value;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::BooleanLiteral;
+        }
+
+        std::string str()
+        {
+            return std::string("BooleanLiteral(") + (value ? "true" : "false") + ")";
+        }
+    };
+
+    class NullLiteralAST : public AST
+    {
+    public:
+        NullLiteralAST(int line)
+        {
+            this->line = line;
+        }
+
+        ASTType type() const
+        {
+            return ASTType::NullLiteral;
+        }
+
+        std::string str()
+        {
+            return "NullLiteral()";
+        }
+    };
+
 }
 
 #endif

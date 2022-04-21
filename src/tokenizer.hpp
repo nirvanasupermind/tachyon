@@ -46,6 +46,8 @@ namespace eris
         {"^\\blet\\b", "let"},
         {"^\\bif\\b", "if"},
         {"^\\belse\\b", "else"},
+        {"^\\btrue\\b", "true"},
+        {"^\\bfalse\\b", "false"},
         
         // --------------------------------------------
         // Numbers:
@@ -57,6 +59,11 @@ namespace eris
         // Identifiers:
 
         {"^\\w+", "IDENTIFIER"},
+
+        // --------------------------------------------
+        // Equality operators: ==, !=
+        
+        {"^[=!]=", "EQUALITY_OPERATOR"},
 
         // --------------------------------------------
         // Assignment operators: =, *=, /=, +=, -=
@@ -74,6 +81,12 @@ namespace eris
         // Relational operators: >, >=, <, <=
 
         {"^[><]=?", "RELATIONAL_OPERATOR"},
+
+        // --------------------------------------------
+        // Logical operators: &&, ||
+
+        {"^&&", "LOGICAL_AND"},
+        {"^\\|\\|", "LOGICAL_OR"},
 
         // --------------------------------------------
         // Strings:

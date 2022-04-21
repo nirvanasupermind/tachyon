@@ -35,14 +35,36 @@ namespace eris
 
             while (this->lookahead.type == operatorToken)
             {
-
                 std::string op = this->lookahead.value;
 
                 this->eat(operatorToken);
-
+                
                 sh_ptr<AST> right = (this->*builder)();
 
                 left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
+            }
+
+            return left;
+        }
+
+        /**
+         * Generic binary expression.
+         */
+        sh_ptr<AST> LogicalExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = (this->*builder)();
+
+            while (this->lookahead.type == operatorToken)
+            {
+                std::string op = this->lookahead.value;
+
+                this->eat(operatorToken);
+                
+                sh_ptr<AST> right = (this->*builder)();
+                
+                left = sh_ptr<LogicalExpressionAST>(new LogicalExpressionAST(line, op, left, right));
             }
 
             return left;
@@ -72,9 +94,8 @@ namespace eris
          */
         bool isLiteral(const std::string &tokenType)
         {
-            return tokenType == "NUMBER" || tokenType == "HEX" || tokenType == "STRING";
+            return tokenType == "NUMBER" || tokenType == "HEX" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null";
         }
-
     public:
         /**
          * Initializes the parser.
@@ -153,7 +174,7 @@ namespace eris
                 return this->BlockStatement();
             }
 
-           if (this->lookahead.type == "if")
+            if (this->lookahead.type == "if")
             {
                 return this->IfStatement();
             }
@@ -225,7 +246,6 @@ namespace eris
 
             return Expression();
         }
-    
 
         /**
          * EmptyStatement
@@ -292,16 +312,16 @@ namespace eris
         }
 
         /**
-         * AssingmentExpression
-         *  : RelationalExpression
-         *  | LeftHandSideExpression AssignmentOperator RelationalExpression
+         * AssignmentExpression
+         *  : EqualityExpression
+         *  | LeftHandSideExpression AssignmentOperator AssignmentExpression
          *  ;
          */
         sh_ptr<AST> AssignmentExpression()
         {
             int line = this->tokenizer.line;
 
-            sh_ptr<AST> left = this->RelationalExpression();
+            sh_ptr<AST> left = this->LogicalORExpression();
 
             if(!this->isAssignmentOperator(this->lookahead.type))
             {
@@ -330,6 +350,40 @@ namespace eris
             }
 
             return this->eat("COMPLEX_ASSIGN");
+        }
+
+
+        /**
+         * LogicalORExpression
+         *  : RelationalExpression
+         *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
+         *  ;
+         */
+        sh_ptr<AST> LogicalORExpression() 
+        {
+            return this->LogicalExpression(&Parser::LogicalANDExpression, "LOGICAL_OR");
+        }
+
+        /**
+         * LogicalANDExpression
+         *  : RelationalExpression
+         *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
+         *  ;
+         */
+        sh_ptr<AST> LogicalANDExpression() 
+        {
+            return this->LogicalExpression(&Parser::EqualityExpression, "LOGICAL_AND");
+        }
+
+        /**
+         * EqualityExpression
+         *  : RelationalExpression
+         *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
+         *  ;
+         */
+        sh_ptr<AST> EqualityExpression() 
+        {
+            return this->BinaryExpression(&Parser::RelationalExpression, "EQUALITY_OPERATOR");
         }
 
         /**
@@ -439,15 +493,20 @@ namespace eris
 
             if (lookahead.type == "STRING")
                 return this->StringLiteral();
-                
+
+            if (lookahead.type == "true")
+                return this->BooleanLiteral(true);
+
+            if (lookahead.type == "false")
+                return this->BooleanLiteral(false);
+                                                        
             error("unexpected literal production");
             return sh_ptr<AST>();
         }
 
         /**
          * NumericLiteral
-         *  :
-         *  NUMBER
+         *  : NUMBER
          *  ;
          */
         sh_ptr<AST> NumericLiteral()
@@ -459,6 +518,34 @@ namespace eris
             return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.value)));
         }
 
+        /**
+         * BooleanLiteral
+         *  : true
+         *  | false
+         *  ;
+         */
+        sh_ptr<AST> BooleanLiteral(bool value)
+        {
+            int line = this->tokenizer.line;
+
+            eat(value ? "true" : "false");
+
+            return sh_ptr<BooleanLiteralAST>(new BooleanLiteralAST(line, value));
+        }
+
+        /**
+         * NullLiteral
+         *  : null
+         *  ;
+         */
+        sh_ptr<AST> NullLiteral()
+        {
+            int line = this->tokenizer.line;
+
+            eat("null");
+
+            return sh_ptr<NullLiteralAST>(new NullLiteralAST(line));
+        }
 
         /**
          * HexLiteral
