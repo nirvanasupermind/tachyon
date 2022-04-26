@@ -1,7 +1,3 @@
-let x = 20;
-
-do {
-    x -= 1;
-} while(x > 10);
-
-x;
+def square(x) {
+    return x * x;
+}
