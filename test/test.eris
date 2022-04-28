@@ -1,3 +1,3 @@
-def square(x) {
-    x * x;
+def empty(x, y) {
+
 }
