@@ -2,4 +2,4 @@ def square(x) {
     return x * x;
 }
 
-return square(5);
+return square(2); // 2
