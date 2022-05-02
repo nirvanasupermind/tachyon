@@ -10,151 +10,81 @@
 
 namespace eris
 {
-    enum class ASTType
-    {
-        IfStatement,
-        VariableStatement,
-        EmptyStatement,
-        BlockStatement,
-        ExpressionStatement,
-        AssignmentExpression,
-        Identifier,
-        LogicalExpression,
-        BinaryExpression,
-        NumericLiteral,
-        StringLiteral,
-        BooleanLiteral,
-        NullLiteral
-    };
-
     class AST
     {
     public:
         int line;
         virtual ~AST() = default;
-        virtual ASTType type() const = 0;
-        virtual std::string str() = 0;
+        virtual std::string type() const = 0;
     };
 
-    class IfStatementAST : public AST
+
+    class NumericLiteralAST : public AST
     {
     public:
-        sh_ptr<AST> test;
-        sh_ptr<AST> consequent;
-        sh_ptr<AST> alternate;
+        double value;
 
-        IfStatementAST(int line, sh_ptr<AST> test, sh_ptr<AST> consequent, sh_ptr<AST> alternate)
-            : test(test), consequent(consequent), alternate(alternate)
+        NumericLiteralAST(int line, double value)
+            : value(value)
         {
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::IfStatement;
-        }
-
-        std::string str()
-        {
-            return "IfStatement(" + test->str() + "," + consequent->str() + (alternate ? "," + alternate->str() : "") + ")";
+            return "NumericLiteral";
         }
     };
 
-    class VariableStatementAST : public AST
+    class StringLiteralAST : public AST
     {
     public:
-        std::string name;
-        sh_ptr<AST> value;
+        std::string string;
 
-        VariableStatementAST(int line, const std::string &name, sh_ptr<AST> value)
-            : name(name), value(value)
+        StringLiteralAST(int line, const std::string &string)
+            : string(string)
         {
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::VariableStatement;
-        }
-
-        std::string str()
-        {
-            return "VariableStatement(" + name + "," + value->str() + ")";
+            return "StringLiteral";
         }
     };
 
-    class EmptyStatementAST : public AST
+    class BooleanLiteralAST : public AST
     {
     public:
-        EmptyStatementAST(int line)
+        bool value;
+
+        BooleanLiteralAST(int line, bool value)
+            : value(value)
+        {
+            this->line = line;
+            this->value = value;
+        }
+
+        std::string type() const
+        {
+            return "BooleanLiteral";
+        }
+    };
+
+    class NullLiteralAST : public AST
+    {
+    public:
+        NullLiteralAST(int line)
         {
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::EmptyStatement;
-        }
-
-        std::string str()
-        {
-            return "EmptyStatement()";
+            return "NullLiteral";
         }
     };
 
-    class BlockStatementAST : public AST
-    {
-    public:
-        std::vector<sh_ptr<AST> > body;
-
-        BlockStatementAST(int line, const std::vector<sh_ptr<AST> > &body)
-            : body(body)
-        {
-            this->line = line;
-        }
-
-        ASTType type() const
-        {
-            return ASTType::BlockStatement;
-        }
-
-        std::string str()
-        {
-            std::string result = "BlockStatement(";
-            for (std::size_t i = 0; i < body.size(); i++)
-            {
-                result += body.at(i)->str() + ",";
-            }
-
-            result.pop_back();
-
-            result += ")";
-
-            return result;
-        }
-    };
-
-    class ExpressionStatementAST : public AST
-    {
-    public:
-        sh_ptr<AST> expression;
-
-        ExpressionStatementAST(int line, sh_ptr<AST> expression)
-            : expression(expression)
-        {
-            this->line = line;
-        }
-
-        ASTType type() const
-        {
-            return ASTType::ExpressionStatement;
-        }
-
-        std::string str()
-        {
-            return "ExpressionStatement(" + expression->str() + ")";
-        }
-    };
 
     class AssignmentExpressionAST : public AST
     {
@@ -169,14 +99,9 @@ namespace eris
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::AssignmentExpression;
-        }
-
-        std::string str()
-        {
-            return "AssignmentExpression("+op+","+left->str()+","+right->str()+")";
+            return "AssignmentExpression";
         }
     };
 
@@ -191,17 +116,11 @@ namespace eris
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::Identifier;
-        }
-
-        std::string str()
-        {
-            return name;
+            return "Identifier";
         }
     };
-
 
     class LogicalExpressionAST : public AST
     {
@@ -216,14 +135,9 @@ namespace eris
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::LogicalExpression;
-        }
-
-        std::string str()
-        {
-            return "LogicalExpression("+op+","+left->str()+","+right->str()+")";
+            return "LogicalExpression";
         }
     };
     
@@ -240,103 +154,118 @@ namespace eris
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::BinaryExpression;
-        }
-
-        std::string str()
-        {
-            return "BinaryExpression("+op+","+left->str()+","+right->str()+")";
+            return "BinaryExpression";
         }
     };
 
-    class NumericLiteralAST : public AST
+
+    // --------------------------------------------
+    // Statements:
+
+    class EmptyStatementAST : public AST
     {
     public:
-        double value;
-
-        NumericLiteralAST(int line, double value)
-            : value(value)
+        EmptyStatementAST(int line)
         {
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::NumericLiteral;
-        }
-
-        std::string str()
-        {
-            return std::to_string(value);
+            return "EmptyStatement";
         }
     };
 
-    class StringLiteralAST : public AST
+    class BlockStatementAST : public AST
     {
     public:
-        std::string string;
+        std::vector<sh_ptr<AST> > body;
 
-        StringLiteralAST(int line, const std::string &string)
-            : string(string)
+        BlockStatementAST(int line, const std::vector<sh_ptr<AST> > &body)
+            : body(body)
         {
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::StringLiteral;
-        }
-
-        std::string str()
-        {
-            return string;
+            return "BlockStatement";
         }
     };
 
-    class BooleanLiteralAST : public AST
+    class ExpressionStatementAST : public AST
     {
     public:
-        bool value;
+        sh_ptr<AST> expression;
 
-        BooleanLiteralAST(int line, bool value)
-            : value(value)
-        {
-            this->line = line;
-            this->value = value;
-        }
-
-        ASTType type() const
-        {
-            return ASTType::BooleanLiteral;
-        }
-
-        std::string str()
-        {
-            return std::string("BooleanLiteral(") + (value ? "true" : "false") + ")";
-        }
-    };
-
-    class NullLiteralAST : public AST
-    {
-    public:
-        NullLiteralAST(int line)
+        ExpressionStatementAST(int line, sh_ptr<AST> expression)
+            : expression(expression)
         {
             this->line = line;
         }
 
-        ASTType type() const
+        std::string type() const
         {
-            return ASTType::NullLiteral;
-        }
-
-        std::string str()
-        {
-            return "NullLiteral()";
+            return "ExpressionStatement";
         }
     };
 
+    class VariableStatementAST : public AST
+    {
+    public:
+        std::string name;
+        sh_ptr<AST> value;
+
+        VariableStatementAST(int line, const std::string &name, sh_ptr<AST> value)
+            : name(name), value(value)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "VariableStatement";
+        }
+    };
+    
+    class IfStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> test;
+        sh_ptr<AST> consequent;
+        sh_ptr<AST> alternate;
+
+        IfStatementAST(int line, sh_ptr<AST> test, sh_ptr<AST> consequent, sh_ptr<AST> alternate)
+            : test(test), consequent(consequent), alternate(alternate)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "IfStatement";
+        }
+    };
+
+    class WhileStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> test;
+        sh_ptr<AST> body;
+
+        WhileStatementAST(int line, sh_ptr<AST> test, sh_ptr<AST> body)
+            : test(test), body(body)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "WhileStatement";
+        }
+    };
 }
 
 #endif

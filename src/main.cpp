@@ -18,7 +18,11 @@ void run(const std::string &filename, const std::string &text)
 
     try
     {
-        std::cout << interpreter.eval(parser.parse(text), global)->str() << '\n';
+        eris::sh_ptr<eris::Value> result = interpreter.eval(parser.parse(text), global);
+
+        if(result) {
+            std::cout << result->str() << '\n';
+        }
     }
     catch (const std::string &e)
     {
@@ -30,6 +34,8 @@ int main(int argc, char **argv)
 {
     if (argc < 2)
     {
+        std::cout << "Welcome to Eris v0.0." << '\n';
+        std::cout << "Use Ctrl+D (i.e. EOF) to exit." << '\n';
         std::string text;
 
         while (true)
@@ -47,7 +53,10 @@ int main(int argc, char **argv)
                 break;
             }
 
-            run("stdin", text);
+            if(text != "") 
+            {
+                run("stdin", text);
+            }
         }
     }
     else
@@ -61,6 +70,11 @@ int main(int argc, char **argv)
         strStream << inFile.rdbuf();
 
         std::string text = strStream.str();
+
+        if(text == "") {
+            std::cerr << "File \"" + text + "\" is empty or does not exist" << '\n'; 
+            return 0;
+        }
 
         run(filename, text);
     }

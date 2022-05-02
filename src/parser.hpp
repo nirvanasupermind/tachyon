@@ -72,7 +72,7 @@ namespace eris
 
         sh_ptr<AST> checkValidAssignmentTarget(sh_ptr<AST> node)
         {
-            if (node->type() == ASTType::Identifier)
+            if (node->type() == "Identifier")
             {
                 return node;
             }
@@ -156,10 +156,12 @@ namespace eris
         }
 
         /**
-         * Statement
+         * Statement 
          *  : ExpressionStatement
+         *  | EmptyStatement
          *  | BlockStatement
          *  | VariableStatement
+         *  | IterationStatement
          *  ;
          */
         sh_ptr<AST> Statement()
@@ -184,7 +186,43 @@ namespace eris
                 return this->VariableStatement();
             }
 
+            if (this->lookahead.type == "while")
+            {
+                return this->IterationStatement();
+            }
+
             return this->ExpressionStatement();
+        }
+
+
+        /**
+         * IterationStatement
+         *  : WhileStatement
+         *  ;
+         */
+        sh_ptr<AST> IterationStatement()
+        {
+            return this->WhileStatement();
+        }
+
+        /**
+         * WhileStatement
+         *  : 'while' '(' Expression ')' Statement
+         *  ;
+         */
+        sh_ptr<AST> WhileStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("while");
+
+            this->eat("(");
+            sh_ptr<AST> test = this->Expression();
+            this->eat(")");
+
+            sh_ptr<AST> body = this->Statement();
+
+            return sh_ptr<WhileStatementAST>(new WhileStatementAST(line, test, body));
         }
 
         /**
@@ -351,7 +389,6 @@ namespace eris
 
             return this->eat("COMPLEX_ASSIGN");
         }
-
 
         /**
          * LogicalORExpression
