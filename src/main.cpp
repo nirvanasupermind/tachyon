@@ -11,7 +11,7 @@
 
 eris::sh_ptr<eris::Environment> global(new eris::Environment());
 
-void run(const std::string &filename, const std::string &text)
+void run(const std::string &filename, const std::string &text, bool shellMode)
 {
     eris::Parser parser;
     eris::Interpreter interpreter;
@@ -20,7 +20,7 @@ void run(const std::string &filename, const std::string &text)
     {
         eris::sh_ptr<eris::Value> result = interpreter.eval(parser.parse(text), global);
 
-        if(result) {
+        if(shellMode && result) {
             std::cout << result->str() << '\n';
         }
     }
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
             if(text != "") 
             {
-                run("stdin", text);
+                run("stdin", text, true);
             }
         }
     }
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
             return 0;
         }
 
-        run(filename, text);
+        run(filename, text, false);
     }
 
     return 0;

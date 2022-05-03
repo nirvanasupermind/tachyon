@@ -48,8 +48,10 @@ namespace eris
         {"^\\belse\\b", "else"},
         {"^\\bwhile\\b", "while"},
         {"^\\bdo\\b", "do"},
+        {"^\\bfor\\b", "for"},
         {"^\\btrue\\b", "true"},
         {"^\\bfalse\\b", "false"},
+        {"^\\bprint\\b", "print"},
         
         // --------------------------------------------
         // Numbers:

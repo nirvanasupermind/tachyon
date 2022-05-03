@@ -162,6 +162,7 @@ namespace eris
          *  | BlockStatement
          *  | VariableStatement
          *  | IterationStatement
+         *  | PrintStatement
          *  ;
          */
         sh_ptr<AST> Statement()
@@ -186,12 +187,145 @@ namespace eris
                 return this->VariableStatement();
             }
 
-            if (this->lookahead.type == "while" || this->lookahead.type == "do")
+            if (this->lookahead.type == "while" || this->lookahead.type == "do" || this->lookahead.type == "for")
             {
                 return this->IterationStatement();
             }
 
+            if (this->lookahead.type == "print")
+            {
+                return this->PrintStatement();
+            }
+
             return this->ExpressionStatement();
+        }
+
+
+        /**
+         * ExpressionStatement
+         *  : Expression ';'
+         *  ;
+         */
+        sh_ptr<AST> ExpressionStatement()
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> expression = this->Expression();
+
+            this->eat(";");
+
+            return sh_ptr<ExpressionStatementAST>(new ExpressionStatementAST(line, expression));
+        }
+
+
+        /**
+         * EmptyStatement
+         *  : ';'
+         *  ;
+         */
+
+        sh_ptr<AST> EmptyStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat(";");
+
+            return sh_ptr<AST>(new EmptyStatementAST(line));
+        }
+
+        /**
+         * BlockStatement
+         *  : '{' OptStatementList '}'
+         *  ;
+         */
+
+        sh_ptr<AST> BlockStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("{");
+
+            // OptStatementList
+            std::vector<sh_ptr<AST> > body;
+
+            if (this->lookahead.type != "}")
+                body = this->StatementList("}");
+
+            this->eat("}");
+
+            return sh_ptr<BlockStatementAST>(new BlockStatementAST(line, body));
+        }
+
+        /**
+         * VariableDeclaration
+         *  : SIMPLE_ASSIGN Expression 
+         *  ;
+         */
+        sh_ptr<AST> VariableDeclaration()
+        {
+            eat("SIMPLE_ASSIGN");
+
+            return Expression();
+        }
+
+        /**
+         * VariableStatementInit
+         *  : 'let' Identifier OptVariableDeclaration
+         *  ;
+         */
+        sh_ptr<AST> VariableStatementInit()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("let");
+                        
+            std::string name = this->eat("IDENTIFIER").value;
+            
+            sh_ptr<AST> value = this->lookahead.type == "SIMPLE_ASSIGN" ? VariableDeclaration() : sh_ptr<AST>();
+
+            return sh_ptr<VariableStatementAST>(new VariableStatementAST(line, name, value));
+        }
+
+        /**
+         * VariableStatement
+         *  : VariableStatementInit ';'
+         *  ;
+         */
+        sh_ptr<AST> VariableStatement()
+        {
+            sh_ptr<AST> result = this->VariableStatementInit();
+
+            this->eat(";");
+
+            return result;
+        }
+
+        /**
+         * IfStatement
+         *  : 'if' '(' Expression ')' Statement
+         *  | 'if' '(' Expression ')' Statement 'else' Statement
+         */
+        sh_ptr<AST> IfStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("if");
+
+            this->eat("(");
+            sh_ptr<AST> test = this->Expression();
+            this->eat(")");
+
+            sh_ptr<AST> consequent = this->Statement();
+
+            sh_ptr<AST> alternate;
+
+            if(this->lookahead.type == "else")
+            {
+                eat("else");
+                alternate = this->Statement();
+            }   
+            
+            return sh_ptr<IfStatementAST>(new IfStatementAST(line, test, consequent, alternate));
         }
 
         /**
@@ -213,6 +347,11 @@ namespace eris
                 return this->DoWhileStatement();
             }   
 
+            if(this->lookahead.type == "for")
+            {
+                return this->ForStatement();
+            }   
+        
             return sh_ptr<AST>();
         }
 
@@ -258,117 +397,59 @@ namespace eris
         }
 
         /**
-         * IfStatement
-         *  : 'if' '(' Expression ')' Statement
-         *  | 'if' '(' Expression ')' Statement 'else' Statement
+         * ForStatementInit
+         *  : VariableStatementInit
+         *  | Expression
+         *  ;
          */
-        sh_ptr<AST> IfStatement()
+        sh_ptr<AST> ForStatementInit()
+        {
+            if(this->lookahead.type == "let")
+            {
+                return this->VariableStatementInit();
+            }
+
+            return this->Expression();
+        }
+
+        /**
+         * ForStatement
+         *  : 'for' '(' ForStatementInit ';' Expression ';' Expression ')'
+         *  ;
+         */
+        sh_ptr<AST> ForStatement()
         {
             int line = this->tokenizer.line;
 
-            this->eat("if");
+            this->eat("for");
 
             this->eat("(");
+
+            sh_ptr<AST> init = this->ForStatementInit();
+            this->eat(";");
             sh_ptr<AST> test = this->Expression();
+            this->eat(";");
+            sh_ptr<AST> update = this->Expression();
+            
             this->eat(")");
 
-            sh_ptr<AST> consequent = this->Statement();
+            sh_ptr<AST> body = this->Statement();
 
-            sh_ptr<AST> alternate;
-
-            if(this->lookahead.type == "else")
-            {
-                eat("else");
-                alternate = this->Statement();
-            }   
-            
-            return sh_ptr<IfStatementAST>(new IfStatementAST(line, test, consequent, alternate));
+            return sh_ptr<ForStatementAST>(new ForStatementAST(line, init, test, update, body));
         }
 
         /**
-         * VariableStatement
-         *  : 'let' Identifier OptVariableDeclaration ';'
+         * PrintStatement
+         *  : 'print' Expression ';'
          *  ;
          */
-        sh_ptr<AST> VariableStatement()
+        sh_ptr<AST> PrintStatement()
         {
-            int line = this->tokenizer.line;
-
-            this->eat("let");
-                        
-            std::string name = this->eat("IDENTIFIER").value;
-            
-            sh_ptr<AST> value = this->lookahead.type == "SIMPLE_ASSIGN" ? VariableDeclaration() : sh_ptr<AST>();
-
-            this->eat(";");
-
-            return sh_ptr<VariableStatementAST>(new VariableStatementAST(line, name, value));
-        }
-
-        /**
-         * VariableDeclaration
-         *  : SIMPLE_ASSIGN Expression 
-         *  ;
-         */
-        sh_ptr<AST> VariableDeclaration()
-        {
-            eat("SIMPLE_ASSIGN");
-
-            return Expression();
-        }
-
-        /**
-         * EmptyStatement
-         *  : ';'
-         *  ;
-         */
-
-        sh_ptr<AST> EmptyStatement()
-        {
-            int line = this->tokenizer.line;
-
-            this->eat(";");
-
-            return sh_ptr<AST>(new EmptyStatementAST(line));
-        }
-
-        /**
-         * BlockStatement
-         *  : '{' OptStatementList '}'
-         *  ;
-         */
-
-        sh_ptr<AST> BlockStatement()
-        {
-            int line = this->tokenizer.line;
-
-            this->eat("{");
-
-            // OptStatementList
-            std::vector<sh_ptr<AST> > body;
-
-            if (this->lookahead.type != "}")
-                body = this->StatementList("}");
-
-            this->eat("}");
-
-            return sh_ptr<BlockStatementAST>(new BlockStatementAST(line, body));
-        }
-
-        /**
-         * ExpressionStatement
-         *  : Expression ';'
-         *  ;
-         */
-        sh_ptr<AST> ExpressionStatement()
-        {
-            int line = this->tokenizer.line;
-
-            sh_ptr<AST> expression = this->Expression();
-
-            this->eat(";");
-
-            return sh_ptr<ExpressionStatementAST>(new ExpressionStatementAST(line, expression));
+           int line = this->tokenizer.line;
+           this->eat("print");
+           sh_ptr<AST> argument = this->Expression();
+           this->eat(";");
+           return sh_ptr<AST>(new PrintStatementAST(line, argument));
         }
 
         /**

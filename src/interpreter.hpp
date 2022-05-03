@@ -127,6 +127,16 @@ namespace eris
                 return this->eval(dynamic_cast<DoWhileStatementAST *>(exp), env);
             }
 
+            if (type == "ForStatement")
+            {
+                return this->eval(dynamic_cast<ForStatementAST *>(exp), env);
+            }
+
+            if (type == "PrintStatement")
+            {
+                return this->eval(dynamic_cast<PrintStatementAST *>(exp), env);
+            }
+
             // --------------------------------------------
             // Unimplemented:
 
@@ -171,6 +181,25 @@ namespace eris
         return sh_ptr<Value>();
     }
 
+    sh_ptr<Value> eval(ForStatementAST *exp, sh_ptr<Environment> env)
+    {
+        this->eval(exp->init, env);
+
+        while (this->eval(exp->test, env)->truthy())
+        {
+            this->eval(exp->body, env);
+            this->eval(exp->update, env);
+        }
+
+        return sh_ptr<Value>();
+    }
+
+    sh_ptr<Value> eval(PrintStatementAST *exp, sh_ptr<Environment> env)
+    {
+        std::cout << this->eval(exp->argument, env)->str() << '\n';
+
+        return sh_ptr<Value>();
+    }
 
     sh_ptr<Value> eval(VariableStatementAST *exp, sh_ptr<Environment> env)
     {

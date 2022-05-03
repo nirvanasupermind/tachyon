@@ -284,6 +284,43 @@ namespace eris
             return "DoWhileStatement";
         }
     };
+
+    class ForStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> init;
+        sh_ptr<AST> test;
+        sh_ptr<AST> update;
+        sh_ptr<AST> body;
+
+        ForStatementAST(int line, sh_ptr<AST> init, sh_ptr<AST> test, sh_ptr<AST> update, sh_ptr<AST> body)
+            : init(init), test(test), update(update), body(body)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "ForStatement";
+        }
+    };
+
+    class PrintStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> argument;
+
+        PrintStatementAST(int line, sh_ptr<AST> argument)
+            : argument(argument)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "PrintStatement";
+        }
+    };    
 }
 
 #endif

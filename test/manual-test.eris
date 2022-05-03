@@ -1,7 +1,5 @@
 let x = 0;
-let i = 0;
-do {
+for (let i = 0; i <= 20; i = i + 1) {
     x = x + i;
-    i = i + 1;
-} while(i <= 10);
-x; // 55
+}
+print x; 
