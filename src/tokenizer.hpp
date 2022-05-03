@@ -47,6 +47,7 @@ namespace eris
         {"^\\bif\\b", "if"},
         {"^\\belse\\b", "else"},
         {"^\\bwhile\\b", "while"},
+        {"^\\bdo\\b", "do"},
         {"^\\btrue\\b", "true"},
         {"^\\bfalse\\b", "false"},
         

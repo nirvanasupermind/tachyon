@@ -165,7 +165,7 @@ namespace eris
          *  ;
          */
         sh_ptr<AST> Statement()
-        {
+        {            
             if (this->lookahead.type == ";")
             {
                 return this->EmptyStatement();
@@ -186,7 +186,7 @@ namespace eris
                 return this->VariableStatement();
             }
 
-            if (this->lookahead.type == "while")
+            if (this->lookahead.type == "while" || this->lookahead.type == "do")
             {
                 return this->IterationStatement();
             }
@@ -194,15 +194,26 @@ namespace eris
             return this->ExpressionStatement();
         }
 
-
         /**
          * IterationStatement
          *  : WhileStatement
+         *  | DoWhileStatement
          *  ;
+         * 
          */
         sh_ptr<AST> IterationStatement()
         {
-            return this->WhileStatement();
+            if(this->lookahead.type == "while")
+            {
+                return this->WhileStatement();
+            }
+
+            if(this->lookahead.type == "do")
+            {
+                return this->DoWhileStatement();
+            }   
+
+            return sh_ptr<AST>();
         }
 
         /**
@@ -223,6 +234,27 @@ namespace eris
             sh_ptr<AST> body = this->Statement();
 
             return sh_ptr<WhileStatementAST>(new WhileStatementAST(line, test, body));
+        }
+
+        /**
+         * DoWhileStatement
+         *  : 'do' Statement 'while' '(' Expression ')'
+         *  ;
+         */
+        sh_ptr<AST> DoWhileStatement()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("do");
+
+            sh_ptr<AST> body = this->Statement();
+
+            this->eat("while");
+            this->eat("(");
+            sh_ptr<AST> test = this->Expression();
+            this->eat(")");
+
+            return sh_ptr<DoWhileStatementAST>(new DoWhileStatementAST(line, body, test));
         }
 
         /**

@@ -266,6 +266,24 @@ namespace eris
             return "WhileStatement";
         }
     };
+
+    class DoWhileStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> body;
+        sh_ptr<AST> test;
+
+        DoWhileStatementAST(int line, sh_ptr<AST> body, sh_ptr<AST> test)
+            :  body(body), test(test)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "DoWhileStatement";
+        }
+    };
 }
 
 #endif

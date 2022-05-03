@@ -122,6 +122,11 @@ namespace eris
                 return this->eval(dynamic_cast<WhileStatementAST *>(exp), env);
             }
             
+            if (type == "DoWhileStatement")
+            {
+                return this->eval(dynamic_cast<DoWhileStatementAST *>(exp), env);
+            }
+
             // --------------------------------------------
             // Unimplemented:
 
@@ -155,6 +160,17 @@ namespace eris
 
         return sh_ptr<Value>();
     }
+
+    sh_ptr<Value> eval(DoWhileStatementAST *exp, sh_ptr<Environment> env)
+    {
+        do 
+        {
+            this->eval(exp->body, env);
+        } while(this->eval(exp->test, env)->truthy());
+
+        return sh_ptr<Value>();
+    }
+
 
     sh_ptr<Value> eval(VariableStatementAST *exp, sh_ptr<Environment> env)
     {
