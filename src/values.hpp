@@ -130,7 +130,7 @@ namespace eris
 
         std::string str() const
         {
-            return "<object>";
+            return "(object)";
         }
     };
 
@@ -144,6 +144,24 @@ namespace eris
         std::string str() const
         {
             return string;
+        }
+    };
+
+    class Function : public Object
+    {
+    public:
+        std::vector<sh_ptr<AST> > params;
+        sh_ptr<AST> body;
+        sh_ptr<Environment> env;
+
+        Function(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env) 
+            : params(params), body(body), env(env) 
+        {
+        } 
+
+        std::string str() const
+        {
+            return "(function)";
         }
     };
 }

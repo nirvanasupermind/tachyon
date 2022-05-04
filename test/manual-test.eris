@@ -1,5 +1,5 @@
-let x = 0;
-for (let i = 0; i <= 20; i = i + 1) {
-    x = x + i;
+def f(x) {
+        
 }
-print x; 
+
+print f;

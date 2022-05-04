@@ -10,6 +10,7 @@
 #include "tokenizer.hpp"
 #include "ast.hpp"
 #include "aliases.hpp"
+#include "util.hpp"
 
 namespace eris
 {
@@ -38,7 +39,7 @@ namespace eris
                 std::string op = this->lookahead.value;
 
                 this->eat(operatorToken);
-                
+
                 sh_ptr<AST> right = (this->*builder)();
 
                 left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
@@ -61,9 +62,9 @@ namespace eris
                 std::string op = this->lookahead.value;
 
                 this->eat(operatorToken);
-                
+
                 sh_ptr<AST> right = (this->*builder)();
-                
+
                 left = sh_ptr<LogicalExpressionAST>(new LogicalExpressionAST(line, op, left, right));
             }
 
@@ -94,8 +95,9 @@ namespace eris
          */
         bool isLiteral(const std::string &tokenType)
         {
-            return tokenType == "NUMBER" || tokenType == "HEX" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null";
+            return tokenType == "NUMBER" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null";
         }
+
     public:
         /**
          * Initializes the parser.
@@ -156,7 +158,7 @@ namespace eris
         }
 
         /**
-         * Statement 
+         * Statement
          *  : ExpressionStatement
          *  | EmptyStatement
          *  | BlockStatement
@@ -166,7 +168,7 @@ namespace eris
          *  ;
          */
         sh_ptr<AST> Statement()
-        {            
+        {
             if (this->lookahead.type == ";")
             {
                 return this->EmptyStatement();
@@ -197,9 +199,13 @@ namespace eris
                 return this->PrintStatement();
             }
 
+            if (this->lookahead.type == "def")
+            {
+                return this->FunctionDeclaration();
+            }
+
             return this->ExpressionStatement();
         }
-
 
         /**
          * ExpressionStatement
@@ -216,7 +222,6 @@ namespace eris
 
             return sh_ptr<ExpressionStatementAST>(new ExpressionStatementAST(line, expression));
         }
-
 
         /**
          * EmptyStatement
@@ -258,7 +263,7 @@ namespace eris
 
         /**
          * VariableDeclaration
-         *  : SIMPLE_ASSIGN Expression 
+         *  : SIMPLE_ASSIGN Expression
          *  ;
          */
         sh_ptr<AST> VariableDeclaration()
@@ -278,9 +283,9 @@ namespace eris
             int line = this->tokenizer.line;
 
             this->eat("let");
-                        
+
             std::string name = this->eat("IDENTIFIER").value;
-            
+
             sh_ptr<AST> value = this->lookahead.type == "SIMPLE_ASSIGN" ? VariableDeclaration() : sh_ptr<AST>();
 
             return sh_ptr<VariableStatementAST>(new VariableStatementAST(line, name, value));
@@ -319,12 +324,12 @@ namespace eris
 
             sh_ptr<AST> alternate;
 
-            if(this->lookahead.type == "else")
+            if (this->lookahead.type == "else")
             {
                 eat("else");
                 alternate = this->Statement();
-            }   
-            
+            }
+
             return sh_ptr<IfStatementAST>(new IfStatementAST(line, test, consequent, alternate));
         }
 
@@ -333,25 +338,25 @@ namespace eris
          *  : WhileStatement
          *  | DoWhileStatement
          *  ;
-         * 
+         *
          */
         sh_ptr<AST> IterationStatement()
         {
-            if(this->lookahead.type == "while")
+            if (this->lookahead.type == "while")
             {
                 return this->WhileStatement();
             }
 
-            if(this->lookahead.type == "do")
+            if (this->lookahead.type == "do")
             {
                 return this->DoWhileStatement();
-            }   
+            }
 
-            if(this->lookahead.type == "for")
+            if (this->lookahead.type == "for")
             {
                 return this->ForStatement();
-            }   
-        
+            }
+
             return sh_ptr<AST>();
         }
 
@@ -404,7 +409,7 @@ namespace eris
          */
         sh_ptr<AST> ForStatementInit()
         {
-            if(this->lookahead.type == "let")
+            if (this->lookahead.type == "let")
             {
                 return this->VariableStatementInit();
             }
@@ -430,7 +435,7 @@ namespace eris
             sh_ptr<AST> test = this->Expression();
             this->eat(";");
             sh_ptr<AST> update = this->Expression();
-            
+
             this->eat(")");
 
             sh_ptr<AST> body = this->Statement();
@@ -445,11 +450,65 @@ namespace eris
          */
         sh_ptr<AST> PrintStatement()
         {
-           int line = this->tokenizer.line;
-           this->eat("print");
-           sh_ptr<AST> argument = this->Expression();
-           this->eat(";");
-           return sh_ptr<AST>(new PrintStatementAST(line, argument));
+            int line = this->tokenizer.line;
+            this->eat("print");
+            sh_ptr<AST> argument = this->Expression();
+            this->eat(";");
+            return sh_ptr<AST>(new PrintStatementAST(line, argument));
+        }
+
+        /**
+         * FunctionDeclaration
+         *  : 'def' Identifier '(' OptFormalParameterList ')' BlockStatement
+         *  ;
+         */
+        sh_ptr<AST> FunctionDeclaration()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("def");
+
+            sh_ptr<AST> name = this->Identifier();
+
+            this->eat("(");
+
+            std::vector<sh_ptr<AST> > params;
+
+            if (this->lookahead.type != ")")
+            {
+                params = this->FormalParameterList();
+            }
+
+            this->eat(")");
+
+            sh_ptr<AST> body = this->BlockStatement();
+
+            return sh_ptr<FunctionDeclarationAST>(new FunctionDeclarationAST(line, name, params, body));
+        }
+
+        /**
+         * FormalParameterList
+         *  : Identifier
+         *  | FormalParameterList ',' Identifier
+         *  ;
+         */
+        std::vector<sh_ptr<AST> > FormalParameterList()
+        {
+            std::vector<sh_ptr<AST> > params;
+
+            for (;;)
+            {
+                params.push_back(this->Identifier());
+
+                if (this->lookahead.type != ",")
+                {
+                    break;
+                }
+
+                this->eat(",");
+            }
+
+            return params;
         }
 
         /**
@@ -474,7 +533,7 @@ namespace eris
 
             sh_ptr<AST> left = this->LogicalORExpression();
 
-            if(!this->isAssignmentOperator(this->lookahead.type))
+            if (!this->isAssignmentOperator(this->lookahead.type))
             {
                 return left;
             }
@@ -483,8 +542,7 @@ namespace eris
                 line,
                 this->AssignmentOperator().value,
                 this->checkValidAssignmentTarget(left),
-                AssignmentExpression()
-            ));
+                AssignmentExpression()));
         }
 
         /**
@@ -493,7 +551,7 @@ namespace eris
          *  | COMPLEX_ASSIGN
          *  ;
          */
-        Token AssignmentOperator() 
+        Token AssignmentOperator()
         {
             if (this->lookahead.type == "SIMPLE_ASSIGN")
             {
@@ -509,7 +567,7 @@ namespace eris
          *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
          *  ;
          */
-        sh_ptr<AST> LogicalORExpression() 
+        sh_ptr<AST> LogicalORExpression()
         {
             return this->LogicalExpression(&Parser::LogicalANDExpression, "LOGICAL_OR");
         }
@@ -520,7 +578,7 @@ namespace eris
          *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
          *  ;
          */
-        sh_ptr<AST> LogicalANDExpression() 
+        sh_ptr<AST> LogicalANDExpression()
         {
             return this->LogicalExpression(&Parser::EqualityExpression, "LOGICAL_AND");
         }
@@ -531,7 +589,7 @@ namespace eris
          *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
          *  ;
          */
-        sh_ptr<AST> EqualityExpression() 
+        sh_ptr<AST> EqualityExpression()
         {
             return this->BinaryExpression(&Parser::RelationalExpression, "EQUALITY_OPERATOR");
         }
@@ -542,14 +600,14 @@ namespace eris
          *  | AdditiveExpression RELATIONAL_OPERATOR RelationalExpression
          *  ;
          */
-        sh_ptr<AST> RelationalExpression() 
+        sh_ptr<AST> RelationalExpression()
         {
             return this->BinaryExpression(&Parser::AdditiveExpression, "RELATIONAL_OPERATOR");
         }
 
         /**
          * LeftHandSideExpression
-         *  : Identifier    
+         *  : Identifier
          *  ;
          */
         sh_ptr<AST> LeftHandSideExpression()
@@ -559,7 +617,7 @@ namespace eris
 
         /**
          * Identifier
-         *  : IDENTIFIER    
+         *  : IDENTIFIER
          *  ;
          */
         sh_ptr<AST> Identifier()
@@ -602,7 +660,7 @@ namespace eris
          */
         sh_ptr<AST> PrimaryExpression()
         {
-            if (this->isLiteral(this->lookahead.type)) 
+            if (this->isLiteral(this->lookahead.type))
             {
                 return this->Literal();
             }
@@ -630,26 +688,30 @@ namespace eris
          * Literal
          *  : NumericLiteral
          *  | StringLiteral
-         *  | HexLiteral
          *  ;
          */
         sh_ptr<AST> Literal()
         {
             if (lookahead.type == "NUMBER")
+            {
                 return this->NumericLiteral();
-
-            if (lookahead.type == "HEX")
-                return this->HexLiteral();
+            }
 
             if (lookahead.type == "STRING")
+            {
                 return this->StringLiteral();
+            }
 
             if (lookahead.type == "true")
+            {
                 return this->BooleanLiteral(true);
+            }
 
             if (lookahead.type == "false")
+            {
                 return this->BooleanLiteral(false);
-                                                        
+            }
+
             error("unexpected literal production");
             return sh_ptr<AST>();
         }
@@ -695,21 +757,6 @@ namespace eris
             eat("null");
 
             return sh_ptr<NullLiteralAST>(new NullLiteralAST(line));
-        }
-
-        /**
-         * HexLiteral
-         *  :
-         *  HEX
-         *  ;
-         */
-        sh_ptr<AST> HexLiteral()
-        {
-            int line = this->tokenizer.line;
-
-            Token token = this->eat("HEX");
-            
-            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stol(token.value, 0, 16)));
         }
 
         /**

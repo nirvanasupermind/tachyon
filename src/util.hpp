@@ -4,12 +4,12 @@
 namespace eris
 {
     int countNewlines(const std::string &s)
-    {        
+    {
         int result = 0;
 
-        for(int i = 0; i < s.length(); i++)
+        for (int i = 0; i < s.length(); i++)
         {
-            if(s[i] == '\n')
+            if (s[i] == '\n')
                 result++;
         }
 

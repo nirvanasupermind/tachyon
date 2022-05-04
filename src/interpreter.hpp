@@ -35,7 +35,6 @@ namespace eris
             }
 
             return result;
-
         }
 
         sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
@@ -46,7 +45,6 @@ namespace eris
         sh_ptr<Value> eval(AST *exp, sh_ptr<Environment> env)
         {
             std::string type = exp->type();
-
 
             // --------------------------------------------
             // Literals:
@@ -121,7 +119,7 @@ namespace eris
             {
                 return this->eval(dynamic_cast<WhileStatementAST *>(exp), env);
             }
-            
+
             if (type == "DoWhileStatement")
             {
                 return this->eval(dynamic_cast<DoWhileStatementAST *>(exp), env);
@@ -137,6 +135,11 @@ namespace eris
                 return this->eval(dynamic_cast<PrintStatementAST *>(exp), env);
             }
 
+            if (type == "FunctionDeclaration")
+            {
+                return this->eval(dynamic_cast<FunctionDeclarationAST *>(exp), env);
+            }
+
             // --------------------------------------------
             // Unimplemented:
 
@@ -144,274 +147,284 @@ namespace eris
             return sh_ptr<Value>();
         }
 
-    sh_ptr<Value> eval(IfStatementAST *exp, sh_ptr<Environment> env)
-    {
-        if (this->eval(exp->test, env)->truthy())
+        sh_ptr<Value> eval(EmptyStatementAST *exp, sh_ptr<Environment> env)
         {
-            this->eval(exp->consequent, env);
+            return sh_ptr<Value>();
         }
-        else
+
+        sh_ptr<Value> eval(BlockStatementAST *exp, sh_ptr<Environment> env)
         {
-            if (exp->alternate)
+            sh_ptr<Environment> child_env(new Environment());
+            child_env->parent = env;
+
+            return this->eval(exp->body, child_env);
+        }
+
+        sh_ptr<Value> eval(ExpressionStatementAST *exp, sh_ptr<Environment> env)
+        {
+            return this->eval(exp->expression, env);
+        }
+
+        sh_ptr<Value> eval(VariableStatementAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> value;
+            if (exp->value)
             {
-                return this->eval(exp->alternate, env);
+                value = this->eval(exp->value, env);
+            }
+            else
+            {
+                value = sh_ptr<Null>(new Null());
+            }
+
+            env->define(exp->name, value);
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(IfStatementAST *exp, sh_ptr<Environment> env)
+        {
+            if (this->eval(exp->test, env)->truthy())
+            {
+                this->eval(exp->consequent, env);
+            }
+            else
+            {
+                if (exp->alternate)
+                {
+                    return this->eval(exp->alternate, env);
+                }
+            }
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(WhileStatementAST *exp, sh_ptr<Environment> env)
+        {
+            while (this->eval(exp->test, env)->truthy())
+            {
+                this->eval(exp->body, env);
+            }
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(DoWhileStatementAST *exp, sh_ptr<Environment> env)
+        {
+            do
+            {
+                this->eval(exp->body, env);
+            } while (this->eval(exp->test, env)->truthy());
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(ForStatementAST *exp, sh_ptr<Environment> env)
+        {
+            this->eval(exp->init, env);
+
+            while (this->eval(exp->test, env)->truthy())
+            {
+                this->eval(exp->body, env);
+                this->eval(exp->update, env);
+            }
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(PrintStatementAST *exp, sh_ptr<Environment> env)
+        {
+            std::cout << this->eval(exp->argument, env)->str() << '\n';
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(FunctionDeclarationAST *exp, sh_ptr<Environment> env)
+        {
+            std::string name = std::dynamic_pointer_cast<IdentifierAST>(exp->name)->name;
+            sh_ptr<Function> fn = sh_ptr<Function>(new Function(exp->params, exp->body, env));
+
+            env->define(name, fn);
+            
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(AssignmentExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            std::string name = std::dynamic_pointer_cast<IdentifierAST>(exp->left)->name;
+            sh_ptr<Number> value = std::dynamic_pointer_cast<Number>(this->eval(exp->right, env));
+
+            if (exp->op == "=")
+            {
+                env->assign(name, value);
+
+                return sh_ptr<Value>();
+            }
+
+            sh_ptr<Number> currentValue;
+
+            try
+            {
+                currentValue = std::dynamic_pointer_cast<Number>(env->lookup(name));
+            }
+            catch (const std::string &e)
+            {
+                // Error messages thrown from outside of interpreter don't have a line number
+                // so insert one here
+
+                error(exp->line, e);
+                return sh_ptr<Value>();
+            }
+
+            if (!currentValue)
+            {
+                error(exp->right->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
+                return sh_ptr<Value>();
+            }
+
+            if (!value)
+            {
+                error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "+=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value + value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "-=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value - value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "*=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value * value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            if (exp->op == "/=")
+            {
+                env->assign(name, sh_ptr<Number>(new Number(currentValue->value / value->value)));
+
+                return sh_ptr<Value>();
+            }
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(IdentifierAST *exp, sh_ptr<Environment> env)
+        {
+            try
+            {
+                return env->lookup(exp->name);
+            }
+            catch (const std::string &e)
+            {
+                // Error messages thrown from outside of interpreter don't have a line number
+                // so insert one here
+
+                error(exp->line, e);
+                return sh_ptr<Value>();
             }
         }
 
-        return sh_ptr<Value>();
-    }
-
-    sh_ptr<Value> eval(WhileStatementAST *exp, sh_ptr<Environment> env)
-    {
-        while (this->eval(exp->test, env)->truthy())
+        sh_ptr<Value> eval(BinaryExpressionAST *exp, sh_ptr<Environment> env)
         {
-            this->eval(exp->body, env);
-        }
+            sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(this->eval(exp->left, env));
+            sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(this->eval(exp->right, env));
 
-        return sh_ptr<Value>();
-    }
+            if (!left)
+            {
+                error(exp->left->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
+                return sh_ptr<Value>();
+            }
 
-    sh_ptr<Value> eval(DoWhileStatementAST *exp, sh_ptr<Environment> env)
-    {
-        do 
-        {
-            this->eval(exp->body, env);
-        } while(this->eval(exp->test, env)->truthy());
+            if (!right)
+            {
+                error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
+                return sh_ptr<Value>();
+            }
 
-        return sh_ptr<Value>();
-    }
+            if (exp->op == "+")
+            {
+                return sh_ptr<Number>(new Number(left->value + right->value));
+            }
 
-    sh_ptr<Value> eval(ForStatementAST *exp, sh_ptr<Environment> env)
-    {
-        this->eval(exp->init, env);
+            if (exp->op == "-")
+            {
+                return sh_ptr<Number>(new Number(left->value - right->value));
+            }
 
-        while (this->eval(exp->test, env)->truthy())
-        {
-            this->eval(exp->body, env);
-            this->eval(exp->update, env);
-        }
+            if (exp->op == "*")
+            {
+                return sh_ptr<Number>(new Number(left->value * right->value));
+            }
 
-        return sh_ptr<Value>();
-    }
+            if (exp->op == "/")
+            {
+                return sh_ptr<Number>(new Number(left->value / right->value));
+            }
 
-    sh_ptr<Value> eval(PrintStatementAST *exp, sh_ptr<Environment> env)
-    {
-        std::cout << this->eval(exp->argument, env)->str() << '\n';
+            if (exp->op == ">")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value > right->value));
+            }
 
-        return sh_ptr<Value>();
-    }
+            if (exp->op == ">=")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value >= right->value));
+            }
 
-    sh_ptr<Value> eval(VariableStatementAST *exp, sh_ptr<Environment> env)
-    {
-        sh_ptr<Value> value;
-        if (exp->value)
-        {
-            value = this->eval(exp->value, env);
-        }
-        else
-        {
-            value = sh_ptr<Null>(new Null());
-        }
+            if (exp->op == "<")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value < right->value));
+            }
 
-        env->define(exp->name, value);
+            if (exp->op == "<=")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value <= right->value));
+            }
 
-        return sh_ptr<Value>();
-    }
+            if (exp->op == "==")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value == right->value));
+            }
 
-    sh_ptr<Value> eval(EmptyStatementAST *exp, sh_ptr<Environment> env)
-    {
-        return sh_ptr<Value>();
-    }
-
-    sh_ptr<Value> eval(BlockStatementAST *exp, sh_ptr<Environment> env)
-    {
-        sh_ptr<Environment> child_env(new Environment());
-        child_env->parent = env;
-
-        return this->eval(exp->body, child_env);
-    }
-
-    sh_ptr<Value> eval(ExpressionStatementAST *exp, sh_ptr<Environment> env)
-    {
-        return this->eval(exp->expression, env);
-    }
-
-    sh_ptr<Value> eval(AssignmentExpressionAST *exp, sh_ptr<Environment> env)
-    {
-        std::string name = std::dynamic_pointer_cast<IdentifierAST>(exp->left)->name;
-        sh_ptr<Number> value = std::dynamic_pointer_cast<Number>(this->eval(exp->right, env));
-
-        if (exp->op == "=")
-        {
-            env->assign(name, value);
+            if (exp->op == "!=")
+            {
+                return sh_ptr<Boolean>(new Boolean(left->value != right->value));
+            }
 
             return sh_ptr<Value>();
         }
 
-        sh_ptr<Number> currentValue;
-
-        try
+        sh_ptr<Value> eval(NumericLiteralAST *exp, sh_ptr<Environment> env)
         {
-            currentValue = std::dynamic_pointer_cast<Number>(env->lookup(name));
+            return sh_ptr<Number>(new Number(exp->value));
         }
-        catch (const std::string &e)
-        {
-            // Error messages thrown from outside of interpreter don't have a line number
-            // so insert one here
 
-            error(exp->line, e);
+        sh_ptr<Value> eval(StringLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<String>(new String(exp->string));
+        }
+
+        sh_ptr<Value> eval(BooleanLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<Boolean>(new Boolean(exp->value));
+        }
+
+        sh_ptr<Value> eval(NullLiteralAST *exp, sh_ptr<Environment> env)
+        {
             return sh_ptr<Value>();
         }
-
-        if (!currentValue)
-        {
-            error(exp->right->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
-            return sh_ptr<Value>();
-        }
-
-        if (!value)
-        {
-            error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
-            return sh_ptr<Value>();
-        }
-
-        if (exp->op == "+=")
-        {
-            env->assign(name, sh_ptr<Number>(new Number(currentValue->value + value->value)));
-
-            return sh_ptr<Value>();
-        }
-
-        if (exp->op == "-=")
-        {
-            env->assign(name, sh_ptr<Number>(new Number(currentValue->value - value->value)));
-
-            return sh_ptr<Value>();
-        }
-
-        if (exp->op == "*=")
-        {
-            env->assign(name, sh_ptr<Number>(new Number(currentValue->value * value->value)));
-
-            return sh_ptr<Value>();
-        }
-
-        if (exp->op == "/=")
-        {
-            env->assign(name, sh_ptr<Number>(new Number(currentValue->value / value->value)));
-
-            return sh_ptr<Value>();
-        }
-
-        return sh_ptr<Value>();
-    }
-
-    sh_ptr<Value> eval(IdentifierAST *exp, sh_ptr<Environment> env)
-    {
-        try
-        {
-            return env->lookup(exp->name);
-        }
-        catch (const std::string &e)
-        {
-            // Error messages thrown from outside of interpreter don't have a line number
-            // so insert one here
-
-            error(exp->line, e);
-            return sh_ptr<Value>();
-        }
-    }
-
-    sh_ptr<Value> eval(BinaryExpressionAST *exp, sh_ptr<Environment> env)
-    {
-        sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(this->eval(exp->left, env));
-        sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(this->eval(exp->right, env));
-
-        if (!left)
-        {
-            error(exp->left->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
-            return sh_ptr<Value>();
-        }
-
-        if (!right)
-        {
-            error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
-            return sh_ptr<Value>();
-        }
-
-        if (exp->op == "+")
-        {
-            return sh_ptr<Number>(new Number(left->value + right->value));
-        }
-
-        if (exp->op == "-")
-        {
-            return sh_ptr<Number>(new Number(left->value - right->value));
-        }
-
-        if (exp->op == "*")
-        {
-            return sh_ptr<Number>(new Number(left->value * right->value));
-        }
-
-        if (exp->op == "/")
-        {
-            return sh_ptr<Number>(new Number(left->value / right->value));
-        }
-
-        if (exp->op == ">")
-        {
-            return sh_ptr<Boolean>(new Boolean(left->value > right->value));
-        }
-
-        if (exp->op == ">=")
-        {
-            return sh_ptr<Boolean>(new Boolean(left->value >= right->value));
-        }
-
-        if (exp->op == "<")
-        {
-            return sh_ptr<Boolean>(new Boolean(left->value < right->value));
-        }
-
-        if (exp->op == "<=")
-        {
-            return sh_ptr<Boolean>(new Boolean(left->value <= right->value));
-        }
-
-        if (exp->op == "==")
-        {
-            return sh_ptr<Boolean>(new Boolean(left->value == right->value));
-        }
-
-        if (exp->op == "!=")
-        {
-            return sh_ptr<Boolean>(new Boolean(left->value != right->value));
-        }
-
-        return sh_ptr<Value>();
-    }
-
-    sh_ptr<Value> eval(NumericLiteralAST *exp, sh_ptr<Environment> env)
-    {
-        return sh_ptr<Number>(new Number(exp->value));
-    }
-
-    sh_ptr<Value> eval(StringLiteralAST *exp, sh_ptr<Environment> env)
-    {
-        return sh_ptr<String>(new String(exp->string));
-    }
-
-    sh_ptr<Value> eval(BooleanLiteralAST *exp, sh_ptr<Environment> env)
-    {
-        return sh_ptr<Boolean>(new Boolean(exp->value));
-    }
-
-    sh_ptr<Value> eval(NullLiteralAST *exp, sh_ptr<Environment> env)
-    {
-        return sh_ptr<Value>();
-    }
-};
+    };
 }
 
 #endif

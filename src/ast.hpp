@@ -321,6 +321,26 @@ namespace eris
             return "PrintStatement";
         }
     };    
+
+    class FunctionDeclarationAST : public AST
+    {
+    public:
+        sh_ptr<AST> name;
+        std::vector<sh_ptr<AST> > params;
+        sh_ptr<AST> body;
+    
+
+        FunctionDeclarationAST(int line, sh_ptr<AST> name, std::vector<sh_ptr<AST> > params, sh_ptr<AST> body)
+            : name(name), params(params), body(body)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "FunctionDeclaration";
+        }
+    };
 }
 
 #endif
