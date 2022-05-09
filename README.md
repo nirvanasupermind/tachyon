@@ -1,6 +1,6 @@
 # Eris
 
-**This interpreter is in a very early stage. Even basic programs will not run.**
+**This interpreter is in an early stage. Some programs (including the example below) will not run yet.**
 
 C++ interpreter for the Eris programming language with a header-only implementation. 
 
