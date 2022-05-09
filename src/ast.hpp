@@ -274,6 +274,26 @@ namespace eris
         }
     };
 
+
+    class CallExpressionAST : public AST
+    {
+    public:
+        sh_ptr<AST> callee;
+        std::vector<sh_ptr<AST> > arguments;
+        bool computed;
+
+        CallExpressionAST(int line, sh_ptr<AST> callee, std::vector<sh_ptr<AST> > arguments)
+            : callee(callee), arguments(arguments)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "CallExpression";
+        }
+    };
+    
     class MemberExpressionAST : public AST
     {
     public:

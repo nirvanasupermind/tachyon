@@ -155,7 +155,6 @@ namespace eris
         sh_ptr<Value> eval(FunctionDeclarationAST *exp, sh_ptr<Environment> env)
         {
             sh_ptr<Function> fn = sh_ptr<Function>(new Function(exp->params, exp->body, env));
-
             env->define(exp->name, fn);
 
             return sh_ptr<Value>();

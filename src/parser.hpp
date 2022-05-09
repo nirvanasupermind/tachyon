@@ -98,8 +98,84 @@ namespace eris
             return tokenType == "NUMBER" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null";
         }
 
+        /**
+         * @brief
+         * Generic call expression helper.
+         * 
+         * CallExpression
+         *  : Callee Arguments
+         *  ;
+         *
+         * Callee:
+         *  : MemberExpression
+         *  | CallExpression
+         * 
+         * 
+         */
+        
+        sh_ptr<AST> CallExpression(sh_ptr<AST> callee) 
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> callExpression(new CallExpressionAST(line, callee, this->Arguments()));
+            
+            if(this->lookahead.type == "(")
+            {
+                callExpression = this->CallExpression(callExpression);
+            }
+
+            return callExpression;
+        }
+
+        /**
+         * @brief 
+         * Arguments
+         *  : '(' OptArgumentList ')'
+         *  ;
+         */
+        std::vector<sh_ptr<AST> > Arguments()
+        {
+            this->eat("(");
+
+            std::vector<sh_ptr<AST> > argumentList;
+
+            if(this->lookahead.type != ")") {
+                argumentList = this->ArgumentList();
+            }
+
+            this->eat(")");
+
+            return argumentList;
+        }
+
+        /**
+         * @brief
+         * ArgumentList
+         *  : AssignmentExpression
+         *  | ArgumentList ',' AssignmentExpression
+         *  ;
+         */
+        std::vector<sh_ptr<AST> > ArgumentList()
+        {
+            std::vector<sh_ptr<AST> > params;
+
+            for (;;)
+            {
+                params.push_back(this->AssignmentExpression());
+
+                if (this->lookahead.type != ",")
+                {
+                    break;
+                }
+
+                this->eat(",");
+            }
+
+            return params;
+        }
     public:
         /**
+         * @brief 
          * Initializes the parser.
          */
         Parser() : string(""), tokenizer(Tokenizer()) {}
@@ -110,6 +186,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * Parses a string.
          */
         std::vector<sh_ptr<AST> > parse(const std::string &string)
@@ -127,6 +204,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * Main entry point.
          *
          * Program
@@ -140,6 +218,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * StatementList
          *  : Statement
          *  | StatementList Statement
@@ -158,6 +237,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * Statement
          *  : ExpressionStatement
          *  | EmptyStatement
@@ -208,6 +288,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * FunctionDeclaration
          *  : 'def' Identifier '(' OptFormalParameterList ')' BlockStatement
          *  ;
@@ -237,6 +318,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * FormalParameterList
          *  : Identifier
          *  | FormalParameterList ',' Identifier
@@ -262,6 +344,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * PrintStatement
          *  : 'print' Expression ';'
          *  ;
@@ -276,6 +359,7 @@ namespace eris
         }
 
         /**
+         * @brief  
          * IterationStatement
          *  : WhileStatement
          *  | DoWhileStatement
@@ -303,6 +387,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * WhileStatement
          *  : 'while' '(' Expression ')' Statement
          *  ;
@@ -323,6 +408,7 @@ namespace eris
         }
 
         /**
+         * @brief 
          * DoWhileStatement
          *  : 'do' Statement 'while' '(' Expression ')'
          *  ;
@@ -641,13 +727,13 @@ namespace eris
 
         /**
          * MultiplicativeExpression
-         *  : MemberExpression
-         *  | MultiplicativeExpression MULTIPLICATIVE_OPERATOR MemberExpression
+         *  : CallMemberExpression
+         *  | MultiplicativeExpression MULTIPLICATIVE_OPERATOR CallMemberExpression
          *  ;
          */
         sh_ptr<AST> MultiplicativeExpression()
         {
-            return this->BinaryExpression(&Parser::MemberExpression, "MULTIPLICATIVE_OPERATOR");
+            return this->BinaryExpression(&Parser::CallMemberExpression, "MULTIPLICATIVE_OPERATOR");
         }
 
         /**
@@ -658,8 +744,16 @@ namespace eris
          */
         sh_ptr<AST> CallMemberExpression()
         {
-            // Member part, 
-            sh_ptr<AST> member = 
+            // Member part, might be part of a call:
+            sh_ptr<AST> member = this->MemberExpression();
+
+            // See if we have a call expression:
+            if (this->lookahead.type == "(") 
+            {
+                return this->CallExpression(member);
+            }
+
+            return member;
         }
 
         /**
@@ -682,7 +776,7 @@ namespace eris
                     sh_ptr<AST> property = this->Identifier();
                     object = sh_ptr<MemberExpressionAST>(new MemberExpressionAST(line, object, property, false));
                 }
-                else if(this->lookahead.type == "[")
+                else if (this->lookahead.type == "[")
                 {
                     this->eat("[");
                     sh_ptr<AST> property = this->Identifier();
