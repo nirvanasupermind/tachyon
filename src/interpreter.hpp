@@ -87,6 +87,11 @@ namespace eris
                 return this->eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
             }
 
+            if (type == "MemberExpression")
+            {
+                return this->eval(dynamic_cast<MemberExpressionAST *>(exp), env);
+            }
+
             // --------------------------------------------
             // Statements:
 
@@ -145,6 +150,57 @@ namespace eris
 
             error(exp->line, "unimplemented");
             return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(FunctionDeclarationAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Function> fn = sh_ptr<Function>(new Function(exp->params, exp->body, env));
+
+            env->define(exp->name, fn);
+
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            if (exp->computed)
+            {
+                return sh_ptr<Value>();
+            }
+
+            sh_ptr<Value> value = eval(exp->object, env);
+
+            sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(value);
+
+            std::cout << "dbg 175" << '\n';
+
+            if (!object)
+            {
+                std::cout << "dbg 179" << '\n';
+
+                error(exp->object->line, value->str() + " does not support member access");
+            }
+            std::cout << "dbg 183" << '\n';
+
+            std::string property = std::dynamic_pointer_cast<IdentifierAST>(exp->property)->name;
+
+            std::cout << "dbg 187" << '\n';
+
+            try
+            {
+                std::cout << "dbg 192 " << object->members << '\n';
+
+                return object->members->lookup(property);
+            }
+            catch (const std::string &e)
+            {
+                std::cout << "dbg 198" << '\n';
+                // Error messages thrown from outside of interpreter don't have a line number
+                // so insert one here
+
+                error(exp->line, e);
+                return sh_ptr<Value>();
+            }
         }
 
         sh_ptr<Value> eval(EmptyStatementAST *exp, sh_ptr<Environment> env)
@@ -236,16 +292,6 @@ namespace eris
         {
             std::cout << this->eval(exp->argument, env)->str() << '\n';
 
-            return sh_ptr<Value>();
-        }
-
-        sh_ptr<Value> eval(FunctionDeclarationAST *exp, sh_ptr<Environment> env)
-        {
-            std::string name = std::dynamic_pointer_cast<IdentifierAST>(exp->name)->name;
-            sh_ptr<Function> fn = sh_ptr<Function>(new Function(exp->params, exp->body, env));
-
-            env->define(name, fn);
-            
             return sh_ptr<Value>();
         }
 

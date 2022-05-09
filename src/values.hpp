@@ -16,10 +16,10 @@ namespace eris
         }
     };
 
-    class Null: public Value
+    class Null : public Value
     {
     public:
-        std::string str() const 
+        std::string str() const
         {
             return "null";
         }
@@ -61,7 +61,7 @@ namespace eris
         }
     };
 
-    class Environment: public std::enable_shared_from_this<Environment>
+    class Environment : public std::enable_shared_from_this<Environment>
     {
     public:
         std::map<std::string, sh_ptr<Value> > record;
@@ -104,29 +104,28 @@ namespace eris
          */
         sh_ptr<Environment> resolve(const std::string &name)
         {
-            if(this->record.count(name) == 1)
+            if (this->record.count(name) == 1)
             {
                 return shared_from_this();
             }
 
-            if(this->parent)
+            if (!this->parent)
             {
-                return this->parent;
+                throw std::string("variable \"" + name + "\" is not defined");
+                return sh_ptr<Environment>();
             }
-                    
-            throw std::string("variable \""+name+"\" is not defined");
-            return sh_ptr<Environment>();
+
+            return this->parent->resolve(name);
         }
     };
-    
+
     class Object : public Value
     {
     public:
-        sh_ptr<Environment> env;
+        sh_ptr<Environment> members;
 
-        Object() = default;
-
-        Object(sh_ptr<Environment> env) : env(env) {}
+        Object() : members(sh_ptr<Environment>(new Environment())) {}
+        Object(sh_ptr<Environment> members) : members(members) {}
 
         std::string str() const
         {
@@ -138,6 +137,11 @@ namespace eris
     {
     public:
         std::string string;
+
+        String()
+        {
+            this->members = sh_ptr<Environment>(new Environment());
+        }
 
         String(const std::string &string) : string(string) {}
 
@@ -154,10 +158,10 @@ namespace eris
         sh_ptr<AST> body;
         sh_ptr<Environment> env;
 
-        Function(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env) 
-            : params(params), body(body), env(env) 
+        Function(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env)
+            : params(params), body(body), env(env)
         {
-        } 
+        }
 
         std::string str() const
         {

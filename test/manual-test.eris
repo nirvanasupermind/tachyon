@@ -1,5 +1,1 @@
-def f(x) {
-        
-}
-
-print f;
+foo(1)();
