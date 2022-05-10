@@ -29,9 +29,9 @@ namespace eris
         {
             sh_ptr<Value> result;
 
-            for (std::size_t i = 0; i < statementList.size(); i++)
+            for (sh_ptr<AST> statement : statementList)
             {
-                result = this->eval(statementList.at(i), env);
+                result = this->eval(statement, env);
             }
 
             return result;
@@ -85,6 +85,11 @@ namespace eris
             if (type == "BinaryExpression")
             {
                 return this->eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
+            }
+
+            if (type == "CallExpression")
+            {
+                return this->eval(dynamic_cast<CallExpressionAST *>(exp), env);
             }
 
             if (type == "MemberExpression")
@@ -158,6 +163,38 @@ namespace eris
             env->define(exp->name, fn);
 
             return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(CallExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> callee = this->eval(exp->callee, env);
+
+            sh_ptr<Function> fn = std::dynamic_pointer_cast<Function>(callee);
+
+            if (!fn)
+            {
+                this->error(exp->callee->line, callee->str() + " is not callable");
+            }
+
+            std::vector<sh_ptr<Value > > args;
+
+            for (sh_ptr<AST> arg : exp->arguments)
+            {
+                args.push_back(this->eval(arg, env));
+            }
+
+            // 2. User-defined function:
+            std::map<std::string, sh_ptr<Value> > activationRecord;
+
+            for (std::size_t i = 0; i < fn->params.size(); i++)
+            {
+                std::string param = std::dynamic_pointer_cast<IdentifierAST>(fn->params.at(i))->name;
+                activationRecord[param] = args.at(i);
+            }
+
+            sh_ptr<Environment> activationEnv(new Environment(activationRecord, fn->env));
+
+            return this->eval(fn->body, activationEnv);
         }
 
         sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
