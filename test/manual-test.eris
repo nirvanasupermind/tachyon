@@ -1,5 +1,5 @@
 def square(x) {
-    print x * x;
+    return x * x;
 }
 
-square(5);
+print square(5);

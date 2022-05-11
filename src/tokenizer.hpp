@@ -56,6 +56,7 @@ namespace eris
         {"^\\bfalse\\b", "false"},
         {"^\\bprint\\b", "print"},
         {"^\\bdef\\b", "def"},
+        {"^\\breturn\\b", "return"},
         
         // --------------------------------------------
         // Numbers:

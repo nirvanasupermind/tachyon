@@ -14,6 +14,8 @@ namespace eris
     {
     public:
         sh_ptr<Environment> global;
+        
+        sh_ptr<Value> returnValue;
 
         Interpreter(sh_ptr<Environment> global = sh_ptr<Environment>(new Environment()))
             : global(global)
@@ -32,6 +34,10 @@ namespace eris
             for (sh_ptr<AST> statement : statementList)
             {
                 result = this->eval(statement, env);
+                if (this->returnValue) {
+                    this->returnValue = sh_ptr<Value>();
+                    return result;
+                }
             }
 
             return result;
@@ -144,6 +150,12 @@ namespace eris
             {
                 return this->eval(dynamic_cast<PrintStatementAST *>(exp), env);
             }
+
+            if (type == "ReturnStatement")
+            {
+                return this->eval(dynamic_cast<ReturnStatementAST *>(exp), env);
+            }
+
 
             if (type == "FunctionDeclaration")
             {
@@ -329,6 +341,16 @@ namespace eris
             std::cout << this->eval(exp->argument, env)->str() << '\n';
 
             return sh_ptr<Value>();
+        }
+
+
+        sh_ptr<Value> eval(ReturnStatementAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> argument = this->eval(exp->argument, env);
+
+            this->returnValue = argument;
+
+            return argument;
         }
 
         sh_ptr<Value> eval(AssignmentExpressionAST *exp, sh_ptr<Environment> env)

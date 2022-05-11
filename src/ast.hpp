@@ -18,9 +18,8 @@ namespace eris
         virtual std::string type() const = 0;
     };
 
-
     // --------------------------------------------
-    // Statements:   
+    // Statements:
 
     class FunctionDeclarationAST : public AST
     {
@@ -28,7 +27,6 @@ namespace eris
         std::string name;
         std::vector<sh_ptr<AST> > params;
         sh_ptr<AST> body;
-    
 
         FunctionDeclarationAST(int line, const std::string &name, std::vector<sh_ptr<AST> > params, sh_ptr<AST> body)
             : name(name), params(params), body(body)
@@ -57,7 +55,25 @@ namespace eris
         {
             return "PrintStatement";
         }
-    }; 
+    };
+
+
+    class ReturnStatementAST : public AST
+    {
+    public:
+        sh_ptr<AST> argument;
+
+        ReturnStatementAST(int line, sh_ptr<AST> argument)
+            : argument(argument)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "ReturnStatement";
+        }
+    };
 
     class WhileStatementAST : public AST
     {
@@ -84,7 +100,7 @@ namespace eris
         sh_ptr<AST> test;
 
         DoWhileStatementAST(int line, sh_ptr<AST> body, sh_ptr<AST> test)
-            :  body(body), test(test)
+            : body(body), test(test)
         {
             this->line = line;
         }
@@ -254,7 +270,7 @@ namespace eris
             return "LogicalExpression";
         }
     };
-    
+
     class BinaryExpressionAST : public AST
     {
     public:
@@ -274,7 +290,6 @@ namespace eris
         }
     };
 
-
     class CallExpressionAST : public AST
     {
     public:
@@ -293,7 +308,7 @@ namespace eris
             return "CallExpression";
         }
     };
-    
+
     class MemberExpressionAST : public AST
     {
     public:

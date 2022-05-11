@@ -245,6 +245,8 @@ namespace eris
          *  | VariableStatement
          *  | IterationStatement
          *  | PrintStatement
+         *  | ReturnStatement
+         *  | FunctionDeclaration
          *  ;
          */
         sh_ptr<AST> Statement()
@@ -277,6 +279,11 @@ namespace eris
             if (this->lookahead.type == "print")
             {
                 return this->PrintStatement();
+            }
+
+            if (this->lookahead.type == "return")
+            {
+                return this->ReturnStatement();
             }
 
             if (this->lookahead.type == "def")
@@ -356,6 +363,22 @@ namespace eris
             sh_ptr<AST> argument = this->Expression();
             this->eat(";");
             return sh_ptr<AST>(new PrintStatementAST(line, argument));
+        }
+
+
+        /**
+         * @brief
+         * ReturnStatement
+         *  : 'return' Expression ';'
+         *  ;
+         */
+        sh_ptr<AST> ReturnStatement()
+        {
+            int line = this->tokenizer.line;
+            this->eat("return");
+            sh_ptr<AST> argument = this->Expression();
+            this->eat(";");
+            return sh_ptr<AST>(new ReturnStatementAST(line, argument));
         }
 
         /**
