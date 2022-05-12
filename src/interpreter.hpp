@@ -188,9 +188,27 @@ namespace eris
         sh_ptr<Value> eval(ClassDeclarationAST *exp, sh_ptr<Environment> env)
         {
             sh_ptr<Environment> classEnv(new Environment());
-            classEnv->parent = env;
+            if(exp->superClass) {
+                sh_ptr<Value> superClass = this->eval(exp->superClass, env);
+                sh_ptr<Object> superClassObj = std::dynamic_pointer_cast<Object>(superClass);
+                
+                if(!superClassObj) 
+                {
+                    this->error(exp->superClass->line, superClass->str() + " cannot be used as a superclass");
+                    return sh_ptr<Value>();
+                }
+
+                classEnv->parent = superClassObj->members;
+            }
+            else
+            {
+                classEnv->parent = env;
+            }
+
+
             std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
             this->eval(body, classEnv);
+            
             env->define(exp->name, sh_ptr<Object>(new Object(classEnv)));
             return sh_ptr<Value>();
         }

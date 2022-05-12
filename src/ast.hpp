@@ -44,10 +44,11 @@ namespace eris
     {
     public:
         std::string name;
+        sh_ptr<AST> superClass;
         sh_ptr<AST> body;
 
-        ClassDeclarationAST(int line, std::string name, sh_ptr<AST> body)
-            : name(name), body(body)
+        ClassDeclarationAST(int line, std::string name, sh_ptr<AST> superClass, sh_ptr<AST> body)
+            : name(name), superClass(superClass), body(body)
         {
             this->line = line;
         }

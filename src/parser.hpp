@@ -303,7 +303,7 @@ namespace eris
         /**
          * @brief 
          * ClassDeclaration
-         *  : 'class' Identifier BlockStatement
+         *  : 'class' Identifier OptClassExtends BlockStatement
          *  ;
          */
         sh_ptr<AST> ClassDeclaration()
@@ -313,10 +313,30 @@ namespace eris
             this->eat("class");
 
             std::string name = this->eat("IDENTIFIER").value;
+            
+            sh_ptr<AST> superClass;
+
+            if(this->lookahead.type == "extends")
+            {
+                superClass = this->ClassExtends();
+            }
 
             sh_ptr<AST> body = this->BlockStatement();
 
-            return sh_ptr<ClassDeclarationAST>(new ClassDeclarationAST(line, name, body));
+            return sh_ptr<ClassDeclarationAST>(new ClassDeclarationAST(line, name, superClass, body));
+        }
+
+
+        /**
+         * @brief 
+         * ClassDeclaration
+         *  : 'extends' Expression
+         *  ;
+         */
+        sh_ptr<AST> ClassExtends()
+        {
+            this->eat("extends");
+            return this->Expression();
         }
 
         /**

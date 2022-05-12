@@ -1,5 +1,11 @@
-class Math {
-    let PI = 3.14;
+class Foo {
+    let x = 20;
 }  
 
-print Math.PI;
+class Bar extends Foo {
+    let y = 50;
+}
+
+print Bar.x;
+
+print Bar.y;
