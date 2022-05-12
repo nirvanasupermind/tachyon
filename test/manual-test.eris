@@ -1,5 +1,5 @@
-def square(x) {
-    return x * x;
-}
+class Math {
+    let PI = 3.14;
+}  
 
-print square(5);
+print Math.PI;

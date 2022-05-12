@@ -3,6 +3,14 @@
 
 namespace eris
 {
+    std::string addressString(const void *p)
+    {
+        std::ostringstream address;
+        address << p;
+        std::string name = address.str();
+        return name;
+    }
+
     int countNewlines(const std::string &s)
     {
         int result = 0;

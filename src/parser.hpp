@@ -247,6 +247,7 @@ namespace eris
          *  | PrintStatement
          *  | ReturnStatement
          *  | FunctionDeclaration
+         *  | ClassDeclaration
          *  ;
          */
         sh_ptr<AST> Statement()
@@ -291,7 +292,31 @@ namespace eris
                 return this->FunctionDeclaration();
             }
 
+            if (this->lookahead.type == "class")
+            {
+                return this->ClassDeclaration();
+            }
+
             return this->ExpressionStatement();
+        }
+
+        /**
+         * @brief 
+         * ClassDeclaration
+         *  : 'class' Identifier BlockStatement
+         *  ;
+         */
+        sh_ptr<AST> ClassDeclaration()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("class");
+
+            std::string name = this->eat("IDENTIFIER").value;
+
+            sh_ptr<AST> body = this->BlockStatement();
+
+            return sh_ptr<ClassDeclarationAST>(new ClassDeclarationAST(line, name, body));
         }
 
         /**
@@ -376,7 +401,13 @@ namespace eris
         {
             int line = this->tokenizer.line;
             this->eat("return");
-            sh_ptr<AST> argument = this->Expression();
+            sh_ptr<AST> argument;
+
+            if(this->lookahead.type != ";")
+            {
+                argument = this->Expression();
+            }
+
             this->eat(";");
             return sh_ptr<AST>(new ReturnStatementAST(line, argument));
         }

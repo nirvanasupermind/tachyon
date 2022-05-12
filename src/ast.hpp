@@ -40,6 +40,24 @@ namespace eris
         }
     };
 
+    class ClassDeclarationAST : public AST
+    {
+    public:
+        std::string name;
+        sh_ptr<AST> body;
+
+        ClassDeclarationAST(int line, std::string name, sh_ptr<AST> body)
+            : name(name), body(body)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "ClassDeclaration";
+        }
+    };
+    
     class PrintStatementAST : public AST
     {
     public:
@@ -56,8 +74,7 @@ namespace eris
             return "PrintStatement";
         }
     };
-
-
+    
     class ReturnStatementAST : public AST
     {
     public:

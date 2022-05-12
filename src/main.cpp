@@ -11,18 +11,14 @@
 
 eris::sh_ptr<eris::Environment> global(new eris::Environment());
 
-void run(const std::string &filename, const std::string &text, bool shellMode)
+void run(const std::string &filename, const std::string &text)
 {
     eris::Parser parser;
-    eris::Interpreter interpreter;
+    eris::Interpreter interpreter(global);
 
     try
     {
-        eris::sh_ptr<eris::Value> result = interpreter.eval(parser.parse(text), global);
-
-        if(shellMode && result) {
-            std::cout << result->str() << '\n';
-        }
+        interpreter.eval(parser.parse(text), global, false);
     }
     catch (const std::string &e)
     {
@@ -34,30 +30,8 @@ int main(int argc, char **argv)
 {
     if (argc < 2)
     {
-        std::cout << "Welcome to Eris v0.0." << '\n';
-        std::cout << "Use Ctrl+D (i.e. EOF) to exit." << '\n';
-        std::string text;
-
-        while (true)
-        {
-            std::cout << "> " << std::flush;
-            std::getline(std::cin, text);
-
-            if (std::cin.bad())
-            {
-                std::cerr << "IO error\n";
-                break;
-            }
-            else if (std::cin.eof())
-            {
-                break;
-            }
-
-            if(text != "") 
-            {
-                run("stdin", text, true);
-            }
-        }
+        std::cerr << "Usage: eris [script]" << '\n';
+        return 0;
     }
     else
     {
@@ -72,11 +46,11 @@ int main(int argc, char **argv)
         std::string text = strStream.str();
 
         if(text == "") {
-            std::cerr << "File \"" + text + "\" is empty or does not exist" << '\n'; 
+            std::cerr << "File \"" + filename + "\" is empty or does not exist" << '\n'; 
             return 0;
         }
 
-        run(filename, text, false);
+        run(filename, text);
     }
 
     return 0;

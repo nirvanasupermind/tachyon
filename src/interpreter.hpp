@@ -5,6 +5,7 @@
 #include "values.hpp"
 #include "aliases.hpp"
 
+
 namespace eris
 {
     /**
@@ -14,7 +15,7 @@ namespace eris
     {
     public:
         sh_ptr<Environment> global;
-        
+
         sh_ptr<Value> returnValue;
 
         Interpreter(sh_ptr<Environment> global = sh_ptr<Environment>(new Environment()))
@@ -27,20 +28,31 @@ namespace eris
             throw std::string(std::to_string(line) + ": runtime error: " + message);
         }
 
-        sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env)
+        sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env, bool inBlock = false)
         {
+            if (statementList.size() == 0)
+            {
+                return sh_ptr<Value>();
+            }
+
             sh_ptr<Value> result;
 
             for (sh_ptr<AST> statement : statementList)
             {
                 result = this->eval(statement, env);
-                if (this->returnValue) {
-                    this->returnValue = sh_ptr<Value>();
-                    return result;
+                
+                if (this->returnValue)
+                {
+                    if (!inBlock)
+                    {
+                        this->returnValue = sh_ptr<Value>();
+                    }
+
+                    return this->returnValue;
                 }
             }
 
-            return result;
+            return sh_ptr<Value>();
         }
 
         sh_ptr<Value> eval(sh_ptr<AST> exp, sh_ptr<Environment> env)
@@ -156,16 +168,30 @@ namespace eris
                 return this->eval(dynamic_cast<ReturnStatementAST *>(exp), env);
             }
 
-
             if (type == "FunctionDeclaration")
             {
                 return this->eval(dynamic_cast<FunctionDeclarationAST *>(exp), env);
+            }
+
+            if (type == "ClassDeclaration")
+            {
+                return this->eval(dynamic_cast<ClassDeclarationAST *>(exp), env);
             }
 
             // --------------------------------------------
             // Unimplemented:
 
             error(exp->line, "unimplemented");
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(ClassDeclarationAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Environment> classEnv(new Environment());
+            classEnv->parent = env;
+            std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
+            this->eval(body, classEnv);
+            env->define(exp->name, sh_ptr<Object>(new Object(classEnv)));
             return sh_ptr<Value>();
         }
 
@@ -188,7 +214,7 @@ namespace eris
                 this->error(exp->callee->line, callee->str() + " is not callable");
             }
 
-            std::vector<sh_ptr<Value > > args;
+            std::vector<sh_ptr<Value> > args;
 
             for (sh_ptr<AST> arg : exp->arguments)
             {
@@ -206,7 +232,16 @@ namespace eris
 
             sh_ptr<Environment> activationEnv(new Environment(activationRecord, fn->env));
 
-            return this->eval(fn->body, activationEnv);
+            std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(fn->body)->body;
+
+            sh_ptr<Value> result = this->eval(body, activationEnv);
+
+            if (!result)
+            {
+                return sh_ptr<Null>(new Null());
+            }
+
+            return result;
         }
 
         sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
@@ -220,29 +255,19 @@ namespace eris
 
             sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(value);
 
-            std::cout << "dbg 175" << '\n';
-
             if (!object)
             {
-                std::cout << "dbg 179" << '\n';
-
                 error(exp->object->line, value->str() + " does not support member access");
             }
-            std::cout << "dbg 183" << '\n';
 
             std::string property = std::dynamic_pointer_cast<IdentifierAST>(exp->property)->name;
 
-            std::cout << "dbg 187" << '\n';
-
             try
             {
-                std::cout << "dbg 192 " << object->members << '\n';
-
                 return object->members->lookup(property);
             }
             catch (const std::string &e)
             {
-                std::cout << "dbg 198" << '\n';
                 // Error messages thrown from outside of interpreter don't have a line number
                 // so insert one here
 
@@ -261,7 +286,9 @@ namespace eris
             sh_ptr<Environment> child_env(new Environment());
             child_env->parent = env;
 
-            return this->eval(exp->body, child_env);
+            this->returnValue = sh_ptr<Value>();
+
+            return this->eval(exp->body, child_env, true);
         }
 
         sh_ptr<Value> eval(ExpressionStatementAST *exp, sh_ptr<Environment> env)
@@ -343,10 +370,15 @@ namespace eris
             return sh_ptr<Value>();
         }
 
-
         sh_ptr<Value> eval(ReturnStatementAST *exp, sh_ptr<Environment> env)
         {
-            sh_ptr<Value> argument = this->eval(exp->argument, env);
+            sh_ptr<Value> argument(new Null());
+
+            if (exp->argument)
+            {
+
+                argument = this->eval(exp->argument, env);
+            }
 
             this->returnValue = argument;
 

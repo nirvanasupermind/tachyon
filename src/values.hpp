@@ -1,7 +1,11 @@
 #ifndef VALUES_HPP
 #define VALUES_HPP
 
+#include <string>
+#include <map>
+
 #include "aliases.hpp"
+#include "util.hpp"
 
 namespace eris
 {
@@ -118,7 +122,7 @@ namespace eris
             return this->parent->resolve(name);
         }
     };
-
+    
     class Object : public Value
     {
     public:
@@ -129,9 +133,10 @@ namespace eris
 
         std::string str() const
         {
-            return "(object)";
+            return "(object : " + addressString((const void *)this)+")";
         }
     };
+
 
     class String : public Object
     {
@@ -163,9 +168,9 @@ namespace eris
         {
         }
 
-        std::string str() const
+        std::string str() 
         {
-            return "(function)";
+            return "(function : " + addressString((const void *)this)+")";
         }
     };
 }
