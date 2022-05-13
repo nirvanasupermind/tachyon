@@ -28,7 +28,7 @@ namespace eris
             throw std::string(std::to_string(line) + ": runtime error: " + message);
         }
 
-        sh_ptr<Value> eval(std::vector<sh_ptr<AST> > statementList, sh_ptr<Environment> env, bool inBlock = false)
+        sh_ptr<Value> eval(const std::vector<sh_ptr<AST> > &statementList, sh_ptr<Environment> env, bool isInFunction = false)
         {
             if (statementList.size() == 0)
             {
@@ -40,15 +40,17 @@ namespace eris
             for (sh_ptr<AST> statement : statementList)
             {
                 result = this->eval(statement, env);
-                
+
                 if (this->returnValue)
                 {
-                    if (!inBlock)
+                    sh_ptr<Value> temp = this->returnValue;
+
+                    if (isInFunction)
                     {
                         this->returnValue = sh_ptr<Value>();
                     }
 
-                    return this->returnValue;
+                    return temp;
                 }
             }
 
@@ -205,7 +207,6 @@ namespace eris
                 classEnv->parent = env;
             }
 
-
             std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
             this->eval(body, classEnv);
             
@@ -252,7 +253,7 @@ namespace eris
 
             std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(fn->body)->body;
 
-            sh_ptr<Value> result = this->eval(body, activationEnv);
+            sh_ptr<Value> result = this->eval(body, activationEnv, true);
 
             if (!result)
             {
@@ -304,9 +305,7 @@ namespace eris
             sh_ptr<Environment> child_env(new Environment());
             child_env->parent = env;
 
-            this->returnValue = sh_ptr<Value>();
-
-            return this->eval(exp->body, child_env, true);
+            return this->eval(exp->body, child_env);
         }
 
         sh_ptr<Value> eval(ExpressionStatementAST *exp, sh_ptr<Environment> env)
@@ -394,7 +393,6 @@ namespace eris
 
             if (exp->argument)
             {
-
                 argument = this->eval(exp->argument, env);
             }
 

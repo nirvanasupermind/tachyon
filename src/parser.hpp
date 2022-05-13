@@ -410,7 +410,6 @@ namespace eris
             return sh_ptr<AST>(new PrintStatementAST(line, argument));
         }
 
-
         /**
          * @brief
          * ReturnStatement

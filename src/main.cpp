@@ -18,7 +18,7 @@ void run(const std::string &filename, const std::string &text)
 
     try
     {
-        interpreter.eval(parser.parse(text), global, false);
+        interpreter.eval(parser.parse(text), global);
     }
     catch (const std::string &e)
     {

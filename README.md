@@ -7,13 +7,13 @@ C++ interpreter for the Eris programming language with a header-only implementat
 # Synopsis
 ```
 class Point {
-    def constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    def constructor(self, x, y) {
+        self.x = x;
+        self.y = y;
     }
 
-    def calc() {
-        return this.x + this.y;
+    def calc(self) {
+        return x + y;
     }
 }
 

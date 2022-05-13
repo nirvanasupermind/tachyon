@@ -1,11 +1,9 @@
-class Foo {
-    let x = 20;
-}  
+def f(x) {    
+    if(x == 0) {
+        return 1;
+    }
 
-class Bar extends Foo {
-    let y = 50;
+    return x * f(x - 1);
 }
 
-print Bar.x;
-
-print Bar.y;
+print f(5);
