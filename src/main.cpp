@@ -8,8 +8,14 @@
 #include "parser.hpp"
 #include "interpreter.hpp"
 #include "aliases.hpp"
+#include "builtins.hpp"
 
 eris::sh_ptr<eris::Environment> global(new eris::Environment());
+void launchBuiltins() 
+{
+    global->define("Object", eris::builtins::Object);    
+    global->define("print", eris::builtins::print);    
+}
 
 void run(const std::string &filename, const std::string &text)
 {
@@ -28,6 +34,8 @@ void run(const std::string &filename, const std::string &text)
 
 int main(int argc, char **argv)
 {
+    launchBuiltins();
+    
     if (argc < 2)
     {
         std::cerr << "Usage: eris [script]" << '\n';

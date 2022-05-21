@@ -1,6 +1,6 @@
 # Eris
 
-**This interpreter is in an early stage. Some programs (including the example below) will not run yet.**
+**This interpreter is in an early stage.**
 
 C++ interpreter for the Eris programming language with a header-only implementation. 
 
@@ -13,11 +13,10 @@ class Point {
     }
 
     def calc(self) {
-        return x + y;
+        return self.x + self.y;
     }
 }
 
-let p = new Point(10, 20);
-
-print(p.calc()); // 30
+let p = Point(10, 20);
+print p.calc(); // 30
 ```

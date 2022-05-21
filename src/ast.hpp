@@ -58,24 +58,7 @@ namespace eris
             return "ClassDeclaration";
         }
     };
-    
-    class PrintStatementAST : public AST
-    {
-    public:
-        sh_ptr<AST> argument;
-
-        PrintStatementAST(int line, sh_ptr<AST> argument)
-            : argument(argument)
-        {
-            this->line = line;
-        }
-
-        std::string type() const
-        {
-            return "PrintStatement";
-        }
-    };
-    
+  
     class ReturnStatementAST : public AST
     {
     public:
@@ -332,10 +315,10 @@ namespace eris
     public:
         sh_ptr<AST> object;
         sh_ptr<AST> property;
-        bool computed;
+        std::string subtype;
 
-        MemberExpressionAST(int line, sh_ptr<AST> object, sh_ptr<AST> property, bool computed)
-            : object(object), property(property), computed(computed)
+        MemberExpressionAST(int line, sh_ptr<AST> object, sh_ptr<AST> property, std::string subtype)
+            : object(object), property(property), subtype(subtype)
         {
             this->line = line;
         }

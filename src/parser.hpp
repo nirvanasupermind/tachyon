@@ -73,7 +73,7 @@ namespace eris
 
         sh_ptr<AST> checkValidAssignmentTarget(sh_ptr<AST> node)
         {
-            if (node->type() == "Identifier")
+            if (node->type() == "Identifier" || node->type() == "MemberExpression")
             {
                 return node;
             }
@@ -244,7 +244,6 @@ namespace eris
          *  | BlockStatement
          *  | VariableStatement
          *  | IterationStatement
-         *  | PrintStatement
          *  | ReturnStatement
          *  | FunctionDeclaration
          *  | ClassDeclaration
@@ -275,11 +274,6 @@ namespace eris
             if (this->lookahead.type == "while" || this->lookahead.type == "do" || this->lookahead.type == "for")
             {
                 return this->IterationStatement();
-            }
-
-            if (this->lookahead.type == "print")
-            {
-                return this->PrintStatement();
             }
 
             if (this->lookahead.type == "return")
@@ -393,21 +387,6 @@ namespace eris
             }
 
             return params;
-        }
-
-        /**
-         * @brief
-         * PrintStatement
-         *  : 'print' Expression ';'
-         *  ;
-         */
-        sh_ptr<AST> PrintStatement()
-        {
-            int line = this->tokenizer.line;
-            this->eat("print");
-            sh_ptr<AST> argument = this->Expression();
-            this->eat(";");
-            return sh_ptr<AST>(new PrintStatementAST(line, argument));
         }
 
         /**
@@ -833,6 +812,7 @@ namespace eris
          * MemberExpression
          *  : PrimaryExpression
          *  | MemberExpression '.' Identifier
+         *  | MemberExpression '::' Identifier
          *  | LeftHandSideExpression
          *  ;
          */
@@ -841,20 +821,19 @@ namespace eris
             int line = this->tokenizer.line;
             sh_ptr<AST> object = this->PrimaryExpression();
 
-            while (this->lookahead.type == "." || this->lookahead.type == "[")
+            while (this->lookahead.type == "." || this->lookahead.type == "::")
             {
                 if (this->lookahead.type == ".")
                 {
                     this->eat(".");
                     sh_ptr<AST> property = this->Identifier();
-                    object = sh_ptr<MemberExpressionAST>(new MemberExpressionAST(line, object, property, false));
+                    object = sh_ptr<MemberExpressionAST>(new MemberExpressionAST(line, object, property, "dot"));
                 }
-                else if (this->lookahead.type == "[")
+                else if (this->lookahead.type == "::")
                 {
-                    this->eat("[");
+                    this->eat("::");
                     sh_ptr<AST> property = this->Identifier();
-                    this->eat("]");
-                    object = sh_ptr<MemberExpressionAST>(new MemberExpressionAST(line, object, property, true));
+                    object = sh_ptr<MemberExpressionAST>(new MemberExpressionAST(line, object, property, "scopeResolution"));
                 }
             }
 

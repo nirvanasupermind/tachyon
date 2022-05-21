@@ -3,12 +3,17 @@
 
 #include <string>
 #include <map>
+#include <functional>
 
 #include "aliases.hpp"
 #include "util.hpp"
 
 namespace eris
 {
+    /**
+     * @brief 
+     * Generic base class for all values in Eris.
+     */
     class Value
     {
     public:
@@ -20,6 +25,10 @@ namespace eris
         }
     };
 
+    /**
+     * @brief 
+     * Represents the null value in Eris.
+     */
     class Null : public Value
     {
     public:
@@ -34,6 +43,10 @@ namespace eris
         }
     };
 
+    /**
+     * @brief 
+     * Represents a double-precision floating-point number in Eris.
+     */
     class Number : public Value
     {
     public:
@@ -47,6 +60,10 @@ namespace eris
         }
     };
 
+    /**
+     * @brief 
+     * Represents a boolean in Eris.
+     */
     class Boolean : public Value
     {
     public:
@@ -65,6 +82,10 @@ namespace eris
         }
     };
 
+    /**
+     * @brief 
+     * Represents a repository of variables and functions defined in a scope.
+     */
     class Environment : public std::enable_shared_from_this<Environment>
     {
     public:
@@ -122,7 +143,11 @@ namespace eris
             return this->parent->resolve(name);
         }
     };
-    
+
+    /**
+     * @brief 
+     * Represents an object in Eris.
+     */
     class Object : public Value
     {
     public:
@@ -137,7 +162,28 @@ namespace eris
         }
     };
 
+    /**
+     * @brief 
+     * Represents a class in Eris.
+     */
+    class Class : public Value
+    {
+    public:
+        sh_ptr<Environment> members;
 
+        Class() : members(sh_ptr<Environment>(new Environment())) {}
+        Class(sh_ptr<Environment> members) : members(members) {}
+
+        std::string str() const
+        {
+            return "(class : " + addressString((const void *)this)+")";
+        }
+    };
+
+    /**
+     * @brief 
+     * Represents a string in Eris.
+     */
     class String : public Object
     {
     public:
@@ -156,23 +202,48 @@ namespace eris
         }
     };
 
-    class Function : public Object
+    /**
+     * @brief 
+     * Represents a user-defined in Eris.
+     */
+    class UserDefinedFunction : public Object
     {
     public:
         std::vector<sh_ptr<AST> > params;
         sh_ptr<AST> body;
         sh_ptr<Environment> env;
 
-        Function(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env)
+        UserDefinedFunction(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env)
             : params(params), body(body), env(env)
         {
         }
 
         std::string str() 
         {
-            return "(function : " + addressString((const void *)this)+")";
+            return "(user-defined function : " + addressString((const void *)this)+")";
         }
-    };
-}
+    };  
+
+    /**
+     * @brief 
+     *  Represents a native (built-in) function included in Eris's standard-library.
+     */
+
+    class NativeFunction : public Object
+    {
+    public:
+        std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> fn;
+
+        NativeFunction(const std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> &fn)
+            : fn(fn)
+        {
+        }
+
+        std::string str() 
+        {
+            return "(native function : " + addressString((const void *)this)+")";
+        }
+    };  
+}   
 
 #endif

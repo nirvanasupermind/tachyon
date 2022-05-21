@@ -42,7 +42,8 @@ namespace eris
         {"^\\]", "]"},
         {"^,", ","},
         {"^\\.", "."},
-
+        {"^::", "::"},
+        
         // --------------------------------------------
         // Keywords:
 
@@ -54,7 +55,6 @@ namespace eris
         {"^\\bfor\\b", "for"},
         {"^\\btrue\\b", "true"},
         {"^\\bfalse\\b", "false"},
-        {"^\\bprint\\b", "print"},
         {"^\\bdef\\b", "def"},
         {"^\\breturn\\b", "return"},
         {"^\\bclass\\b", "class"},
