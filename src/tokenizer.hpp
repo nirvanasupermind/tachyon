@@ -59,11 +59,14 @@ namespace eris
         {"^\\breturn\\b", "return"},
         {"^\\bclass\\b", "class"},
         {"^\\bextends\\b", "extends"},
+        {"^\\bnamespace\\b", "namespace"},
         
         // --------------------------------------------
         // Numbers:
 
-        {"^\\d+(\\.\\d+)?([eE][+-]?\\d+)?", "NUMBER"},
+        {"^\\d+(?![.eE])", "INT"},
+
+        {"^\\d+(\\.\\d*)?([eE][+-]?\\d+)?", "DOUBLE"},
 
         // --------------------------------------------
         // Identifiers:

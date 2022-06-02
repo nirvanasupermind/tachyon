@@ -1,10 +1,10 @@
 #ifndef AST_HPP
 #define AST_HPP
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "aliases.hpp"
 
@@ -58,7 +58,25 @@ namespace eris
             return "ClassDeclaration";
         }
     };
-  
+
+    class NamespaceDeclarationAST : public AST
+    {
+    public:
+        std::string name;
+        sh_ptr<AST> body;
+
+        NamespaceDeclarationAST(int line, std::string name, sh_ptr<AST> body)
+            : name(name), body(body)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "NamespaceDeclaration";
+        }
+    };
+
     class ReturnStatementAST : public AST
     {
     public:
@@ -329,12 +347,12 @@ namespace eris
         }
     };
 
-    class NumericLiteralAST : public AST
+    class IntLiteralAST : public AST
     {
     public:
-        double value;
+        int value;
 
-        NumericLiteralAST(int line, double value)
+        IntLiteralAST(int line, std::int32_t value)
             : value(value)
         {
             this->line = line;
@@ -342,7 +360,24 @@ namespace eris
 
         std::string type() const
         {
-            return "NumericLiteral";
+            return "IntLiteral";
+        }
+    };
+
+    class DoubleLiteralAST : public AST
+    {
+    public:
+        double value;
+
+        DoubleLiteralAST(int line, double value)
+            : value(value)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "DoubleLiteral";
         }
     };
 

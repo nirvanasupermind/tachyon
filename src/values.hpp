@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <cstdint>
+#include <limits>
 
 #include "aliases.hpp"
 #include "util.hpp"
@@ -45,20 +47,92 @@ namespace eris
 
     /**
      * @brief 
-     * Represents a double-precision floating-point number in Eris.
+     * Generic base class for all numeric values in Eris.
      */
     class Number : public Value
     {
     public:
-        double value;
+        virtual std::int32_t intVal() const = 0;
 
-        Number(double value) : value(value) {}
+        virtual double doubleVal() const = 0;
+        
+        virtual bool isInt() const = 0;
+    };
+
+
+    /**
+     * @brief 
+     * Represents a signed 32-bit integer in Eris.
+     */
+    class Int: public Number
+    {
+    public:
+        std::int32_t value;
+        
+        Int(std::int32_t value)
+            : value(value)
+        {
+        }
+
+        bool isInt() const
+        {
+            return true;
+        }
+
+        int intVal() const
+        {
+            return value;
+        }
+
+        double doubleVal() const 
+        {
+            return (double)value;
+        }
 
         std::string str() const
         {
             return std::to_string(value);
         }
     };
+
+    /**
+     * @brief 
+     * Represents a double-precision floating-point number in Eris.
+     */
+    class Double: public Number
+    {
+    public:
+        double value;
+        
+        Double(double value)
+            : value(value)
+        {
+        }
+
+        bool isInt() const
+        {
+            return false;
+        }
+
+        int intVal() const
+        {
+            return (std::int32_t)value;
+        }
+        
+        double doubleVal() const 
+        {
+            return value;
+        }
+
+        std::string str() const
+        {
+            return std::to_string(value);
+        }
+
+        static const sh_ptr<Double> inf;
+    };
+
+    const sh_ptr<Double> Double::inf { new Double(std::numeric_limits<double>::infinity()) };
 
     /**
      * @brief 
@@ -142,6 +216,24 @@ namespace eris
 
             return this->parent->resolve(name);
         }
+
+        /**
+         * Returns whether or not a variable is defined.
+         */
+        bool contains(const std::string &name)
+        {
+            if (this->record.count(name) == 1)
+            {
+                return true;
+            }
+
+            if (!this->parent)
+            {
+                return false;
+            }
+
+            return this->parent->contains(name);
+        }
     };
 
     /**
@@ -189,12 +281,10 @@ namespace eris
     public:
         std::string string;
 
-        String()
+        String(const std::string &string, sh_ptr<Environment> members) : string(string)
         {
-            this->members = sh_ptr<Environment>(new Environment());
+            this->members = members;
         }
-
-        String(const std::string &string) : string(string) {}
 
         std::string str() const
         {
@@ -204,7 +294,7 @@ namespace eris
 
     /**
      * @brief 
-     * Represents a user-defined in Eris.
+     * Represents a user-defined function in Eris.
      */
     class UserDefinedFunction : public Object
     {

@@ -11,10 +11,13 @@
 #include "builtins.hpp"
 
 eris::sh_ptr<eris::Environment> global(new eris::Environment());
+
 void launchBuiltins() 
 {
-    global->define("Object", eris::builtins::Object);    
-    global->define("print", eris::builtins::print);    
+    global->define("Object", eris::builtins::Object); 
+    global->define("String", eris::builtins::String);
+    eris::builtins::String->members->define("len", eris::builtins::Stringlen);
+    global->define("print", eris::builtins::print);  
 }
 
 void run(const std::string &filename, const std::string &text)

@@ -1,10 +1,10 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-// #include <functional>
 #include <string>
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 #include "tokens.hpp"
 #include "tokenizer.hpp"
@@ -20,159 +20,6 @@ namespace eris
 
     class Parser
     {
-    private:
-        std::string string;
-        Tokenizer tokenizer;
-        Token lookahead;
-
-        /**
-         * Generic binary expression.
-         */
-        sh_ptr<AST> BinaryExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
-        {
-            int line = this->tokenizer.line;
-
-            sh_ptr<AST> left = (this->*builder)();
-
-            while (this->lookahead.type == operatorToken)
-            {
-                std::string op = this->lookahead.value;
-
-                this->eat(operatorToken);
-
-                sh_ptr<AST> right = (this->*builder)();
-
-                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
-            }
-
-            return left;
-        }
-
-        /**
-         * Generic binary expression.
-         */
-        sh_ptr<AST> LogicalExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
-        {
-            int line = this->tokenizer.line;
-
-            sh_ptr<AST> left = (this->*builder)();
-
-            while (this->lookahead.type == operatorToken)
-            {
-                std::string op = this->lookahead.value;
-
-                this->eat(operatorToken);
-
-                sh_ptr<AST> right = (this->*builder)();
-
-                left = sh_ptr<LogicalExpressionAST>(new LogicalExpressionAST(line, op, left, right));
-            }
-
-            return left;
-        }
-
-        sh_ptr<AST> checkValidAssignmentTarget(sh_ptr<AST> node)
-        {
-            if (node->type() == "Identifier" || node->type() == "MemberExpression")
-            {
-                return node;
-            }
-
-            error("invalid left-hand side in assignment expression");
-            return sh_ptr<AST>();
-        }
-
-        /**
-         * Whether the token type is an assignment operator.
-         */
-        bool isAssignmentOperator(const std::string &tokenType)
-        {
-            return tokenType == "SIMPLE_ASSIGN" || tokenType == "COMPLEX_ASSIGN";
-        }
-
-        /**
-         * Whether the token is a literal.
-         */
-        bool isLiteral(const std::string &tokenType)
-        {
-            return tokenType == "NUMBER" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null";
-        }
-
-        /**
-         * @brief
-         * Generic call expression helper.
-         * 
-         * CallExpression
-         *  : Callee Arguments
-         *  ;
-         *
-         * Callee:
-         *  : MemberExpression
-         *  | CallExpression
-         * 
-         * 
-         */
-        
-        sh_ptr<AST> CallExpression(sh_ptr<AST> callee) 
-        {
-            int line = this->tokenizer.line;
-
-            sh_ptr<AST> callExpression(new CallExpressionAST(line, callee, this->Arguments()));
-            
-            if(this->lookahead.type == "(")
-            {
-                callExpression = this->CallExpression(callExpression);
-            }
-
-            return callExpression;
-        }
-
-        /**
-         * @brief 
-         * Arguments
-         *  : '(' OptArgumentList ')'
-         *  ;
-         */
-        std::vector<sh_ptr<AST> > Arguments()
-        {
-            this->eat("(");
-
-            std::vector<sh_ptr<AST> > argumentList;
-
-            if(this->lookahead.type != ")") {
-                argumentList = this->ArgumentList();
-            }
-
-            this->eat(")");
-
-            return argumentList;
-        }
-
-        /**
-         * @brief
-         * ArgumentList
-         *  : AssignmentExpression
-         *  | ArgumentList ',' AssignmentExpression
-         *  ;
-         */
-        std::vector<sh_ptr<AST> > ArgumentList()
-        {
-            std::vector<sh_ptr<AST> > params;
-
-            for (;;)
-            {
-                params.push_back(this->AssignmentExpression());
-
-                if (this->lookahead.type != ",")
-                {
-                    break;
-                }
-
-                this->eat(",");
-            }
-
-            return params;
-        }
     public:
         /**
          * @brief 
@@ -291,6 +138,11 @@ namespace eris
                 return this->ClassDeclaration();
             }
 
+            if (this->lookahead.type == "namespace")
+            {
+                return this->NamespaceDeclaration();
+            }
+
             return this->ExpressionStatement();
         }
 
@@ -320,10 +172,9 @@ namespace eris
             return sh_ptr<ClassDeclarationAST>(new ClassDeclarationAST(line, name, superClass, body));
         }
 
-
         /**
          * @brief 
-         * ClassDeclaration
+         * ClassExtends
          *  : 'extends' Expression
          *  ;
          */
@@ -331,6 +182,25 @@ namespace eris
         {
             this->eat("extends");
             return this->Expression();
+        }
+
+        /**
+         * @brief 
+         * NamespaceDeclaration
+         *  : 'namespace' Identifier BlockStatement
+         *  ;
+         */
+        sh_ptr<AST> NamespaceDeclaration()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("namespace");
+
+            std::string name = this->eat("IDENTIFIER").value;
+            
+            sh_ptr<AST> body = this->BlockStatement();
+
+            return sh_ptr<NamespaceDeclarationAST>(new NamespaceDeclarationAST(line, name, body));
         }
 
         /**
@@ -875,15 +745,22 @@ namespace eris
 
         /**
          * Literal
-         *  : NumericLiteral
+         *  : IntLiteral
+         *  | DoubleLiteral
          *  | StringLiteral
+         *  | BooleanLiteral
          *  ;
          */
         sh_ptr<AST> Literal()
         {
-            if (lookahead.type == "NUMBER")
+            if (lookahead.type == "INT")
             {
-                return this->NumericLiteral();
+                return this->IntLiteral();
+            }
+
+            if (lookahead.type == "DOUBLE")
+            {
+                return this->DoubleLiteral();
             }
 
             if (lookahead.type == "STRING")
@@ -906,17 +783,46 @@ namespace eris
         }
 
         /**
-         * NumericLiteral
-         *  : NUMBER
+         * IntLiteral
+         *  : INT
          *  ;
          */
-        sh_ptr<AST> NumericLiteral()
+        sh_ptr<AST> IntLiteral()
         {
             int line = this->tokenizer.line;
 
-            Token token = this->eat("NUMBER");
+            Token token = this->eat("INT");
 
-            return sh_ptr<NumericLiteralAST>(new NumericLiteralAST(line, std::stod(token.value)));
+            return sh_ptr<IntLiteralAST>(new IntLiteralAST(line, (std::int32_t)std::stol(token.value)));
+        }
+
+        /**
+         * DoubleLiteral
+         *  : DOUBLE
+         *  ;
+         */
+        sh_ptr<AST> DoubleLiteral()
+        {
+            int line = this->tokenizer.line;
+
+            Token token = this->eat("DOUBLE");
+
+            return sh_ptr<DoubleLiteralAST>(new DoubleLiteralAST(line, std::stod(token.value)));
+        }
+
+        /**
+         * StringLiteral
+         *  :
+         *  STRING
+         *  ;
+         */
+        sh_ptr<AST> StringLiteral()
+        {
+            int line = this->tokenizer.line;
+
+            Token token = this->eat("STRING");
+
+            return sh_ptr<StringLiteralAST>(new StringLiteralAST(line, token.value.substr(1, token.value.size() - 2)));
         }
 
         /**
@@ -949,21 +855,6 @@ namespace eris
         }
 
         /**
-         * StringLiteral
-         *  :
-         *  STRING
-         *  ;
-         */
-        sh_ptr<AST> StringLiteral()
-        {
-            int line = this->tokenizer.line;
-
-            Token token = this->eat("STRING");
-
-            return sh_ptr<StringLiteralAST>(new StringLiteralAST(line, token.value.substr(1, token.value.size() - 2)));
-        }
-
-        /**
          * Expects a token of a given type.
          */
 
@@ -987,6 +878,164 @@ namespace eris
             this->lookahead = this->tokenizer.getNextToken();
 
             return token;
+        }
+    protected:
+        std::string string;
+        Tokenizer tokenizer;
+        Token lookahead;
+
+        /**
+         * Generic binary expression.
+         */
+        sh_ptr<AST> BinaryExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = (this->*builder)();
+
+            while (this->lookahead.type == operatorToken)
+            {
+                std::string op = this->lookahead.value;
+
+                this->eat(operatorToken);
+
+                sh_ptr<AST> right = (this->*builder)();
+
+                left = sh_ptr<BinaryExpressionAST>(new BinaryExpressionAST(line, op, left, right));
+            }
+
+            return left;
+        }
+
+        /**
+         * Generic binary expression.
+         */
+        sh_ptr<AST> LogicalExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> left = (this->*builder)();
+
+            while (this->lookahead.type == operatorToken)
+            {
+                std::string op = this->lookahead.value;
+
+                this->eat(operatorToken);
+
+                sh_ptr<AST> right = (this->*builder)();
+
+                left = sh_ptr<LogicalExpressionAST>(new LogicalExpressionAST(line, op, left, right));
+            }
+
+            return left;
+        }
+
+        sh_ptr<AST> checkValidAssignmentTarget(sh_ptr<AST> node)
+        {
+            if (node->type() == "Identifier" || node->type() == "MemberExpression")
+            {
+                return node;
+            }
+
+            error("invalid left-hand side in assignment expression");
+            return sh_ptr<AST>();
+        }
+
+        /**
+         * Whether the token type is an assignment operator.
+         */
+        bool isAssignmentOperator(const std::string &tokenType)
+        {
+            return tokenType == "SIMPLE_ASSIGN" || tokenType == "COMPLEX_ASSIGN";
+        }
+
+        /**
+         * Whether the token is a literal.
+         */
+        bool isLiteral(const std::string &tokenType)
+        {
+            return tokenType == "INT" 
+                    || tokenType == "DOUBLE" 
+                    || tokenType == "STRING" 
+                    || tokenType == "true" 
+                    || tokenType == "false" 
+                    || tokenType == "null";
+        }
+
+        /**
+         * @brief
+         * Generic call expression helper.
+         * 
+         * CallExpression
+         *  : Callee Arguments
+         *  ;
+         *
+         * Callee:
+         *  : MemberExpression
+         *  | CallExpression
+         * 
+         * 
+         */
+        
+        sh_ptr<AST> CallExpression(sh_ptr<AST> callee) 
+        {
+            int line = this->tokenizer.line;
+
+            sh_ptr<AST> callExpression(new CallExpressionAST(line, callee, this->Arguments()));
+            
+            if(this->lookahead.type == "(")
+            {
+                callExpression = this->CallExpression(callExpression);
+            }
+
+            return callExpression;
+        }
+
+        /**
+         * @brief 
+         * Arguments
+         *  : '(' OptArgumentList ')'
+         *  ;
+         */
+        std::vector<sh_ptr<AST> > Arguments()
+        {
+            this->eat("(");
+
+            std::vector<sh_ptr<AST> > argumentList;
+
+            if(this->lookahead.type != ")") {
+                argumentList = this->ArgumentList();
+            }
+
+            this->eat(")");
+
+            return argumentList;
+        }
+
+        /**
+         * @brief
+         * ArgumentList
+         *  : AssignmentExpression
+         *  | ArgumentList ',' AssignmentExpression
+         *  ;
+         */
+        std::vector<sh_ptr<AST> > ArgumentList()
+        {
+            std::vector<sh_ptr<AST> > params;
+
+            for (;;)
+            {
+                params.push_back(this->AssignmentExpression());
+
+                if (this->lookahead.type != ",")
+                {
+                    break;
+                }
+
+                this->eat(",");
+            }
+
+            return params;
         }
     };
 }

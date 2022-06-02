@@ -70,9 +70,14 @@ namespace eris
             // --------------------------------------------
             // Literals:
 
-            if (type == "NumericLiteral")
+            if (type == "IntLiteral")
             {
-                return this->eval(dynamic_cast<NumericLiteralAST *>(exp), env);
+                return this->eval(dynamic_cast<IntLiteralAST *>(exp), env);
+            }
+
+            if (type == "DoubleLiteral")
+            {
+                return this->eval(dynamic_cast<DoubleLiteralAST *>(exp), env);
             }
 
             if (type == "StringLiteral")
@@ -176,10 +181,27 @@ namespace eris
                 return this->eval(dynamic_cast<ClassDeclarationAST *>(exp), env);
             }
 
+            if (type == "NamespaceDeclaration")
+            {
+                return this->eval(dynamic_cast<NamespaceDeclarationAST *>(exp), env);
+            }
+
             // --------------------------------------------
             // Unimplemented:
 
             error(exp->line, "unimplemented");
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(NamespaceDeclarationAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Environment> namespaceEnv(new Environment({}, env));
+
+            std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
+            this->eval(body, namespaceEnv);
+
+            env->define(exp->name, sh_ptr<Object>(new Object(namespaceEnv)));
+
             return sh_ptr<Value>();
         }
 
@@ -207,7 +229,7 @@ namespace eris
             std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
             this->eval(body, classEnv);
 
-            env->define(exp->name, sh_ptr<Object>(new Object(classEnv)));
+            env->define(exp->name, sh_ptr<Class>(new Class(classEnv)));
             return sh_ptr<Value>();
         }
 
@@ -269,6 +291,8 @@ namespace eris
 
                 std::map<std::string, sh_ptr<Value> > activationRecord;
 
+                args.insert(args.begin(), object);
+
                 for (std::size_t i = 0; i < constructor_fn->params.size(); i++)
                 {
                     std::string param = std::dynamic_pointer_cast<IdentifierAST>(constructor_fn->params.at(i))->name;
@@ -287,7 +311,7 @@ namespace eris
             }
 
             // 3. User-defined function:
-            if(userDefined)
+            if (userDefined)
             {
                 std::map<std::string, sh_ptr<Value> > activationRecord;
 
@@ -503,32 +527,80 @@ namespace eris
                     return sh_ptr<Value>();
                 }
 
-                if (exp->op == "+=")
+                if (currentValue->isInt() && number->isInt())
                 {
-                    object->members->assign(property, sh_ptr<Number>(new Number(currentValue->value + number->value)));
+                    if (exp->op == "+=")
+                    {
+                        object->members->assign(property, sh_ptr<Int>(new Int(currentValue->intVal() + number->intVal())));
 
-                    return right;
+                        return right;
+                    }
+
+                    if (exp->op == "-=")
+                    {
+                        object->members->assign(property, sh_ptr<Int>(new Int(currentValue->intVal() - number->intVal())));
+
+                        return right;
+                    }
+
+                    if (exp->op == "*=")
+                    {
+                        object->members->assign(property, sh_ptr<Int>(new Int(currentValue->intVal() * number->intVal())));
+
+                        return right;
+                    }
+
+                    if (exp->op == "/=")
+                    {
+                        if(number->intVal() == 0)
+                        {
+                            error(exp->right->line, "integer division by zero");
+
+                            return sh_ptr<Value>();
+                        }
+
+                        object->members->assign(property, sh_ptr<Int>(new Int(currentValue->intVal() / number->intVal())));
+
+                        return right;
+                    }
                 }
-
-                if (exp->op == "-=")
+                else
                 {
-                    object->members->assign(property, sh_ptr<Number>(new Number(currentValue->value - number->value)));
 
-                    return right;
-                }
+                    if (exp->op == "+=")
+                    {
+                        object->members->assign(property, sh_ptr<Double>(new Double(currentValue->doubleVal() + number->doubleVal())));
 
-                if (exp->op == "*=")
-                {
-                    object->members->assign(property, sh_ptr<Number>(new Number(currentValue->value * number->value)));
+                        return right;
+                    }
 
-                    return right;
-                }
+                    if (exp->op == "-=")
+                    {
+                        object->members->assign(property, sh_ptr<Double>(new Double(currentValue->doubleVal() - number->doubleVal())));
 
-                if (exp->op == "/=")
-                {
-                    object->members->assign(property, sh_ptr<Number>(new Number(currentValue->value / number->value)));
+                        return right;
+                    }
 
-                    return right;
+                    if (exp->op == "*=")
+                    {
+                        object->members->assign(property, sh_ptr<Double>(new Double(currentValue->doubleVal() * number->doubleVal())));
+
+                        return right;
+                    }
+
+                    if (exp->op == "/=")
+                    {
+                        if(number->doubleVal() == 0.0)
+                        {
+                            object->members->assign(property, Double::inf);
+
+                            return right;
+                        }
+                    
+                        object->members->assign(property, sh_ptr<Double>(new Double(currentValue->doubleVal() / number->doubleVal())));
+
+                        return right;
+                    }
                 }
 
                 return right;
@@ -574,32 +646,80 @@ namespace eris
                 return sh_ptr<Value>();
             }
 
-            if (exp->op == "+=")
+            if (currentValue->isInt() && number->isInt())
             {
-                env->assign(name, sh_ptr<Number>(new Number(currentValue->value + number->value)));
+                if (exp->op == "+=")
+                {
+                    env->assign(name, sh_ptr<Int>(new Int(currentValue->intVal() + number->intVal())));
 
-                return right;
+                    return right;
+                }
+
+                if (exp->op == "-=")
+                {
+                    env->assign(name, sh_ptr<Int>(new Int(currentValue->intVal() - number->intVal())));
+
+                    return right;
+                }
+
+                if (exp->op == "*=")
+                {
+                    env->assign(name, sh_ptr<Int>(new Int(currentValue->intVal() * number->intVal())));
+
+                    return right;
+                }
+
+                if (exp->op == "/=")
+                {
+
+                    if(number->intVal() == 0)
+                    {
+                        error(exp->right->line, "integer division by zero");
+
+                        return sh_ptr<Value>();
+                    }
+
+                    env->assign(name, sh_ptr<Int>(new Int(currentValue->intVal() / number->intVal())));
+
+                    return right;
+                }
             }
-
-            if (exp->op == "-=")
+            else
             {
-                env->assign(name, sh_ptr<Number>(new Number(currentValue->value - number->value)));
+                if (exp->op == "+=")
+                {
+                    env->assign(name, sh_ptr<Double>(new Double(currentValue->doubleVal() + number->doubleVal())));
 
-                return right;
-            }
+                    return right;
+                }
 
-            if (exp->op == "*=")
-            {
-                env->assign(name, sh_ptr<Number>(new Number(currentValue->value * number->value)));
+                if (exp->op == "-=")
+                {
+                    env->assign(name, sh_ptr<Double>(new Double(currentValue->doubleVal() - number->doubleVal())));
 
-                return right;
-            }
+                    return right;
+                }
 
-            if (exp->op == "/=")
-            {
-                env->assign(name, sh_ptr<Number>(new Number(currentValue->value / number->value)));
+                if (exp->op == "*=")
+                {
+                    env->assign(name, sh_ptr<Double>(new Double(currentValue->doubleVal() * number->doubleVal())));
 
-                return right;
+                    return right;
+                }
+
+                if (exp->op == "/=")
+                {
+                    if(number->doubleVal() == 0.0)
+                    {
+                        env->assign(name, Double::inf);
+
+                        return right;
+                    }
+
+                    env->assign(name, sh_ptr<Double>(new Double(currentValue->doubleVal() / number->doubleVal())));
+
+                    return right;
+                }
             }
 
             return sh_ptr<Value>();
@@ -638,67 +758,142 @@ namespace eris
                 return sh_ptr<Value>();
             }
 
-            if (exp->op == "+")
+            if (left->isInt() && right->isInt())
             {
-                return sh_ptr<Number>(new Number(left->value + right->value));
-            }
+                if (exp->op == "+")
+                {
+                    return sh_ptr<Int>(new Int(left->intVal() + right->intVal()));
+                }
 
-            if (exp->op == "-")
-            {
-                return sh_ptr<Number>(new Number(left->value - right->value));
-            }
+                if (exp->op == "-")
+                {
+                    return sh_ptr<Int>(new Int(left->intVal() - right->intVal()));
+                }
 
-            if (exp->op == "*")
-            {
-                return sh_ptr<Number>(new Number(left->value * right->value));
-            }
+                if (exp->op == "*")
+                {
+                    return sh_ptr<Int>(new Int(left->intVal() * right->intVal()));
+                }
 
-            if (exp->op == "/")
-            {
-                return sh_ptr<Number>(new Number(left->value / right->value));
-            }
+                if (exp->op == "/")
+                {
+                    if(right->intVal() == 0)
+                    {
+                        error(exp->right->line, "integer division by zero");
 
-            if (exp->op == ">")
-            {
-                return sh_ptr<Boolean>(new Boolean(left->value > right->value));
-            }
+                        return sh_ptr<Value>();
+                    }
 
-            if (exp->op == ">=")
-            {
-                return sh_ptr<Boolean>(new Boolean(left->value >= right->value));
-            }
+                    return sh_ptr<Int>(new Int(left->intVal() / right->intVal()));
+                }
 
-            if (exp->op == "<")
-            {
-                return sh_ptr<Boolean>(new Boolean(left->value < right->value));
-            }
+                if (exp->op == ">")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->intVal() > right->intVal()));
+                }
 
-            if (exp->op == "<=")
-            {
-                return sh_ptr<Boolean>(new Boolean(left->value <= right->value));
-            }
+                if (exp->op == ">=")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->intVal() >= right->intVal()));
+                }
 
-            if (exp->op == "==")
-            {
-                return sh_ptr<Boolean>(new Boolean(left->value == right->value));
-            }
+                if (exp->op == "<")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->intVal() < right->intVal()));
+                }
 
-            if (exp->op == "!=")
+                if (exp->op == "<=")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->intVal() <= right->intVal()));
+                }
+
+                if (exp->op == "==")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->intVal() == right->intVal()));
+                }
+
+                if (exp->op == "!=")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->intVal() != right->intVal()));
+                }
+
+                return sh_ptr<Value>();
+            }
+            else
             {
-                return sh_ptr<Boolean>(new Boolean(left->value != right->value));
+
+                if (exp->op == "+")
+                {
+                    return sh_ptr<Double>(new Double(left->doubleVal() + right->doubleVal()));
+                }
+
+                if (exp->op == "-")
+                {
+                    return sh_ptr<Double>(new Double(left->doubleVal() - right->doubleVal()));
+                }
+
+                if (exp->op == "*")
+                {
+                    return sh_ptr<Double>(new Double(left->doubleVal() * right->doubleVal()));
+                }
+
+                if (exp->op == "/")
+                {
+                    if(right->doubleVal() == 0.0)
+                    {
+                        return Double::inf;
+                    }
+
+                    return sh_ptr<Double>(new Double(left->doubleVal() / right->doubleVal()));
+                }
+
+                if (exp->op == ">")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() > right->doubleVal()));
+                }
+
+                if (exp->op == ">=")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() >= right->doubleVal()));
+                }
+
+                if (exp->op == "<")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() < right->doubleVal()));
+                }
+
+                if (exp->op == "<=")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() <= right->doubleVal()));
+                }
+
+                if (exp->op == "==")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() == right->doubleVal()));
+                }
+
+                if (exp->op == "!=")
+                {
+                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() != right->doubleVal()));
+                }
             }
 
             return sh_ptr<Value>();
         }
 
-        sh_ptr<Value> eval(NumericLiteralAST *exp, sh_ptr<Environment> env)
+        sh_ptr<Value> eval(IntLiteralAST *exp, sh_ptr<Environment> env)
         {
-            return sh_ptr<Number>(new Number(exp->value));
+            return sh_ptr<Int>(new Int(exp->value));
+        }
+
+        sh_ptr<Value> eval(DoubleLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<Double>(new Double(exp->value));
         }
 
         sh_ptr<Value> eval(StringLiteralAST *exp, sh_ptr<Environment> env)
         {
-            return sh_ptr<String>(new String(exp->string));
+            return sh_ptr<String>(new String(exp->string, sh_ptr<Environment>(new Environment({}, builtins::String->members))));
         }
 
         sh_ptr<Value> eval(BooleanLiteralAST *exp, sh_ptr<Environment> env)
