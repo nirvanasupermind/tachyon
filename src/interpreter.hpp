@@ -743,8 +743,21 @@ namespace eris
 
         sh_ptr<Value> eval(BinaryExpressionAST *exp, sh_ptr<Environment> env)
         {
-            sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(this->eval(exp->left, env));
-            sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(this->eval(exp->right, env));
+            sh_ptr<Value> leftValue = this->eval(exp->left, env);
+            sh_ptr<Value> rightValue = this->eval(exp->right, env);
+
+            if (exp->op == "==")
+            {
+                return sh_ptr<Boolean>(new Boolean(leftValue->eq(rightValue)));
+            }
+
+            if (exp->op == "!=")
+            {
+                return sh_ptr<Boolean>(new Boolean(!(leftValue->eq(rightValue))));
+            }
+
+            sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(left);
+            sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(right);
 
             if (!left)
             {
@@ -807,16 +820,6 @@ namespace eris
                     return sh_ptr<Boolean>(new Boolean(left->intVal() <= right->intVal()));
                 }
 
-                if (exp->op == "==")
-                {
-                    return sh_ptr<Boolean>(new Boolean(left->intVal() == right->intVal()));
-                }
-
-                if (exp->op == "!=")
-                {
-                    return sh_ptr<Boolean>(new Boolean(left->intVal() != right->intVal()));
-                }
-
                 return sh_ptr<Value>();
             }
             else
@@ -865,16 +868,6 @@ namespace eris
                 if (exp->op == "<=")
                 {
                     return sh_ptr<Boolean>(new Boolean(left->doubleVal() <= right->doubleVal()));
-                }
-
-                if (exp->op == "==")
-                {
-                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() == right->doubleVal()));
-                }
-
-                if (exp->op == "!=")
-                {
-                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() != right->doubleVal()));
                 }
             }
 

@@ -6,6 +6,7 @@
 #include <functional>
 #include <cstdint>
 #include <limits>
+#include <memory>
 
 #include "aliases.hpp"
 #include "util.hpp"
@@ -16,15 +17,19 @@ namespace eris
      * @brief 
      * Generic base class for all values in Eris.
      */
-    class Value
+    class Value: public std::enable_shared_from_this<Value>
     {
     public:
         virtual ~Value() = default;
+
         virtual std::string str() const = 0;
-        virtual bool truthy()
+
+        virtual bool truthy() const
         {
             return true;
         }
+
+        virtual bool eq(sh_ptr<Value> other) const = 0;
     };
 
     /**
@@ -39,8 +44,18 @@ namespace eris
             return "null";
         }
 
-        bool truthy()
+        bool truthy() const
         {
+            return false;
+        }
+
+        bool eq(sh_ptr<Value> other) const
+        {
+            if(std::dynamic_pointer_cast<Null>(other))
+            {
+                return true;
+            }
+
             return false;
         }
     };
@@ -57,8 +72,19 @@ namespace eris
         virtual double doubleVal() const = 0;
         
         virtual bool isInt() const = 0;
-    };
 
+        bool eq(sh_ptr<Value> other) const
+        {
+            sh_ptr<Number> otherNum = std::dynamic_pointer_cast<Number>(other);
+
+            if(otherNum)
+            {
+                return this->doubleVal() == otherNum->doubleVal();
+            }
+
+            return false;
+        }
+    };
 
     /**
      * @brief 
@@ -153,6 +179,18 @@ namespace eris
         std::string str() const
         {
             return value ? "true" : "false";
+        }
+
+        bool eq(sh_ptr<Value> other) const 
+        {
+            sh_ptr<Boolean> otherBool = std::dynamic_pointer_cast<Boolean>(other);
+
+            if(otherBool)
+            {
+                return this->value == otherBool->value;
+            }
+
+            return false;  
         }
     };
 
@@ -252,6 +290,11 @@ namespace eris
         {
             return "(object : " + addressString((const void *)this)+")";
         }
+
+        bool eq(sh_ptr<Value> other) const 
+        {
+            return shared_from_this() == other;
+        }
     };
 
     /**
@@ -269,6 +312,11 @@ namespace eris
         std::string str() const
         {
             return "(class : " + addressString((const void *)this)+")";
+        }
+
+        bool eq(sh_ptr<Value> other) const 
+        {
+            return shared_from_this() == other;
         }
     };
 

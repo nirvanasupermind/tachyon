@@ -16,6 +16,7 @@ void launchBuiltins()
 {
     global->define("Object", eris::builtins::Object); 
     global->define("String", eris::builtins::String);
+    eris::builtins::String->members->define("at", eris::builtins::Stringat);
     eris::builtins::String->members->define("len", eris::builtins::Stringlen);
     global->define("print", eris::builtins::print);  
 }

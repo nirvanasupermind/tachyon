@@ -1,1 +1,1 @@
-print(1 / 0); // Integer division by zero
+print(true == true);
