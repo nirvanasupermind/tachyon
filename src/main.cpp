@@ -15,9 +15,10 @@ eris::sh_ptr<eris::Environment> global(new eris::Environment());
 void launchBuiltins() 
 {
     global->define("Object", eris::builtins::Object); 
+    eris::builtins::Object->members->define("constructor", eris::builtins::Object_constructor);
     global->define("String", eris::builtins::String);
-    eris::builtins::String->members->define("at", eris::builtins::Stringat);
-    eris::builtins::String->members->define("len", eris::builtins::Stringlen);
+    eris::builtins::String->members->define("at", eris::builtins::String_at);
+    eris::builtins::String->members->define("len", eris::builtins::String_len);
     global->define("print", eris::builtins::print);  
 }
 

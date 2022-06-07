@@ -9,9 +9,13 @@ namespace eris
     {
         sh_ptr<Class> Object{new Class(sh_ptr<Environment>(new Environment()))};
 
+        sh_ptr<NativeFunction> Object_constructor{new NativeFunction([](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            return sh_ptr<Null>(new Null()); })};
+
         sh_ptr<Class> String{new Class(sh_ptr<Environment>(new Environment({}, Object->members)))};
 
-        sh_ptr<NativeFunction> Stringat{new NativeFunction([](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+        sh_ptr<NativeFunction> String_at{new NativeFunction([](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
                                                            { 
                                                             sh_ptr<Value> selfValue = args.at(0);
 
@@ -47,7 +51,7 @@ namespace eris
                                                                 return sh_ptr<Value>();
                                                             } })};
 
-        sh_ptr<NativeFunction> Stringlen{new NativeFunction([](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+        sh_ptr<NativeFunction> String_len{new NativeFunction([](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
                                                             { 
                                                             sh_ptr<Value> selfValue = args.at(0);
 

@@ -193,6 +193,7 @@ namespace eris
             return sh_ptr<Value>();
         }
 
+    protected:
         sh_ptr<Value> eval(NamespaceDeclarationAST *exp, sh_ptr<Environment> env)
         {
             sh_ptr<Environment> namespaceEnv(new Environment({}, env));
@@ -241,34 +242,15 @@ namespace eris
             return sh_ptr<Value>();
         }
 
-        sh_ptr<Value> eval(CallExpressionAST *exp, sh_ptr<Environment> env)
-        {
-            sh_ptr<Value> callee = this->eval(exp->callee, env);
 
+        sh_ptr<Value> call(sh_ptr<Value> callee, std::vector<sh_ptr<Value> > &args)
+        {
             sh_ptr<NativeFunction> native = std::dynamic_pointer_cast<NativeFunction>(callee);
 
             sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(callee);
 
             sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
-
-            std::vector<sh_ptr<Value> > args;
-
-            if ((userDefined || native) && exp->callee->type() == "MemberExpression")
-            {
-                sh_ptr<MemberExpressionAST> member = std::dynamic_pointer_cast<MemberExpressionAST>(exp->callee);
-                if (member->subtype == "dot")
-                {
-                    sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(this->eval(member->object, env));
-
-                    args.push_back(object);
-                }
-            }
-
-            for (sh_ptr<AST> arg : exp->arguments)
-            {
-                args.push_back(this->eval(arg, env));
-            }
-
+      
             // 1. Native function:
             if (native)
             {
@@ -278,34 +260,11 @@ namespace eris
             // 2. Class instantiation:
             if (cls)
             {
-                sh_ptr<Value> constructor = std::dynamic_pointer_cast<UserDefinedFunction>(cls->members->lookup("constructor"));
+                sh_ptr<Value> constructor = cls->members->lookup("constructor");
 
-                sh_ptr<UserDefinedFunction> constructor_fn = std::dynamic_pointer_cast<UserDefinedFunction>(constructor);
+                sh_ptr<Object> object(new Object(sh_ptr<Environment>(new Environment({}, cls->members))));
 
-                if (!constructor_fn)
-                {
-                    this->error(exp->callee->line, constructor->str() + " is not callable");
-                }
-
-                sh_ptr<Object> object(new Object());
-
-                std::map<std::string, sh_ptr<Value> > activationRecord;
-
-                args.insert(args.begin(), object);
-
-                for (std::size_t i = 0; i < constructor_fn->params.size(); i++)
-                {
-                    std::string param = std::dynamic_pointer_cast<IdentifierAST>(constructor_fn->params.at(i))->name;
-                    activationRecord[param] = args.at(i);
-                }
-
-                sh_ptr<Environment> activationEnv(new Environment(activationRecord, constructor_fn->env));
-
-                std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(constructor_fn->body)->body;
-
-                this->eval(body, activationEnv, true);
-
-                object->members = activationEnv;
+                call(constructor, args);
 
                 return object;
             }
@@ -335,8 +294,44 @@ namespace eris
                 return result;
             }
 
-            this->error(exp->callee->line, callee->str() + " is not callable");
+            throw std::string(callee->str() + " is not callable");
             return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(CallExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> callee = this->eval(exp->callee, env);
+
+            sh_ptr<NativeFunction> native = std::dynamic_pointer_cast<NativeFunction>(callee);
+
+            sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(callee);
+
+            sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
+
+            std::vector<sh_ptr<Value> > args;
+
+            if ((userDefined || native) && exp->callee->type() == "MemberExpression")
+            {
+                sh_ptr<MemberExpressionAST> member = std::dynamic_pointer_cast<MemberExpressionAST>(exp->callee);
+                
+                if (member->subtype == "dot")
+                {
+                    sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(this->eval(member->object, env));
+
+                    args.insert(args.begin(), object);
+                }
+            }
+
+            try
+            {
+                return call(callee, args);
+            }
+            catch(const std::string &e)
+            {
+                throw std::string(std::to_string(exp->line) + ": " + e);
+                return sh_ptr<Value>();
+            }
+            
         }
 
         sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
