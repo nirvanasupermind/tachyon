@@ -309,7 +309,7 @@ namespace eris
             sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
 
             std::vector<sh_ptr<Value> > args;
-
+            
             if ((userDefined || native) && exp->callee->type() == "MemberExpression")
             {
                 sh_ptr<MemberExpressionAST> member = std::dynamic_pointer_cast<MemberExpressionAST>(exp->callee);
@@ -318,8 +318,13 @@ namespace eris
                 {
                     sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(this->eval(member->object, env));
 
-                    args.insert(args.begin(), object);
+                    args.push_back(object);
                 }
+            }
+
+            for(int i = 0; i < exp->arguments.size(); i++)
+            {
+                args.push_back(this->eval(exp->arguments.at(i), env));
             }
 
             try

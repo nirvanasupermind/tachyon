@@ -66,7 +66,7 @@ namespace eris
                                                             return sh_ptr<Int>(new Int(self->string.size())); })};
 
         sh_ptr<NativeFunction> print{new NativeFunction([](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
-                                                        { 
+                                                        {                                                             
                                                             sh_ptr<Value> data = args.at(0);
 
                                                             std::cout << data->str() << '\n';
