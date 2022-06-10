@@ -18,7 +18,15 @@ void launchBuiltins()
     eris::builtins::Object->members->define("constructor", eris::builtins::Object_constructor);
     global->define("String", eris::builtins::String);
     eris::builtins::String->members->define("at", eris::builtins::String_at);
+    eris::builtins::String->members->define("concat", eris::builtins::String_concat);
+    eris::builtins::String->members->define("find", eris::builtins::String_find);
+    eris::builtins::String->members->define("findLast", eris::builtins::String_findLast);
     eris::builtins::String->members->define("len", eris::builtins::String_len);
+    global->define("List", eris::builtins::List);
+    eris::builtins::List->members->define("add", eris::builtins::List_add);    
+    eris::builtins::List->members->define("at", eris::builtins::List_at);    
+    eris::builtins::List->members->define("atPut", eris::builtins::List_atPut);    
+    eris::builtins::List->members->define("len", eris::builtins::List_len);    
     global->define("print", eris::builtins::print);  
 }
 

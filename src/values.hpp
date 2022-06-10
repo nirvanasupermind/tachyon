@@ -286,7 +286,7 @@ namespace eris
         Object() : members(sh_ptr<Environment>(new Environment())) {}
         Object(sh_ptr<Environment> members) : members(members) {}
 
-        std::string str() const
+        virtual std::string str() const
         {
             return "(object : " + addressString((const void *)this)+")";
         }
@@ -329,7 +329,8 @@ namespace eris
     public:
         std::string string;
 
-        String(const std::string &string, sh_ptr<Environment> members) : string(string)
+        String(const std::string &string, sh_ptr<Environment> members)
+            : string(string)
         {
             this->members = members;
         }
@@ -340,11 +341,57 @@ namespace eris
         }
     };
 
+
+    /**
+     * @brief 
+     * Represents a list in Eris.
+     */
+    class List : public Object
+    {
+    public:
+        std::vector<sh_ptr<Value> > vec;
+
+        List(const std::vector<sh_ptr<Value> > &vec, sh_ptr<Environment> members) 
+            : vec(vec)
+        {
+            this->members = members;
+        }
+
+        std::string str() const
+        {
+            if(vec.size() == 0)
+            {
+                return "[]";
+            }
+
+            std::string result("[");
+
+            for(sh_ptr<Value> value : vec)
+            {       
+                result += value->str() + ", ";
+            }
+
+            result.pop_back();
+
+            result.pop_back();
+
+            result.push_back(']');
+            
+            return result;
+        }
+    };
+
+    class Function : public Object
+    {
+    public:
+        int arity;
+    };
+
     /**
      * @brief 
      * Represents a user-defined function in Eris.
      */
-    class UserDefinedFunction : public Object
+    class UserDefinedFunction : public Function
     {
     public:
         std::vector<sh_ptr<AST> > params;
@@ -354,9 +401,10 @@ namespace eris
         UserDefinedFunction(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env)
             : params(params), body(body), env(env)
         {
+            this->arity = params.size();
         }
 
-        std::string str() 
+        std::string str() const
         {
             return "(user-defined function : " + addressString((const void *)this)+")";
         }
@@ -366,18 +414,20 @@ namespace eris
      * @brief 
      *  Represents a native (built-in) function included in Eris's standard-library.
      */
-
-    class NativeFunction : public Object
+    class NativeFunction : public Function
     {
     public:
+        std::string name;
+
         std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> fn;
 
-        NativeFunction(const std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> &fn)
-            : fn(fn)
+        NativeFunction(int arity, const std::string &name, const std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> &fn)
+            : fn(fn), name(name)
         {
+            this->arity = arity;
         }
 
-        std::string str() 
+        std::string str() const 
         {
             return "(native function : " + addressString((const void *)this)+")";
         }

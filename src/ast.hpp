@@ -290,6 +290,24 @@ namespace eris
         }
     };
 
+    class UnaryExpressionAST : public AST
+    {
+    public:
+        std::string op;
+        sh_ptr<AST> argument;
+
+        UnaryExpressionAST(int line, const std::string &op, sh_ptr<AST> argument)
+            : op(op), argument(argument)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "UnaryExpression";
+        }
+    };
+
     class BinaryExpressionAST : public AST
     {
     public:
@@ -381,6 +399,7 @@ namespace eris
         }
     };
 
+
     class StringLiteralAST : public AST
     {
     public:
@@ -427,6 +446,23 @@ namespace eris
         std::string type() const
         {
             return "NullLiteral";
+        }
+    };
+
+    class ListLiteralAST : public AST
+    {
+    public:
+        std::vector<sh_ptr<AST> > elements;
+
+        ListLiteralAST(int line, const std::vector<sh_ptr<AST> > &elements)
+            : elements(elements)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "ListLiteral";
         }
     };
 }

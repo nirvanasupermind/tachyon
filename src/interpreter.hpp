@@ -95,6 +95,11 @@ namespace eris
                 return this->eval(dynamic_cast<NullLiteralAST *>(exp), env);
             }
 
+            if (type == "ListLiteral")
+            {
+                return this->eval(dynamic_cast<ListLiteralAST *>(exp), env);
+            }
+
             // --------------------------------------------
             // Expressions:
 
@@ -111,6 +116,11 @@ namespace eris
             if (type == "BinaryExpression")
             {
                 return this->eval(dynamic_cast<BinaryExpressionAST *>(exp), env);
+            }
+
+            if (type == "UnaryExpression")
+            {
+                return this->eval(dynamic_cast<UnaryExpressionAST *>(exp), env);
             }
 
             if (type == "CallExpression")
@@ -240,135 +250,6 @@ namespace eris
             env->define(exp->name, fn);
 
             return sh_ptr<Value>();
-        }
-
-
-        sh_ptr<Value> call(sh_ptr<Value> callee, std::vector<sh_ptr<Value> > &args)
-        {
-            sh_ptr<NativeFunction> native = std::dynamic_pointer_cast<NativeFunction>(callee);
-
-            sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(callee);
-
-            sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
-      
-            // 1. Native function:
-            if (native)
-            {
-                return native->fn(args);
-            }
-
-            // 2. Class instantiation:
-            if (cls)
-            {
-                sh_ptr<Value> constructor = cls->members->lookup("constructor");
-
-                sh_ptr<Object> object(new Object(sh_ptr<Environment>(new Environment({}, cls->members))));
-
-                call(constructor, args);
-
-                return object;
-            }
-
-            // 3. User-defined function:
-            if (userDefined)
-            {
-                std::map<std::string, sh_ptr<Value> > activationRecord;
-
-                for (std::size_t i = 0; i < userDefined->params.size(); i++)
-                {
-                    std::string param = std::dynamic_pointer_cast<IdentifierAST>(userDefined->params.at(i))->name;
-                    activationRecord[param] = args.at(i);
-                }
-
-                sh_ptr<Environment> activationEnv(new Environment(activationRecord, userDefined->env));
-
-                std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(userDefined->body)->body;
-
-                sh_ptr<Value> result = this->eval(body, activationEnv, true);
-
-                if (!result)
-                {
-                    return sh_ptr<Null>(new Null());
-                }
-
-                return result;
-            }
-
-            throw std::string(callee->str() + " is not callable");
-            return sh_ptr<Value>();
-        }
-
-        sh_ptr<Value> eval(CallExpressionAST *exp, sh_ptr<Environment> env)
-        {
-            sh_ptr<Value> callee = this->eval(exp->callee, env);
-
-            sh_ptr<NativeFunction> native = std::dynamic_pointer_cast<NativeFunction>(callee);
-
-            sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(callee);
-
-            sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
-
-            std::vector<sh_ptr<Value> > args;
-            
-            if ((userDefined || native) && exp->callee->type() == "MemberExpression")
-            {
-                sh_ptr<MemberExpressionAST> member = std::dynamic_pointer_cast<MemberExpressionAST>(exp->callee);
-                
-                if (member->subtype == "dot")
-                {
-                    sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(this->eval(member->object, env));
-
-                    args.push_back(object);
-                }
-            }
-
-            for(int i = 0; i < exp->arguments.size(); i++)
-            {
-                args.push_back(this->eval(exp->arguments.at(i), env));
-            }
-
-            try
-            {
-                return call(callee, args);
-            }
-            catch(const std::string &e)
-            {
-                throw std::string(std::to_string(exp->line) + ": " + e);
-                return sh_ptr<Value>();
-            }
-            
-        }
-
-        sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
-        {
-            if (exp->subtype == "computed")
-            {
-                return sh_ptr<Value>();
-            }
-
-            sh_ptr<Value> value = this->eval(exp->object, env);
-
-            sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(value);
-
-            if (!object)
-            {
-                error(exp->object->line, value->str() + " does not support member access");
-            }
-
-            std::string property = std::dynamic_pointer_cast<IdentifierAST>(exp->property)->name;
-
-            try
-            {
-                return object->members->lookup(property);
-            }
-            catch (const std::string &e)
-            {
-                // Error messages thrown from outside of interpreter don't have a line number
-                // so insert one here
-
-                error(exp->line, e);
-                return sh_ptr<Value>();
-            }
         }
 
         sh_ptr<Value> eval(EmptyStatementAST *exp, sh_ptr<Environment> env)
@@ -515,7 +396,7 @@ namespace eris
 
                 if (!currentValue)
                 {
-                    error(exp->right->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
+                    error(exp->left->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
 
                     return sh_ptr<Value>();
                 }
@@ -756,68 +637,68 @@ namespace eris
                 return sh_ptr<Boolean>(new Boolean(!(leftValue->eq(rightValue))));
             }
 
-            sh_ptr<Number> left = std::dynamic_pointer_cast<Number>(left);
-            sh_ptr<Number> right = std::dynamic_pointer_cast<Number>(right);
+            sh_ptr<Number> leftNum = std::dynamic_pointer_cast<Number>(leftValue);
+            sh_ptr<Number> rightNum = std::dynamic_pointer_cast<Number>(rightValue);
 
-            if (!left)
+            if (!leftNum)
             {
                 error(exp->left->line, "invalid argument #1 for binary operator \"" + exp->op + "\"");
                 return sh_ptr<Value>();
             }
 
-            if (!right)
+            if (!rightNum)
             {
                 error(exp->right->line, "invalid argument #2 for binary operator \"" + exp->op + "\"");
                 return sh_ptr<Value>();
             }
 
-            if (left->isInt() && right->isInt())
+            if (leftNum->isInt() && rightNum->isInt())
             {
                 if (exp->op == "+")
                 {
-                    return sh_ptr<Int>(new Int(left->intVal() + right->intVal()));
+                    return sh_ptr<Int>(new Int(leftNum->intVal() + rightNum->intVal()));
                 }
 
                 if (exp->op == "-")
                 {
-                    return sh_ptr<Int>(new Int(left->intVal() - right->intVal()));
+                    return sh_ptr<Int>(new Int(leftNum->intVal() - rightNum->intVal()));
                 }
 
                 if (exp->op == "*")
                 {
-                    return sh_ptr<Int>(new Int(left->intVal() * right->intVal()));
+                    return sh_ptr<Int>(new Int(leftNum->intVal() * rightNum->intVal()));
                 }
 
                 if (exp->op == "/")
                 {
-                    if(right->intVal() == 0)
+                    if(rightNum->intVal() == 0)
                     {
                         error(exp->right->line, "integer division by zero");
 
                         return sh_ptr<Value>();
                     }
 
-                    return sh_ptr<Int>(new Int(left->intVal() / right->intVal()));
+                    return sh_ptr<Int>(new Int(leftNum->intVal() / rightNum->intVal()));
                 }
 
                 if (exp->op == ">")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->intVal() > right->intVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->intVal() > rightNum->intVal()));
                 }
 
                 if (exp->op == ">=")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->intVal() >= right->intVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->intVal() >= rightNum->intVal()));
                 }
 
                 if (exp->op == "<")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->intVal() < right->intVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->intVal() < rightNum->intVal()));
                 }
 
                 if (exp->op == "<=")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->intVal() <= right->intVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->intVal() <= rightNum->intVal()));
                 }
 
                 return sh_ptr<Value>();
@@ -827,50 +708,244 @@ namespace eris
 
                 if (exp->op == "+")
                 {
-                    return sh_ptr<Double>(new Double(left->doubleVal() + right->doubleVal()));
+                    return sh_ptr<Double>(new Double(leftNum->doubleVal() + rightNum->doubleVal()));
                 }
 
                 if (exp->op == "-")
                 {
-                    return sh_ptr<Double>(new Double(left->doubleVal() - right->doubleVal()));
+                    return sh_ptr<Double>(new Double(leftNum->doubleVal() - rightNum->doubleVal()));
                 }
 
                 if (exp->op == "*")
                 {
-                    return sh_ptr<Double>(new Double(left->doubleVal() * right->doubleVal()));
+                    return sh_ptr<Double>(new Double(leftNum->doubleVal() * rightNum->doubleVal()));
                 }
 
                 if (exp->op == "/")
                 {
-                    if(right->doubleVal() == 0.0)
+                    if(rightNum->doubleVal() == 0.0)
                     {
                         return Double::inf;
                     }
 
-                    return sh_ptr<Double>(new Double(left->doubleVal() / right->doubleVal()));
+                    return sh_ptr<Double>(new Double(leftNum->doubleVal() / rightNum->doubleVal()));
                 }
 
                 if (exp->op == ">")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() > right->doubleVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->doubleVal() > rightNum->doubleVal()));
                 }
 
                 if (exp->op == ">=")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() >= right->doubleVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->doubleVal() >= rightNum->doubleVal()));
                 }
 
                 if (exp->op == "<")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() < right->doubleVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->doubleVal() < rightNum->doubleVal()));
                 }
 
                 if (exp->op == "<=")
                 {
-                    return sh_ptr<Boolean>(new Boolean(left->doubleVal() <= right->doubleVal()));
+                    return sh_ptr<Boolean>(new Boolean(leftNum->doubleVal() <= rightNum->doubleVal()));
                 }
             }
 
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(UnaryExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> argValue = this->eval(exp->argument, env);
+
+            sh_ptr<Number> argNum = std::dynamic_pointer_cast<Number>(argValue);
+            
+            sh_ptr<Boolean> argBool = std::dynamic_pointer_cast<Boolean>(argValue);
+
+            if(argNum)
+            {
+                if(exp->op == "+")
+                {
+                    return argNum;
+                }
+
+
+                if(exp->op == "-")
+                {
+                    if(argNum->isInt())
+                    {
+                        return sh_ptr<Int>(new Int(-argNum->intVal()));
+                    }
+
+                    return sh_ptr<Double>(new Double(-argNum->doubleVal()));
+                }
+                
+            }
+
+            if(argBool)
+            {
+                return sh_ptr<Boolean>(new Boolean(!argBool->value));           
+            }
+            
+            error(exp->argument->line, "invalid argument #1 for unary operator \"" + exp->op + "\"");
+            return sh_ptr<Value>();
+        }
+
+
+        sh_ptr<Value> call(sh_ptr<Value> callee, std::vector<sh_ptr<Value> > &args)
+        {
+            sh_ptr<NativeFunction> native = std::dynamic_pointer_cast<NativeFunction>(callee);
+
+            sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(callee);
+
+            sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
+      
+            // 1. Native function:
+            if (native)
+            {
+                if(args.size() < native->arity)
+                {
+                    throw std::string("missing argument #"+std::to_string(args.size() + 1) + " for function \"" + native->name+"\"");
+                }
+
+                return native->fn(args);
+            }
+
+            // 2. Class instantiation:
+            if (cls)
+            {
+                sh_ptr<Value> constructor = cls->members->lookup("constructor");
+
+                sh_ptr<Object> object(new Object(sh_ptr<Environment>(new Environment({}, cls->members))));
+
+                args.insert(args.begin(), object);
+
+                call(constructor, args);
+
+                return object;
+            }
+
+            // 3. User-defined function:
+            if (userDefined)
+            {
+                if(args.size() < userDefined->arity)
+                {
+                    throw std::string("missing argument #"+std::to_string(args.size() + 1) + " for function");
+                }
+
+                std::map<std::string, sh_ptr<Value> > activationRecord;
+
+                for (std::size_t i = 0; i < userDefined->params.size(); i++)
+                {
+                    std::string param = std::dynamic_pointer_cast<IdentifierAST>(userDefined->params.at(i))->name;
+                    activationRecord[param] = args.at(i);
+                }
+
+                sh_ptr<Environment> activationEnv(new Environment(activationRecord, userDefined->env));
+
+                std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(userDefined->body)->body;
+
+                sh_ptr<Value> result = this->eval(body, activationEnv, true);
+
+                if (!result)
+                {
+                    return sh_ptr<Null>(new Null());
+                }
+
+                return result;
+            }
+
+            throw std::string(callee->str() + " is not callable");
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(CallExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> callee = this->eval(exp->callee, env);
+
+            sh_ptr<NativeFunction> native = std::dynamic_pointer_cast<NativeFunction>(callee);
+
+            sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(callee);
+
+            sh_ptr<UserDefinedFunction> userDefined = std::dynamic_pointer_cast<UserDefinedFunction>(callee);
+
+            std::vector<sh_ptr<Value> > args;
+            
+            if ((userDefined || native) && exp->callee->type() == "MemberExpression")
+            {
+                sh_ptr<MemberExpressionAST> member = std::dynamic_pointer_cast<MemberExpressionAST>(exp->callee);
+                
+                if (member->subtype == "dot")
+                {
+                    sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(this->eval(member->object, env));
+
+                    args.push_back(object);
+                }
+            }
+
+            for(int i = 0; i < exp->arguments.size(); i++)
+            {
+                args.push_back(this->eval(exp->arguments.at(i), env));
+            }
+
+            try
+            {
+                return call(callee, args);
+            }
+            catch(const std::string &e)
+            {
+                throw std::string(std::to_string(exp->line) + ": " + e);
+                return sh_ptr<Value>();
+            }
+        }
+
+
+
+        sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
+        {
+            sh_ptr<Value> value = this->eval(exp->object, env);
+
+            sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(value);
+
+            sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(value);
+
+             std::string property = std::dynamic_pointer_cast<IdentifierAST>(exp->property)->name;
+
+            if(cls)
+            {
+                try
+                {
+                    return cls->members->lookup(property);
+                }
+                catch (const std::string &e)
+                {
+                    // Error messages thrown from outside of interpreter don't have a line number
+                    // so insert one here
+
+                    error(exp->line, e);
+                    return sh_ptr<Value>();
+                }
+            }
+
+            if(object)
+            {
+                try
+                {
+                    return object->members->lookup(property);
+                }
+                catch (const std::string &e)
+                {
+                    // Error messages thrown from outside of interpreter don't have a line number
+                    // so insert one here
+
+                    error(exp->line, e);
+                    return sh_ptr<Value>();
+                }
+            }
+
+            
+            error(exp->object->line, value->str() + " does not support member access");
             return sh_ptr<Value>();
         }
 
@@ -896,7 +971,21 @@ namespace eris
 
         sh_ptr<Value> eval(NullLiteralAST *exp, sh_ptr<Environment> env)
         {
-            return sh_ptr<Value>();
+            return sh_ptr<Null>(new Null());
+        }
+
+        sh_ptr<Value> eval(ListLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            std::vector<sh_ptr<Value> > elements;
+
+            for(sh_ptr<AST> elem : exp->elements)
+            {  
+                elements.push_back(this->eval(elem, env));
+            }
+
+            sh_ptr<Environment> members(new Environment({}, builtins::List->members));
+
+            return sh_ptr<List>(new List(elements, members));
         }
     };
 }

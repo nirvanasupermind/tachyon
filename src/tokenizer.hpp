@@ -100,6 +100,7 @@ namespace eris
 
         {"^&&", "LOGICAL_AND"},
         {"^\\|\\|", "LOGICAL_OR"},
+        {"^!", "LOGICAL_NOT"},
 
         // --------------------------------------------
         // Strings:

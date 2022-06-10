@@ -22,7 +22,7 @@ namespace eris
     {
     public:
         /**
-         * @brief 
+         * @brief
          * Initializes the parser.
          */
         Parser() : string(""), tokenizer(Tokenizer()) {}
@@ -33,7 +33,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * Parses a string.
          */
         std::vector<sh_ptr<AST> > parse(const std::string &string)
@@ -51,7 +51,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * Main entry point.
          *
          * Program
@@ -65,7 +65,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * StatementList
          *  : Statement
          *  | StatementList Statement
@@ -84,7 +84,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * Statement
          *  : ExpressionStatement
          *  | EmptyStatement
@@ -147,7 +147,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * ClassDeclaration
          *  : 'class' Identifier OptClassExtends BlockStatement
          *  ;
@@ -159,10 +159,10 @@ namespace eris
             this->eat("class");
 
             std::string name = this->eat("IDENTIFIER").value;
-            
+
             sh_ptr<AST> superClass;
 
-            if(this->lookahead.type == "extends")
+            if (this->lookahead.type == "extends")
             {
                 superClass = this->ClassExtends();
             }
@@ -173,7 +173,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * ClassExtends
          *  : 'extends' Expression
          *  ;
@@ -185,7 +185,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * NamespaceDeclaration
          *  : 'namespace' Identifier BlockStatement
          *  ;
@@ -197,14 +197,14 @@ namespace eris
             this->eat("namespace");
 
             std::string name = this->eat("IDENTIFIER").value;
-            
+
             sh_ptr<AST> body = this->BlockStatement();
 
             return sh_ptr<NamespaceDeclarationAST>(new NamespaceDeclarationAST(line, name, body));
         }
 
         /**
-         * @brief 
+         * @brief
          * FunctionDeclaration
          *  : 'def' Identifier '(' OptFormalParameterList ')' BlockStatement
          *  ;
@@ -271,7 +271,7 @@ namespace eris
             this->eat("return");
             sh_ptr<AST> argument;
 
-            if(this->lookahead.type != ";")
+            if (this->lookahead.type != ";")
             {
                 argument = this->Expression();
             }
@@ -281,7 +281,7 @@ namespace eris
         }
 
         /**
-         * @brief  
+         * @brief
          * IterationStatement
          *  : WhileStatement
          *  | DoWhileStatement
@@ -309,7 +309,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * WhileStatement
          *  : 'while' '(' Expression ')' Statement
          *  ;
@@ -330,7 +330,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * DoWhileStatement
          *  : 'do' Statement 'while' '(' Expression ')'
          *  ;
@@ -352,6 +352,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * ForStatementInit
          *  : VariableStatementInit
          *  | Expression
@@ -368,6 +369,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * ForStatement
          *  : 'for' '(' ForStatementInit ';' Expression ';' Expression ')'
          *  ;
@@ -394,6 +396,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * IfStatement
          *  : 'if' '(' Expression ')' Statement
          *  | 'if' '(' Expression ')' Statement 'else' Statement
@@ -422,6 +425,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * VariableDeclaration
          *  : SIMPLE_ASSIGN Expression
          *  ;
@@ -434,6 +438,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * VariableStatementInit
          *  : 'let' Identifier OptVariableDeclaration
          *  ;
@@ -452,6 +457,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * VariableStatement
          *  : VariableStatementInit ';'
          *  ;
@@ -466,6 +472,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * BlockStatement
          *  : '{' OptStatementList '}'
          *  ;
@@ -489,6 +496,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * EmptyStatement
          *  : ';'
          *  ;
@@ -503,6 +511,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * ExpressionStatement
          *  : Expression ';'
          *  ;
@@ -519,6 +528,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * Expression
          *  : AssignmentExpression
          *  ;
@@ -529,6 +539,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * AssignmentExpression
          *  : EqualityExpression
          *  | LeftHandSideExpression AssignmentOperator AssignmentExpression
@@ -553,6 +564,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * AssignmentOperator
          *  : SIMPLE_ASSIGN
          *  | COMPLEX_ASSIGN
@@ -569,6 +581,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * LogicalORExpression
          *  : RelationalExpression
          *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
@@ -580,6 +593,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * LogicalANDExpression
          *  : RelationalExpression
          *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
@@ -591,6 +605,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * EqualityExpression
          *  : RelationalExpression
          *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
@@ -602,6 +617,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * RelationalExpression
          *  : AdditiveExpression
          *  | AdditiveExpression RELATIONAL_OPERATOR RelationalExpression
@@ -613,6 +629,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * LeftHandSideExpression
          *  : Identifier
          *  ;
@@ -623,6 +640,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * Identifier
          *  : IDENTIFIER
          *  ;
@@ -637,6 +655,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * AdditiveExpression
          *  : Literal
          *  | AdditiveExpression ADDITIVE_OPERATOR Literal
@@ -648,17 +667,48 @@ namespace eris
         }
 
         /**
+         * @brief
          * MultiplicativeExpression
-         *  : CallMemberExpression
-         *  | MultiplicativeExpression MULTIPLICATIVE_OPERATOR CallMemberExpression
+         *  : UnaryExpression
+         *  | MultiplicativeExpression MULTIPLICATIVE_OPERATOR UnaryExpression
          *  ;
          */
         sh_ptr<AST> MultiplicativeExpression()
         {
-            return this->BinaryExpression(&Parser::CallMemberExpression, "MULTIPLICATIVE_OPERATOR");
+            return this->BinaryExpression(&Parser::UnaryExpression, "MULTIPLICATIVE_OPERATOR");
         }
 
         /**
+         * @brief
+         * UnaryExpression
+         *  : CallMemberExpression
+         *  | ADDITIVE_OPERATOR CallMemberExpression
+         *  | LOGICAL_NOT CallMemberExpression
+         *  ;
+         */
+        sh_ptr<AST> UnaryExpression()
+        {
+            int line = this->tokenizer.line;
+
+            if (this->lookahead.type == "ADDITIVE_OPERATOR")
+            {
+                std::string op = this->lookahead.value;
+                this->eat("ADDITIVE_OPERATOR");
+                return sh_ptr<UnaryExpressionAST>(new UnaryExpressionAST(line, op, this->CallMemberExpression()));
+            }
+
+            if (this->lookahead.type == "LOGICAL_NOT")
+            {
+                std::string op = this->lookahead.value;
+                this->eat("LOGICAL_NOT");
+                return sh_ptr<UnaryExpressionAST>(new UnaryExpressionAST(line, op, this->CallMemberExpression()));
+            }
+
+            return this->CallMemberExpression();
+        }
+
+        /**
+         * @brief
          * CallMemberExpression
          *  : MemberExpression
          *  | CallExpression
@@ -670,7 +720,7 @@ namespace eris
             sh_ptr<AST> member = this->MemberExpression();
 
             // See if we have a call expression:
-            if (this->lookahead.type == "(") 
+            if (this->lookahead.type == "(")
             {
                 return this->CallExpression(member);
             }
@@ -679,6 +729,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * MemberExpression
          *  : PrimaryExpression
          *  | MemberExpression '.' Identifier
@@ -711,6 +762,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * PrimaryExpression
          *  : Literal
          *  | ParenthesizedExpression
@@ -731,6 +783,12 @@ namespace eris
 
             return this->LeftHandSideExpression();
         }
+
+        /**
+         * @brief
+         *
+         *
+         */
 
         sh_ptr<AST> ParenthesizedExpression()
         {
@@ -776,6 +834,11 @@ namespace eris
             if (lookahead.type == "false")
             {
                 return this->BooleanLiteral(false);
+            }
+
+            if (lookahead.type == "[")
+            {
+                return this->ListLiteral();
             }
 
             error("unexpected literal production");
@@ -855,6 +918,30 @@ namespace eris
         }
 
         /**
+         * @brief
+         * ListLiteral
+         *  : '[' OptArgumentList ']'
+         *  ;
+         */
+        sh_ptr<AST> ListLiteral()
+        {
+            int line = this->tokenizer.line;
+
+            this->eat("[");
+
+            std::vector<sh_ptr<AST> > elements;
+
+            if (this->lookahead.type != "]")
+            {
+                elements = this->ArgumentList();
+            }
+
+            this->eat("]");
+
+            return sh_ptr<ListLiteralAST>(new ListLiteralAST(line, elements));
+        }
+
+        /**
          * Expects a token of a given type.
          */
 
@@ -879,6 +966,7 @@ namespace eris
 
             return token;
         }
+
     protected:
         std::string string;
         Tokenizer tokenizer;
@@ -908,7 +996,8 @@ namespace eris
         }
 
         /**
-         * Generic binary expression.
+         * @brief
+         * Generic logical expression.
          */
         sh_ptr<AST> LogicalExpression(sh_ptr<AST> (Parser::*builder)(), const std::string &operatorToken)
         {
@@ -942,6 +1031,7 @@ namespace eris
         }
 
         /**
+         * @brief
          * Whether the token type is an assignment operator.
          */
         bool isAssignmentOperator(const std::string &tokenType)
@@ -954,18 +1044,13 @@ namespace eris
          */
         bool isLiteral(const std::string &tokenType)
         {
-            return tokenType == "INT" 
-                    || tokenType == "DOUBLE" 
-                    || tokenType == "STRING" 
-                    || tokenType == "true" 
-                    || tokenType == "false" 
-                    || tokenType == "null";
+            return tokenType == "INT" || tokenType == "DOUBLE" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null" || tokenType == "[";
         }
 
         /**
          * @brief
          * Generic call expression helper.
-         * 
+         *
          * CallExpression
          *  : Callee Arguments
          *  ;
@@ -973,17 +1058,14 @@ namespace eris
          * Callee:
          *  : MemberExpression
          *  | CallExpression
-         * 
-         * 
          */
-        
-        sh_ptr<AST> CallExpression(sh_ptr<AST> callee) 
+        sh_ptr<AST> CallExpression(sh_ptr<AST> callee)
         {
             int line = this->tokenizer.line;
 
             sh_ptr<AST> callExpression(new CallExpressionAST(line, callee, this->Arguments()));
-            
-            if(this->lookahead.type == "(")
+
+            if (this->lookahead.type == "(")
             {
                 callExpression = this->CallExpression(callExpression);
             }
@@ -992,7 +1074,7 @@ namespace eris
         }
 
         /**
-         * @brief 
+         * @brief
          * Arguments
          *  : '(' OptArgumentList ')'
          *  ;
@@ -1003,7 +1085,8 @@ namespace eris
 
             std::vector<sh_ptr<AST> > argumentList;
 
-            if(this->lookahead.type != ")") {
+            if (this->lookahead.type != ")")
+            {
                 argumentList = this->ArgumentList();
             }
 
