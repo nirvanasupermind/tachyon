@@ -2,6 +2,7 @@
 #define INTERPRETER_HPP
 
 #include "ast.hpp"
+#include "parser.hpp"
 #include "values.hpp"
 #include "aliases.hpp"
 #include "builtins.hpp"
@@ -181,6 +182,11 @@ namespace eris
                 return this->eval(dynamic_cast<ReturnStatementAST *>(exp), env);
             }
 
+            if (type == "RequireStatement")
+            {
+                return this->eval(dynamic_cast<RequireStatementAST *>(exp), env);
+            }
+
             if (type == "FunctionDeclaration")
             {
                 return this->eval(dynamic_cast<FunctionDeclarationAST *>(exp), env);
@@ -334,6 +340,31 @@ namespace eris
                 this->eval(exp->update, env);
             }
 
+            return sh_ptr<Value>();
+        }
+
+        sh_ptr<Value> eval(RequireStatementAST *exp, sh_ptr<Environment> env)
+        {
+            std::string filename = exp->path;
+
+            std::ifstream inFile;
+
+            inFile.open(filename);
+
+            std::stringstream strStream;
+            strStream << inFile.rdbuf();
+
+            std::string text = strStream.str();
+
+            if(text == "") {
+                this->error(exp->line, "File \"" + filename + "\" is empty or does not exist"); 
+                return sh_ptr<Value>();
+            }
+
+            Parser parser;
+
+            this->eval(parser.parse(text), global);
+                
             return sh_ptr<Value>();
         }
 

@@ -1,1 +1,7 @@
-print([1, 2, 3].at(-1));
+require "test/sqr.eris";
+
+let x = [ 1, 2, 3 ];
+
+x.del(sqr(1));
+
+print(x);

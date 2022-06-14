@@ -60,6 +60,7 @@ namespace eris
         {"^\\bclass\\b", "class"},
         {"^\\bextends\\b", "extends"},
         {"^\\bnamespace\\b", "namespace"},
+        {"^\\brequire\\b", "require"},
         
         // --------------------------------------------
         // Numbers:

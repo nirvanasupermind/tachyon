@@ -94,6 +94,23 @@ namespace eris
         }
     };
 
+    class RequireStatementAST : public AST
+    {
+    public:
+        std::string path;
+
+        RequireStatementAST(int line, const std::string &path)
+            : path(path)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "RequireStatement";
+        }
+    };
+
     class WhileStatementAST : public AST
     {
     public:

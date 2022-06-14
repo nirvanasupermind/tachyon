@@ -128,6 +128,11 @@ namespace eris
                 return this->ReturnStatement();
             }
 
+            if (this->lookahead.type == "require")
+            {
+                return this->RequireStatement();
+            }
+
             if (this->lookahead.type == "def")
             {
                 return this->FunctionDeclaration();
@@ -277,7 +282,22 @@ namespace eris
             }
 
             this->eat(";");
-            return sh_ptr<AST>(new ReturnStatementAST(line, argument));
+            return sh_ptr<ReturnStatementAST>(new ReturnStatementAST(line, argument));
+        }
+
+        /**
+         * @brief
+         * RequireStatement
+         *  : 'require' StringLiteral ';'
+         *  ;
+         */
+        sh_ptr<AST> RequireStatement()
+        {
+            int line = this->tokenizer.line;
+            this->eat("require");
+            std::string path = std::dynamic_pointer_cast<StringLiteralAST>(this->StringLiteral())->string;
+            this->eat(";");
+            return sh_ptr<RequireStatementAST>(new RequireStatementAST(line, path));
         }
 
         /**
