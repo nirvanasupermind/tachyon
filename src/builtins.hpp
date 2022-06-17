@@ -183,57 +183,6 @@ namespace eris
                                                             self->vec.push_back(args.at(1));
                                                             return sh_ptr<Value>(); })};
 
-        sh_ptr<NativeFunction> List_del{new NativeFunction(2, "del", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
-                                                           { 
-                                                            sh_ptr<Value> selfValue = args.at(0);
-
-                                                            sh_ptr<class List> self = std::dynamic_pointer_cast<class List>(selfValue);
-
-                                                            if(!self)
-                                                            {
-                                                                throw std::string("invalid argument #1 for function \"at\"");
-                                                                return sh_ptr<Value>();
-                                                            }
-                                                            
-
-                                                            sh_ptr<Value> idxValue = args.at(1);
-
-                                                            sh_ptr<Int> idx = std::dynamic_pointer_cast<Int>(idxValue);
-
-                                                            if(!idx)
-                                                            {
-                                                                throw std::string("invalid argument #2 for function \"at\"");
-                                                                return sh_ptr<Value>();
-                                                            }
-                                                           
-                                                            try
-                                                            {
-                                                                std::vector<sh_ptr<Value> >::iterator q = self->vec.begin();
-
-                                                                if(idx->value < 0)
-                                                                {
-                                                                    q += self->vec.size() + idx->value; 
-                                                                } 
-                                                                else
-                                                                {
-                                                                    q += idx->value; 
-                                                                }
-                                                                
-                                                                sh_ptr<Value> result = self->vec.at(idx->value);
-
-                                                                self->vec.erase(q);
-
-                                                                return result;
-                                                            }
-
-                                                            catch(const std::out_of_range &e)
-                                                            {
-                                                                throw std::string("list index out of range");
-                                                                return sh_ptr<Value>();
-                                                            } 
-
-                                                            return sh_ptr<Value>(); })};
-
         sh_ptr<NativeFunction> List_at{new NativeFunction(1, "at", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
                                                            { 
                                                             sh_ptr<Value> selfValue = args.at(0);
@@ -326,6 +275,58 @@ namespace eris
                                                                 throw std::string("list index out of range");
                                                                 return sh_ptr<Value>();
                                                             } })};
+
+
+        sh_ptr<NativeFunction> List_del{new NativeFunction(2, "del", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                           { 
+                                                            sh_ptr<Value> selfValue = args.at(0);
+
+                                                            sh_ptr<class List> self = std::dynamic_pointer_cast<class List>(selfValue);
+
+                                                            if(!self)
+                                                            {
+                                                                throw std::string("invalid argument #1 for function \"at\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+                                                            
+
+                                                            sh_ptr<Value> idxValue = args.at(1);
+
+                                                            sh_ptr<Int> idx = std::dynamic_pointer_cast<Int>(idxValue);
+
+                                                            if(!idx)
+                                                            {
+                                                                throw std::string("invalid argument #2 for function \"at\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+                                                           
+                                                            try
+                                                            {
+                                                                std::vector<sh_ptr<Value> >::iterator q = self->vec.begin();
+
+                                                                if(idx->value < 0)
+                                                                {
+                                                                    q += self->vec.size() + idx->value; 
+                                                                } 
+                                                                else
+                                                                {
+                                                                    q += idx->value; 
+                                                                }
+                                                                
+                                                                sh_ptr<Value> result = self->vec.at(idx->value);
+
+                                                                self->vec.erase(q);
+
+                                                                return result;
+                                                            }
+
+                                                            catch(const std::out_of_range &e)
+                                                            {
+                                                                throw std::string("list index out of range");
+                                                                return sh_ptr<Value>();
+                                                            } 
+
+                                                            return sh_ptr<Value>(); })};
 
         sh_ptr<NativeFunction> List_len{new NativeFunction(1, "len", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
                                                             { 

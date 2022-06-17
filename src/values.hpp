@@ -320,6 +320,30 @@ namespace eris
         }
     };
 
+
+    /**
+     * @brief 
+     * Represents a namespace in Eris.
+     */
+    class Namespace : public Value
+    {
+    public:
+        sh_ptr<Environment> members;
+
+        Namespace() : members(sh_ptr<Environment>(new Environment())) {}
+        Namespace(sh_ptr<Environment> members) : members(members) {}
+
+        std::string str() const
+        {
+            return "(namespace : " + addressString((const void *)this)+")";
+        }
+
+        bool eq(sh_ptr<Value> other) const 
+        {
+            return shared_from_this() == other;
+        }
+    };
+
     /**
      * @brief 
      * Represents a string in Eris.

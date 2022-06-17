@@ -1,7 +1,9 @@
-require "test/sqr.eris";
+namespace ns {
+    let a = 2;
+}
 
-let x = [ 1, 2, 3 ];
+namespace ns {
+    let b = 3;
+}
 
-x.del(sqr(1));
-
-print(x);
+print(ns::a + ns::b); // 5

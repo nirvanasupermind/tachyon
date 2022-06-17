@@ -214,10 +214,20 @@ namespace eris
         {
             sh_ptr<Environment> namespaceEnv(new Environment({}, env));
 
+            if(env->contains(exp->name))
+            {
+                sh_ptr<Namespace> ns = std::dynamic_pointer_cast<Namespace>(env->lookup(exp->name));
+                if(ns)
+                {
+                    namespaceEnv = ns->members;
+                }
+            }
+
             std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
+
             this->eval(body, namespaceEnv);
 
-            env->define(exp->name, sh_ptr<Object>(new Object(namespaceEnv)));
+            env->define(exp->name, sh_ptr<Namespace>(new Namespace(namespaceEnv)));
 
             return sh_ptr<Value>();
         }
@@ -939,15 +949,33 @@ namespace eris
 
             sh_ptr<Class> cls = std::dynamic_pointer_cast<Class>(value);
 
+            sh_ptr<Namespace> ns = std::dynamic_pointer_cast<Namespace>(value);
+
             sh_ptr<Object> object = std::dynamic_pointer_cast<Object>(value);
 
-             std::string property = std::dynamic_pointer_cast<IdentifierAST>(exp->property)->name;
+            std::string property = std::dynamic_pointer_cast<IdentifierAST>(exp->property)->name;
 
             if(cls)
             {
                 try
                 {
                     return cls->members->lookup(property);
+                }
+                catch (const std::string &e)
+                {
+                    // Error messages thrown from outside of interpreter don't have a line number
+                    // so insert one here
+
+                    error(exp->line, e);
+                    return sh_ptr<Value>();
+                }
+            }
+            
+            if(ns)
+            {
+                try
+                {
+                    return ns->members->lookup(property);
                 }
                 catch (const std::string &e)
                 {
@@ -975,7 +1003,6 @@ namespace eris
                 }
             }
 
-            
             error(exp->object->line, value->str() + " does not support member access");
             return sh_ptr<Value>();
         }
