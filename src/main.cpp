@@ -13,7 +13,7 @@
 eris::sh_ptr<eris::Environment> global(new eris::Environment());
 
 void launchBuiltins() 
-{
+{   
     global->define("Object", eris::builtins::Object); 
     eris::builtins::Object->members->define("constructor", eris::builtins::Object_constructor);
     global->define("String", eris::builtins::String);
@@ -27,8 +27,23 @@ void launchBuiltins()
     eris::builtins::List->members->define("at", eris::builtins::List_at);    
     eris::builtins::List->members->define("atPut", eris::builtins::List_atPut);    
     eris::builtins::List->members->define("del", eris::builtins::List_del);    
-    eris::builtins::List->members->define("len", eris::builtins::List_len);    
-    global->define("print", eris::builtins::print);  
+    eris::builtins::List->members->define("len", eris::builtins::List_len);  
+    global->define("Math", eris::builtins::Math); 
+    eris::builtins::Math->members->define("PI", eris::builtins::Math_PI);  
+    eris::builtins::Math->members->define("E", eris::builtins::Math_E);  
+    eris::builtins::Math->members->define("abs", eris::builtins::Math_abs);  
+    eris::builtins::Math->members->define("acos", eris::builtins::Math_acos);  
+    eris::builtins::Math->members->define("atan", eris::builtins::Math_atan);  
+    eris::builtins::Math->members->define("ceil", eris::builtins::Math_ceil);  
+    eris::builtins::Math->members->define("cos", eris::builtins::Math_cos);  
+    eris::builtins::Math->members->define("exp", eris::builtins::Math_exp);  
+    eris::builtins::Math->members->define("log", eris::builtins::Math_log);  
+    
+    global->define("input", eris::builtins::input);  
+    global->define("print", eris::builtins::print);
+    global->define("toInt", eris::builtins::toInt);
+    global->define("toDouble", eris::builtins::toDouble);
+    global->define("toString", eris::builtins::toString);
 }
 
 void run(const std::string &filename, const std::string &text)

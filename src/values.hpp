@@ -105,7 +105,7 @@ namespace eris
             return true;
         }
 
-        int intVal() const
+        std::int32_t intVal() const
         {
             return value;
         }
@@ -140,7 +140,7 @@ namespace eris
             return false;
         }
 
-        int intVal() const
+        std::int32_t intVal() const
         {
             return (std::int32_t)value;
         }

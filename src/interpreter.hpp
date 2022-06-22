@@ -1,6 +1,11 @@
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 
+#include <string>
+#include <memory>
+#include <vector>
+#include <map>
+
 #include "ast.hpp"
 #include "parser.hpp"
 #include "values.hpp"
@@ -234,7 +239,11 @@ namespace eris
 
         sh_ptr<Value> eval(ClassDeclarationAST *exp, sh_ptr<Environment> env)
         {
-            sh_ptr<Environment> classEnv(new Environment());
+            sh_ptr<Environment> classEnv(new Environment({}, env));
+
+            std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
+            this->eval(body, classEnv);
+
             if (exp->superClass)
             {
                 sh_ptr<Value> superValue = this->eval(exp->superClass, env);
@@ -250,11 +259,8 @@ namespace eris
             }
             else
             {
-                classEnv->parent = env;
+                classEnv->parent = builtins::Object->members;
             }
-
-            std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
-            this->eval(body, classEnv);
 
             env->define(exp->name, sh_ptr<Class>(new Class(classEnv)));
             return sh_ptr<Value>();

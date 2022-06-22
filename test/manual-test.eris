@@ -1,9 +1,1 @@
-namespace ns {
-    let a = 2;
-}
-
-namespace ns {
-    let b = 3;
-}
-
-print(ns::a + ns::b); // 5
+print(Math::cos(Math.PI));

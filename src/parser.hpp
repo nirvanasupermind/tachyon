@@ -420,6 +420,7 @@ namespace eris
          * IfStatement
          *  : 'if' '(' Expression ')' Statement
          *  | 'if' '(' Expression ')' Statement 'else' Statement
+         *  ;
          */
         sh_ptr<AST> IfStatement()
         {
@@ -925,7 +926,7 @@ namespace eris
 
         /**
          * NullLiteral
-         *  : null
+         *  : 'null'
          *  ;
          */
         sh_ptr<AST> NullLiteral()
