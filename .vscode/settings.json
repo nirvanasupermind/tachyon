@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.punylisp": "lisp",
+        "*.eris": "swift",
+        "*.bnf": "bnf",
+        "algorithm": "cpp"
+    }
+}

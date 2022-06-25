@@ -37,8 +37,11 @@ void launchBuiltins()
     eris::builtins::Math->members->define("ceil", eris::builtins::Math_ceil);  
     eris::builtins::Math->members->define("cos", eris::builtins::Math_cos);  
     eris::builtins::Math->members->define("exp", eris::builtins::Math_exp);  
-    eris::builtins::Math->members->define("log", eris::builtins::Math_log);  
-    
+    eris::builtins::Math->members->define("log", eris::builtins::Math_log);
+    eris::builtins::Math->members->define("max", eris::builtins::Math_max);
+    eris::builtins::Math->members->define("min", eris::builtins::Math_min);
+    eris::builtins::Math->members->define("pow", eris::builtins::Math_pow);  
+
     global->define("input", eris::builtins::input);  
     global->define("print", eris::builtins::print);
     global->define("toInt", eris::builtins::toInt);

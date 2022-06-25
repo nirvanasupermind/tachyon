@@ -481,6 +481,21 @@ namespace eris
                                                             return sh_ptr<Value>();
                                                             })};
 
+        sh_ptr<NativeFunction> Math_floor{new NativeFunction(1, "floor", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Value> value = args.at(0);
+
+                                                            sh_ptr<Number> numVal = std::dynamic_pointer_cast<Number>(value);
+
+                                                            if (numVal)
+                                                            {
+                                                                return sh_ptr<Double>(new Double(std::floor(numVal->doubleVal())));
+                                                            }
+
+                                                            throw std::string("invalid argument #1 for function \"exp\"");
+                                                            return sh_ptr<Value>();
+                                                            })};
+
         sh_ptr<NativeFunction> Math_log{new NativeFunction(1, "log", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
                                                             { 
                                                             sh_ptr<Value> value = args.at(0);
@@ -493,6 +508,126 @@ namespace eris
                                                             }
 
                                                             throw std::string("invalid argument #1 for function \"log\"");
+                                                            return sh_ptr<Value>();
+                                                            })};
+
+        sh_ptr<NativeFunction> Math_max{new NativeFunction(2, "max", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Number> numA = std::dynamic_pointer_cast<Number>(args.at(0));
+
+                                                            if (!numA) 
+                                                            {
+                                                                throw std::string("invalid argument #1 for function \"max\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+
+                                                            sh_ptr<Number> numB = std::dynamic_pointer_cast<Number>(args.at(1));
+
+                                                            if (!numB) 
+                                                            {
+                                                                throw std::string("invalid argument #2 for function \"max\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+
+                                                            if (numA->isInt() && numB->isInt()) {
+                                                                return sh_ptr<Int>(new Int(std::max(numA->intVal(), numB->intVal())));
+                                                            }
+
+                                                            return sh_ptr<Double>(new Double(std::max(numA->doubleVal(), numB->doubleVal())));
+                                                            })};
+
+        sh_ptr<NativeFunction> Math_min{new NativeFunction(2, "min", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Number> numA = std::dynamic_pointer_cast<Number>(args.at(0));
+
+                                                            if (!numA) 
+                                                            {
+                                                                throw std::string("invalid argument #1 for function \"min\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+
+                                                            sh_ptr<Number> numB = std::dynamic_pointer_cast<Number>(args.at(1));
+
+                                                            if (!numB) 
+                                                            {
+                                                                throw std::string("invalid argument #2 for function \"min\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+
+                                                            if (numA->isInt() && numB->isInt()) 
+                                                            {
+                                                                return sh_ptr<Int>(new Int(std::min(numA->intVal(), numB->intVal())));
+                                                            }
+
+                                                            return sh_ptr<Double>(new Double(std::min(numA->doubleVal(), numB->doubleVal())));
+                                                            })};
+
+
+        sh_ptr<NativeFunction> Math_pow{new NativeFunction(2, "pow", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Number> numA = std::dynamic_pointer_cast<Number>(args.at(0));
+
+                                                            if (!numA) 
+                                                            {
+                                                                throw std::string("invalid argument #1 for function \"pow\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+
+
+                                                            sh_ptr<Number> numB = std::dynamic_pointer_cast<Number>(args.at(1));
+
+                                                            if (!numB) 
+                                                            {
+                                                                throw std::string("invalid argument #2 for function \"pow\"");
+                                                                return sh_ptr<Value>();
+                                                            }
+
+                                                            return sh_ptr<Double>(new Double(std::pow(numA->doubleVal(), numB->doubleVal())));
+                                                            })};
+
+        sh_ptr<NativeFunction> Math_round{new NativeFunction(1, "round", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Value> value = args.at(0);
+
+                                                            sh_ptr<Number> numVal = std::dynamic_pointer_cast<Number>(value);
+
+                                                            if (numVal)
+                                                            {
+                                                                return sh_ptr<Double>(new Double(std::round(numVal->doubleVal())));
+                                                            }
+
+                                                            throw std::string("invalid argument #1 for function \"round\"");
+                                                            return sh_ptr<Value>();
+                                                            })};
+
+
+        sh_ptr<NativeFunction> Math_sin{new NativeFunction(1, "sin", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Value> value = args.at(0);
+
+                                                            sh_ptr<Number> numVal = std::dynamic_pointer_cast<Number>(value);
+
+                                                            if (numVal)
+                                                            {
+                                                                return sh_ptr<Double>(new Double(std::sin(numVal->doubleVal())));
+                                                            }
+
+                                                            throw std::string("invalid argument #1 for function \"sin\"");
+                                                            return sh_ptr<Value>();
+                                                            })};
+
+        sh_ptr<NativeFunction> Math_tan{new NativeFunction(1, "tan", [](std::vector<sh_ptr<Value> > args) -> sh_ptr<Value>
+                                                            { 
+                                                            sh_ptr<Value> value = args.at(0);
+
+                                                            sh_ptr<Number> numVal = std::dynamic_pointer_cast<Number>(value);
+
+                                                            if (numVal)
+                                                            {
+                                                                return sh_ptr<Double>(new Double(std::tan(numVal->doubleVal())));
+                                                            }
+
+                                                            throw std::string("invalid argument #1 for function \"tan\"");
                                                             return sh_ptr<Value>();
                                                             })};
 

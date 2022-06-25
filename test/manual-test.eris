@@ -1,1 +1,1 @@
-print(Math::cos(Math.PI));
+print(Math::pow(2.0, 3.0));
