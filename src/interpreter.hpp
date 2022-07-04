@@ -1,11 +1,6 @@
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 
-#include <string>
-#include <memory>
-#include <vector>
-#include <map>
-
 #include "ast.hpp"
 #include "parser.hpp"
 #include "values.hpp"
@@ -268,7 +263,7 @@ namespace eris
 
         sh_ptr<Value> eval(FunctionDeclarationAST *exp, sh_ptr<Environment> env)
         {
-            sh_ptr<UserDefinedFunction> fn = sh_ptr<UserDefinedFunction>(new UserDefinedFunction(exp->params, exp->body, env));
+            sh_ptr<UserDefinedFunction> fn = sh_ptr<UserDefinedFunction>(new UserDefinedFunction(exp->name, exp->params, exp->body, env));
             env->define(exp->name, fn);
 
             return sh_ptr<Value>();
@@ -878,7 +873,7 @@ namespace eris
             {
                 if(args.size() < userDefined->arity)
                 {
-                    throw std::string("missing argument #"+std::to_string(args.size() + 1) + " for function");
+                    throw std::string("missing argument #"+std::to_string(args.size() + 1) + " for function \"" + userDefined->name+"\"");
                 }
 
                 std::map<std::string, sh_ptr<Value> > activationRecord;

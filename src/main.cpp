@@ -40,13 +40,15 @@ void launchBuiltins()
     eris::builtins::Math->members->define("log", eris::builtins::Math_log);
     eris::builtins::Math->members->define("max", eris::builtins::Math_max);
     eris::builtins::Math->members->define("min", eris::builtins::Math_min);
+    eris::builtins::Math->members->define("rand", eris::builtins::Math_rand);  
+    eris::builtins::Math->members->define("round", eris::builtins::Math_round);  
     eris::builtins::Math->members->define("pow", eris::builtins::Math_pow);  
 
     global->define("input", eris::builtins::input);  
     global->define("print", eris::builtins::print);
     global->define("toInt", eris::builtins::toInt);
     global->define("toDouble", eris::builtins::toDouble);
-    global->define("toString", eris::builtins::toString);
+    global->define("toStr", eris::builtins::toStr);
 }
 
 void run(const std::string &filename, const std::string &text)

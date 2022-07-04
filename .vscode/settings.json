@@ -3,6 +3,7 @@
         "*.punylisp": "lisp",
         "*.eris": "swift",
         "*.bnf": "bnf",
-        "algorithm": "cpp"
+        "vector": "cpp",
+        "memory": "cpp"
     }
 }

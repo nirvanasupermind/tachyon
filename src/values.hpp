@@ -409,6 +409,7 @@ namespace eris
     {
     public:
         int arity;
+        std::string name;
     };
 
     /**
@@ -421,6 +422,14 @@ namespace eris
         std::vector<sh_ptr<AST> > params;
         sh_ptr<AST> body;
         sh_ptr<Environment> env;
+
+
+        UserDefinedFunction(const std::string &name, const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env)
+            : params(params), body(body), env(env)
+        {
+            this->arity = params.size();
+            this->name = name;
+        }
 
         UserDefinedFunction(const std::vector<sh_ptr<AST> > &params, sh_ptr<AST> body, sh_ptr<Environment> env)
             : params(params), body(body), env(env)
@@ -441,14 +450,14 @@ namespace eris
     class NativeFunction : public Function
     {
     public:
-        std::string name;
-
         std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> fn;
 
-        NativeFunction(int arity, const std::string &name, const std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> &fn)
-            : fn(fn), name(name)
+        NativeFunction(int arity, const std::string &name, sh_ptr<Environment> members, const std::function<sh_ptr<Value> (std::vector<sh_ptr<Value> >)> &fn)
+            : fn(fn)
         {
             this->arity = arity;
+            this->name = name;
+            this->members = members;
         }
 
         std::string str() const 
