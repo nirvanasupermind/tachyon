@@ -73,7 +73,7 @@ namespace eris
         
         virtual bool isInt() const = 0;
 
-        bool eq(sh_ptr<Value> other) const
+        virtual bool eq(sh_ptr<Value> other) const
         {
             sh_ptr<Number> otherNum = std::dynamic_pointer_cast<Number>(other);
 
@@ -119,6 +119,8 @@ namespace eris
         {
             return std::to_string(value);
         }
+
+        
     };
 
     /**
@@ -171,7 +173,7 @@ namespace eris
 
         Boolean(bool value) : value(value) {}
 
-        bool truthy()
+        bool truthy() const
         {
             return value;
         }

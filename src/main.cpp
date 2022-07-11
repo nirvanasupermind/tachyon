@@ -27,7 +27,7 @@ void launchBuiltins()
     eris::builtins::List->members->define("at", eris::builtins::List_at);    
     eris::builtins::List->members->define("atPut", eris::builtins::List_atPut);    
     eris::builtins::List->members->define("del", eris::builtins::List_del);    
-    eris::builtins::List->members->define("len", eris::builtins::List_len);  
+    eris::builtins::List->members->define("len", eris::builtins::List_len);
     global->define("Math", eris::builtins::Math); 
     eris::builtins::Math->members->define("PI", eris::builtins::Math_PI);  
     eris::builtins::Math->members->define("E", eris::builtins::Math_E);  

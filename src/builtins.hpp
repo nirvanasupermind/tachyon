@@ -14,9 +14,11 @@ namespace eris
 {
     namespace builtins
     {
-        extern sh_ptr<Class> Function;
+        // extern sh_ptr<Class> Function;
 
         sh_ptr<Class> Object{new Class(sh_ptr<Environment>(new Environment()))};
+
+        sh_ptr<Class> Function{new Class(sh_ptr<Environment>(new Environment({}, Object->members)))};
 
         sh_ptr<NativeFunction> Object_constructor{new NativeFunction(1, "constructor", sh_ptr<Environment>(new Environment({}, Function->members)), [](std::vector<sh_ptr<Value>> args) -> sh_ptr<Value>
                                                                      {
@@ -349,8 +351,7 @@ namespace eris
                                                             
                                                             return sh_ptr<Int>(new Int(self->vec.size())); })};
 
-        sh_ptr<Class> Function{new Class(sh_ptr<Environment>(new Environment({}, Object->members)))};
-
+        
         sh_ptr<Class> Math{new Class(sh_ptr<Environment>(new Environment({}, Object->members)))};
 
         sh_ptr<Double> Math_PI{new Double(3.141592653589793)};
