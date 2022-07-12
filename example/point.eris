@@ -1,0 +1,13 @@
+class Point {
+    def constructor(self, x, y) {
+        self.x = x;
+        self.y = y;
+    }
+
+    def calc(self) {
+        return Math::pow(self.x, 2.0) + Math::pow(self.y, 2.0);
+    }
+}
+
+let p = Point(5, 6);
+print(p.calc()); // 61.0

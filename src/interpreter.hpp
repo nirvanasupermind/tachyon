@@ -234,10 +234,12 @@ namespace eris
 
         sh_ptr<Value> eval(ClassDeclarationAST *exp, sh_ptr<Environment> env)
         {
-            sh_ptr<Environment> classEnv(new Environment({}, env));
+            sh_ptr<Environment> declarationEnv(new Environment({}, env));
 
             std::vector<sh_ptr<AST> > body = std::dynamic_pointer_cast<BlockStatementAST>(exp->body)->body;
-            this->eval(body, classEnv);
+            this->eval(body, declarationEnv);
+
+            sh_ptr<Environment> classEnv(new Environment(declarationEnv->record));
 
             if (exp->superClass)
             {
@@ -930,6 +932,8 @@ namespace eris
             {
                 args.push_back(this->eval(exp->arguments.at(i), env));
             }
+
+            // std::cout << args.size() << '\n';
 
             try
             {
