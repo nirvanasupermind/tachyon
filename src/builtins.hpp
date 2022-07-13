@@ -31,6 +31,7 @@ namespace eris
                                                                 throw std::string("invalid argument #1 for function \"constructor\"");
                                                                 return sh_ptr<Value>();
                                                             } 
+                                                            
                                                             return sh_ptr<Null>(new Null()); })};
 
         sh_ptr<Class> String{new Class(sh_ptr<Environment>(new Environment({}, Object->members)))};
@@ -743,7 +744,7 @@ namespace eris
                                                             
                                                             return sh_ptr<Boolean>(new Boolean((bool)std::dynamic_pointer_cast<class Object>(value))); })};
 
-        sh_ptr<NativeFunction> isFunction{new NativeFunction(1, "isFunction", sh_ptr<Environment>(new Environment({}, Function->members)), [](std::vector<sh_ptr<Value>> args) -> sh_ptr<Value>
+        sh_ptr<NativeFunction> isFunc{new NativeFunction(1, "isFunc", sh_ptr<Environment>(new Environment({}, Function->members)), [](std::vector<sh_ptr<Value>> args) -> sh_ptr<Value>
                                                            {                                                             
                                                             sh_ptr<Value> value = args.at(0);
                                                             

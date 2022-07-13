@@ -49,6 +49,12 @@ void launchBuiltins()
     global->define("toInt", eris::builtins::toInt);
     global->define("toDouble", eris::builtins::toDouble);
     global->define("toStr", eris::builtins::toStr);
+    global->define("isInt", eris::builtins::isInt);
+    global->define("isDouble", eris::builtins::isDouble);
+    global->define("isObject", eris::builtins::isObject);
+    global->define("isFunc", eris::builtins::isFunc);
+    
+    global->define("isStr", eris::builtins::isStr);
 }
 
 void run(const std::string &filename, const std::string &text)
