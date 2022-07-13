@@ -1,13 +1,13 @@
 def input();
-def print(data);
-def toInt(val);
-def toDouble(val);
-def toStr(val);
 def isInt(val);
 def isDouble(val);
 def isObject(val);
 def isFunc(val);
 def isStr(val);
+def print(data);
+def toInt(val);
+def toDouble(val);
+def toStr(val);
 
 class Object {
     def constructor(self);
@@ -26,6 +26,10 @@ class List extends Object {
     def at(self, idx);
     def atPut(self, idx, val);
     def del(self, idx);
+}
+
+class Function {
+    
 }
 
 class Math extends Object {
@@ -48,4 +52,3 @@ class Math extends Object {
     def sin(a);
     def tan(a);
 }
-
