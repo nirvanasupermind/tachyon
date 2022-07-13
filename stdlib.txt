@@ -28,8 +28,7 @@ class List extends Object {
     def del(self, idx);
 }
 
-class Function {
-    
+class Function extends Object {
 }
 
 class Math extends Object {
