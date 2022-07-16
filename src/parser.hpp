@@ -92,8 +92,10 @@ namespace eris
          *  | VariableStatement
          *  | IterationStatement
          *  | ReturnStatement
+         *  | RequireStatement
          *  | FunctionDeclaration
          *  | ClassDeclaration
+         *  | NamespaceDeclaration
          *  ;
          */
         sh_ptr<AST> Statement()
@@ -305,6 +307,7 @@ namespace eris
          * IterationStatement
          *  : WhileStatement
          *  | DoWhileStatement
+         *  | ForStatement
          *  ;
          *
          */
@@ -352,7 +355,7 @@ namespace eris
         /**
          * @brief
          * DoWhileStatement
-         *  : 'do' Statement 'while' '(' Expression ')'
+         *  : 'do' Statement 'while' '(' Expression ')' ';'
          *  ;
          */
         sh_ptr<AST> DoWhileStatement()
@@ -367,6 +370,7 @@ namespace eris
             this->eat("(");
             sh_ptr<AST> test = this->Expression();
             this->eat(")");
+            this->eat(";");
 
             return sh_ptr<DoWhileStatementAST>(new DoWhileStatementAST(line, body, test));
         }

@@ -6,4 +6,4 @@ def fac(x) {
     }
 }
 
-print(fac(5.0));
+print(fac(5.0)); // 120.0
