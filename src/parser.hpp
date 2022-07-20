@@ -566,7 +566,7 @@ namespace eris
         /**
          * @brief
          * AssignmentExpression
-         *  : EqualityExpression
+         *  : LogicalORExpression
          *  | LeftHandSideExpression AssignmentOperator AssignmentExpression
          *  ;
          */
@@ -608,8 +608,8 @@ namespace eris
         /**
          * @brief
          * LogicalORExpression
-         *  : RelationalExpression
-         *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
+         *  : LogicalANDExpression
+         *  | LogicalANDExpression LOGICAL_OR LogicalORExpression
          *  ;
          */
         sh_ptr<AST> LogicalORExpression()
@@ -620,8 +620,8 @@ namespace eris
         /**
          * @brief
          * LogicalANDExpression
-         *  : RelationalExpression
-         *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
+         *  : EqualityExpression
+         *  | EqualityExpression LOGICAL_AND EqualityExpression
          *  ;
          */
         sh_ptr<AST> LogicalANDExpression()
@@ -633,7 +633,7 @@ namespace eris
          * @brief
          * EqualityExpression
          *  : RelationalExpression
-         *  | RelationalExpression EQUALITY_OPERATOR RelationalExpression
+         *  | RelationalExpression EQUALITY_OPERATOR EqualityExpression
          *  ;
          */
         sh_ptr<AST> EqualityExpression()
@@ -682,8 +682,8 @@ namespace eris
         /**
          * @brief
          * AdditiveExpression
-         *  : Literal
-         *  | AdditiveExpression ADDITIVE_OPERATOR Literal
+         *  : MultiplicativeExpression
+         *  | AdditiveExpression ADDITIVE_OPERATOR MultiplactiveExpression
          *  ;
          */
         sh_ptr<AST> AdditiveExpression()
@@ -759,7 +759,6 @@ namespace eris
          *  : PrimaryExpression
          *  | MemberExpression '.' Identifier
          *  | MemberExpression '::' Identifier
-         *  | LeftHandSideExpression
          *  ;
          */
         sh_ptr<AST> MemberExpression()

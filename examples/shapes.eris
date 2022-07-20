@@ -1,0 +1,39 @@
+namespace shapes {
+    class Shape {
+    }
+
+    class Triangle extends Shape {
+        def constructor(self, b, h) {
+            self.b = b;
+            self.h = h;
+        }
+        
+        def getArea(self) {
+            return (self.b * self.h) / 2;
+        }
+    }
+    
+    class Rectangle extends Shape {
+        def constructor(self, w, h) {
+            self.w = w;
+            self.h = h;
+        }
+        
+        def getArea(self) {
+            return self.w * self.h;
+        }
+    }
+
+    class Square extends Rectangle {
+        def constructor(self, w) {
+            self.w = w;
+            self.h = w;
+        }
+    }
+}
+
+let triangle = shapes::Triangle(2, 3);
+let square = shapes::Square(2);
+
+print(triangle.getArea()); // => 3
+print(square.getArea()); // => 4

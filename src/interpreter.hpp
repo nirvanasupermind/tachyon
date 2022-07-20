@@ -244,7 +244,8 @@ namespace eris
             if (exp->superClass)
             {
                 sh_ptr<Value> superValue = this->eval(exp->superClass, env);
-                sh_ptr<Class> superClass = std::dynamic_pointer_cast<Class>(superClass);
+                sh_ptr<Class> superClass = std::dynamic_pointer_cast<Class>(superValue);
+
 
                 if (!superClass)
                 {
@@ -941,12 +942,10 @@ namespace eris
             }
             catch(const std::string &e)
             {
-                throw std::string(std::to_string(exp->line) + ": " + e);
+                throw std::string(e);
                 return sh_ptr<Value>();
             }
         }
-
-
 
         sh_ptr<Value> eval(MemberExpressionAST *exp, sh_ptr<Environment> env)
         {
