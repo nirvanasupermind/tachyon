@@ -53,8 +53,8 @@ The `<skip>` token is ignored in parsing.
 <identifier-start-char> ::= <letter> | "_"
 <identifier-char> ::= <letter> | <digit> | "_"
 <whitespace> ::= <whitespace-char> | <whitespace> <whitespace-char> 
-<single-line-comment> ::= "//" <single-line-char-seq>
-<multi-line-comment> ::= "/*" <any-char-seq> "*/"
+<single-line-comment> ::= "//" <opt-single-line-char-seq>
+<multi-line-comment> ::= "/*" <opt-any-char-seq> "*/"
 <skip> ::= <whitespace> | <single-line-comment> | <multi-line-comment>
 <double-literal> ::= <int-literal> "." <opt-int-literal>
 <int-literal> ::= <digit> | <int-literal> digit
