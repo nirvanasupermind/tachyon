@@ -416,6 +416,22 @@ namespace eris
         }
     };
 
+    class CharLiteralAST : public AST
+    {
+    public:
+        char value;
+
+        CharLiteralAST(int line, char value)
+            : value(value)
+        {
+            this->line = line;
+        }
+
+        std::string type() const
+        {
+            return "CharLiteral";
+        }
+    };
 
     class StringLiteralAST : public AST
     {

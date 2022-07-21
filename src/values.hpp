@@ -119,8 +119,6 @@ namespace eris
         {
             return std::to_string(value);
         }
-
-        
     };
 
     /**
@@ -161,6 +159,39 @@ namespace eris
     };
 
     const sh_ptr<Double> Double::inf { new Double(std::numeric_limits<double>::infinity()) };
+
+
+    /**
+     * @brief 
+     * Represents a character in Eris.
+     */
+    class Char: public Value
+    {
+    public:
+        char value;
+        
+        Char(char value)
+            : value(value)
+        {
+        }
+
+        std::string str() const
+        {
+            return std::string(1, value);
+        }
+
+        bool eq(sh_ptr<Value> other) const
+        {
+            sh_ptr<Char> otherChar = std::dynamic_pointer_cast<Char>(other);
+
+            if(otherChar)
+            {
+                return this->value == otherChar->value;
+            }
+
+            return false;
+        }
+    };
 
     /**
      * @brief 

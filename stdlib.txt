@@ -1,12 +1,14 @@
 def input();
-def isInt(val);
+def isChar(val);
 def isDouble(val);
-def isObject(val);
 def isFunc(val);
+def isInt(val);
+def isObject(val);
 def isStr(val);
 def print(data);
-def toInt(val);
+def toChar(val);
 def toDouble(val);
+def toInt(val);
 def toStr(val);
 
 class Object {

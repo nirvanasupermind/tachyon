@@ -81,6 +81,11 @@ namespace eris
                 return this->eval(dynamic_cast<DoubleLiteralAST *>(exp), env);
             }
 
+            if (type == "CharLiteral")
+            {
+                return this->eval(dynamic_cast<CharLiteralAST *>(exp), env);
+            }
+
             if (type == "StringLiteral")
             {
                 return this->eval(dynamic_cast<StringLiteralAST *>(exp), env);
@@ -1019,6 +1024,11 @@ namespace eris
         sh_ptr<Value> eval(DoubleLiteralAST *exp, sh_ptr<Environment> env)
         {
             return sh_ptr<Double>(new Double(exp->value));
+        }
+
+        sh_ptr<Value> eval(CharLiteralAST *exp, sh_ptr<Environment> env)
+        {
+            return sh_ptr<Char>(new Char(exp->value));
         }
 
         sh_ptr<Value> eval(StringLiteralAST *exp, sh_ptr<Environment> env)

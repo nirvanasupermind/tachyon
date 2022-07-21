@@ -829,6 +829,7 @@ namespace eris
          * Literal
          *  : IntLiteral
          *  | DoubleLiteral
+         *  | CharLiteral
          *  | StringLiteral
          *  | BooleanLiteral
          *  ;
@@ -843,6 +844,11 @@ namespace eris
             if (lookahead.type == "DOUBLE")
             {
                 return this->DoubleLiteral();
+            }
+
+            if (lookahead.type == "CHAR")
+            {
+                return this->CharLiteral();
             }
 
             if (lookahead.type == "STRING")
@@ -895,6 +901,20 @@ namespace eris
             Token token = this->eat("DOUBLE");
 
             return sh_ptr<DoubleLiteralAST>(new DoubleLiteralAST(line, std::stod(token.value)));
+        }
+
+        /**
+         * CharLiteral
+         *  : CHAR
+         *  ;
+         */
+        sh_ptr<AST> CharLiteral()
+        {
+            int line = this->tokenizer.line;
+
+            Token token = this->eat("CHAR");
+
+            return sh_ptr<CharLiteralAST>(new CharLiteralAST(line, token.value.at(1)));
         }
 
         /**
@@ -1068,7 +1088,7 @@ namespace eris
          */
         bool isLiteral(const std::string &tokenType)
         {
-            return tokenType == "INT" || tokenType == "DOUBLE" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null" || tokenType == "[";
+            return tokenType == "INT" || tokenType == "DOUBLE" || tokenType == "CHAR" || tokenType == "STRING" || tokenType == "true" || tokenType == "false" || tokenType == "null" || tokenType == "[";
         }
 
         /**

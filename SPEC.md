@@ -6,9 +6,6 @@ Eris is a general-purpose, lightweight, dynamic programming language with class-
 Eris is designed to be simple enough that many programmers can achieve fluency in the language.
 Eris in spirit is related to Python & C++ but is organized rather differently, with a number of aspects omitted and a few ideas from other languages included.
 
-## 1.1 - Example Programs
-See the `examples` folder to see several example Eris programs.
-
 # 2 - Grammar
 
 This section defines the formal grammar used to define the lexical and syntactic structure of an Eris program.
@@ -40,6 +37,7 @@ The `<skip>` token is ignored in parsing.
 <single-line-char-seq> ::= <inline-char> | <inline-char-seq> <inline-char>
 <string-char> ::= (any unicode character, but not a double quote or newline)
 <string-char-seq> ::= <string-char> | <string-char-seq> <string-char>
+<char-literal-char> ::= (any unicode character, but not a single quote or newline)
 <whitespace-char> ::= " " | "\t" | "\n" | "\v" | "\f" | "\r"
 <letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G"
        | "H" | "I" | "J" | "K" | "L" | "M" | "N"
@@ -53,11 +51,12 @@ The `<skip>` token is ignored in parsing.
 <identifier-start-char> ::= <letter> | "_"
 <identifier-char> ::= <letter> | <digit> | "_"
 <whitespace> ::= <whitespace-char> | <whitespace> <whitespace-char> 
-<single-line-comment> ::= "//" <opt-single-line-char-seq>
+<single-line-comment> ::= "//" <opt-=single-line-char-seq>
 <multi-line-comment> ::= "/*" <opt-any-char-seq> "*/"
 <skip> ::= <whitespace> | <single-line-comment> | <multi-line-comment>
 <double-literal> ::= <int-literal> "." <opt-int-literal>
 <int-literal> ::= <digit> | <int-literal> digit
+<char-literal> ::= "'" <char-literal-char> "'"
 <identifier> ::= <identifier-start-char> | <identifier> <identifier-char>
 <equality-operator> ::= "==" | "!="
 <simple-assign> ::= "="
@@ -114,7 +113,68 @@ The `<skip>` token is ignored in parsing.
 # 3 - The Language
 ## 3.1 - Values and Types
 
+All data in Eris, including functions, classes, and namespaces, is modeled by values. All values can be stored in variables, passed as arguments to other functions, and returned as results.
+
+All values belong to one of the seven basic types: *null*, *boolean*, *int*, *double*, *char*, *object*, *class*, and *namespace*. The type *object* has the subtypes *string*, *list*, and *function* that serve more specialized uses. 
+
+### 3.1.1 - The *null* Type and Values
+The type *null* has exactly one value, `null`, that represents the absence of a useful value. 
+
+### 3.1.2 - The *boolean* Type and Values
+The type *boolean* has exactly two values, `true` and `false`. They are created using boolean literals, which are outlined in the [grammar rule](#2---Grammar) `<boolean-literal>`. *boolean* values support the following operators:
+
+* The equality operators, which result in a value of type `boolean`:
+    * The equality operator `==`
+    * The inequality operator `!=`
+* The logical operators, which result in a value of type `boolean`:
+    * The logical NOT operator `!`
+    * The logical AND operator `&&`
+    * The logical OR operator `||`
+
+Boolean expressions determine the control flow in several types of statements. 
+
+Both `null` and `false` make a condition false. Any other value makes a condition true. 
+
+### 3.1.3 - The *int* Type and Values
+The type *int* represents a signed 32-bit integer that supports standard mathematical operations. 2's complement notation is used for negative numbers. They may be created using integer literals, which are outlined in the [grammar rule](#2---Grammar) `<int-literal>`. *int* values support the following operators:
+
+* The equality operators, which result in a value of type `boolean`:
+    * The equality operator `==`
+    * The inequality operator `!=`
+* The relational operators, which result in a value of type `boolean`:
+    * The less-than operator, `<`
+    * The greater-than operator, `>`
+    * The less-than or equal operator, `<=`
+    * The greater-than or equal operator, `>=`    
+* The numerical operators, which result in a value of type `int` or `double`:
+    * The addition operator `+`
+    * The subtraction operator `-`
+    * The multiplication operator `*`
+    * The division operator `/`
+    * The unary plus operator `+`
+    * The unary minus operator `-`
+    
+### 3.1.4 - The *double* Type and Values
+The type *double* represents a double-precision floating-number that follows the IEEE-754 `binary64` format. They may be created using double literals, which are outlined in the [grammar rule](#2---Grammar) `<double-literal>`. *double* values support the following operators:
+
+* The equality operators, which result in a value of type `boolean`:
+    * The equality operator `==`
+    * The inequality operator `!=`
+* The relational operators, which result in a value of type `boolean`:
+    * The less-than operator, `<`
+    * The greater-than operator, `>`
+    * The less-than or equal operator, `<=`
+    * The greater-than or equal operator, `>=`    
+* The numerical operators, which result in a value of type `int` or `double`:
+    * The addition operator `+`
+    * The subtraction operator `-`
+    * The multiplication operator `*`
+    * The division operator `/`
+    * The unary plus operator `+`
+    * The unary minus operator `-`
+    
 ## 3.2 - Environments
+
 ## 3.3 - Variables
 ## 3.4 - Expressions
 ## 3.5 - Statements
