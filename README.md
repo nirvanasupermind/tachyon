@@ -5,7 +5,13 @@ C++ interpreter for the Eris programming language with a header-only implementat
 
 Eris is a general-purpose, lightweight, dynamic programming language with class-based object-oriented programming support.
 
-# Basic example
+Compile `src/main.cpp` to get an executable that can run Eris programs.
+
+## Status
+Currently, the language is mostlyworking, but the implementation is old and unstable, and thus may contain bugs.
+A refactoring of the interpreter and the addition of hash maps is slated for Eris 2.0.
+
+## Point example
 ```
 class Point {
     def constructor(self, x, y) {
@@ -22,7 +28,7 @@ let p = Point(5, 6);
 print(p.calc()); // 61.0
 ```
 
-# Documentation
+## Documentation
 Currently, documentation is sparse, however, there are:
 * [Example programs](examples) 
 * [List of all STL classes and functions](stdlib.txt)
