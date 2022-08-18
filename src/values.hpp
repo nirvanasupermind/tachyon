@@ -67,7 +67,7 @@ namespace eris
     class Number : public Value
     {
     public:
-        virtual std::int32_t intVal() const = 0;
+        virtual int32_t intVal() const = 0;
 
         virtual double doubleVal() const = 0;
         
@@ -93,9 +93,9 @@ namespace eris
     class Int: public Number
     {
     public:
-        std::int32_t value;
+        int32_t value;
         
-        Int(std::int32_t value)
+        Int(int32_t value)
             : value(value)
         {
         }
@@ -105,7 +105,7 @@ namespace eris
             return true;
         }
 
-        std::int32_t intVal() const
+        int32_t intVal() const
         {
             return value;
         }
@@ -140,9 +140,9 @@ namespace eris
             return false;
         }
 
-        std::int32_t intVal() const
+        int32_t intVal() const
         {
-            return (std::int32_t)value;
+            return (int32_t)value;
         }
         
         double doubleVal() const 
