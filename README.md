@@ -5,11 +5,11 @@ C++ interpreter for the Eris programming language with a header-only implementat
 
 Eris is a general-purpose, lightweight, dynamic programming language with class-based object-oriented programming support.
 
-Compile `src/main.cpp` to get an executable that can run Eris programs.
+Compile `src/main.cpp` to get an executable that can run Eris programs (make sure to compile on C++11).
 
 ## Status
 Currently, the interpreter is mostly working, but the implementation is old and unstable, and thus may contain bugs, and documentation is sparse.
-A refactoring of the interpreter and the addition of hash maps is slated for Eris 2.0.
+A refactoring of the interpreter, the addition of hash maps, and many stability and performance updates, are slated for Eris 2.0.
 
 ## Point example
 ```
