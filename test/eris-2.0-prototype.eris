@@ -4,22 +4,15 @@
 		this.y = y;
 	}
 
-    def calc() {
-        return this.x + this.y;
+    def toString() {
+        return "(" + this.x.toString() + ", " + this.y.toString() + ")";
     }
 }
- 
-
 
 let points = List();
 
 for(let i = 0; i < 5; i += 1) {
-    points.add(Point(i, i));
+    points.add(Point(Math.random, Math.random));
 }
 
-points.each(\(elem) {
-    print(elem.calc());
-    print(" ");
-});
-
-// output: 0 2 4 6 8
+points.each(println)
