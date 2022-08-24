@@ -1,26 +1,22 @@
- class Distance {	
-	def Distance(val, unit) {
-		this.val = val;
-		this.unit = unit;
+ class Point {	
+	def Point(x, y) {
+		this.x = x;
+		this.y = y;
 	}
 
-    def toString() {
-        return this.val.toString() + " " + this.unit;
+    def calc() {
+        return this.x + this.y;
     }
 }
  
-class KMDistance extends Distance {
-    def KMDistance(val) {
-        this.val = val;
-        this.unit = "km";
-    }
 
-    def meters() {
-        return this.val * 1000;
-    }
+
+let points = List();
+
+for(let i = 0; i < 5; i += 1) {
+    points.add(Point(i, i));
 }
 
-let kmDistance = KMDistance(2.5);
-
-println(kmDistance); // 2.5 km
-println(kmDistance.meters()); // 2500
+points.each(%(elem) {
+    println(elem.calc());
+});
