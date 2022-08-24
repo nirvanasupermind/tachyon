@@ -1,0 +1,26 @@
+ class Distance {	
+	def Distance(val, unit) {
+		this.val = val;
+		this.unit = unit;
+	}
+
+    def toString() {
+        return this.val.toString() + " " + this.unit;
+    }
+}
+ 
+class KMDistance extends Distance {
+    def KMDistance(val) {
+        this.val = val;
+        this.unit = "km";
+    }
+
+    def meters() {
+        return this.val * 1000;
+    }
+}
+
+let kmDistance = KMDistance(2.5);
+
+println(kmDistance); // 2.5 km
+println(kmDistance.meters()); // 2500
