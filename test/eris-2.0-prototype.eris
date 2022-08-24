@@ -12,7 +12,8 @@
 let points = List();
 
 for(let i = 0; i < 5; i += 1) {
-    points.add(Point(Math.random, Math.random));
+    let randomPoint = Point(Math.random(), Math.random());
+    points.add(randomPoint);
 }
 
 points.each(println);
