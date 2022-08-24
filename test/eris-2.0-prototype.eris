@@ -1,5 +1,5 @@
  class Point {	
-	def Point(x, y) {
+	def constructor(x, y) {
 		this.x = x;
 		this.y = y;
 	}
