@@ -15,4 +15,4 @@ for(let i = 0; i < 5; i += 1) {
     points.add(Point(Math.random, Math.random));
 }
 
-points.each(println)
+points.each(println);
