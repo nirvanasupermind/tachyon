@@ -3,6 +3,9 @@
 ## 1.1 - Microsyntax
 ## 1.2 - Macrosyntax
 # 2 - Values and Data Types
+Eris is a dynamically typed language, so ariables do not have types; only values do. In Eris, every value is first-class. This implies that any values can be used as parameters for other functions, saved in variables, and returned as results.
+
+
 ## 2.1 - Integer
 ## 2.2 - Double
 ## 2.3 - Boolean
