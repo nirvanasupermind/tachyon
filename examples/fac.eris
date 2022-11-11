@@ -1,9 +1,0 @@
-def fac(x) {
-    if(x <= 1.0) {
-        return 1.0; 
-    } else {
-        return x * fac(x - 1.0);
-    }
-}
-
-print(fac(5.0)); // => 120.0
