@@ -7,13 +7,13 @@
 #include "error.h"
 #include "token.h"
 #include "lexer.h"
+#include "parser.h"
 
 void run(const std::string& filename, const std::string& text) {
     eris::Lexer lexer(filename, text);
     std::vector<eris::Token> tokens = lexer.generate_tokens();
-    for (const eris::Token& token : tokens) {
-        std::cout << static_cast<std::string>(token) << ' ';
-    }
+    eris::Parser parser(filename, tokens);
+    std::cout << parser.parse().str() << '\n';
 }
 
 int main(int argc, char** argv) {

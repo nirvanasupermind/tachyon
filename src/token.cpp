@@ -3,8 +3,8 @@
 #include "token.h"
 
 namespace eris {
-    std::string token_type_str(TokenType tokenType) {
-        switch(tokenType) {
+    std::string token_type_str(TokenType type) {
+        switch(type) {
             case TokenType::NUMBER:
                 return "NUMBER";
             case TokenType::PLUS:
@@ -23,22 +23,27 @@ namespace eris {
                 return "RPAREN";
             case TokenType::SEMICOLON:
                 return "SEMICOLON";
+            case TokenType::EOF_:
+                return "EOF_";
+            default:
+                return "DEFAULT";
         }
     }
+    
 
-    Token::Token(size_t line, TokenType type)
-        : line(line), type(type), value("") {
+    Token::Token(TokenType type, size_t line)
+        : type(type), line(line), val("") {
     }
 
-    Token::Token(size_t line, TokenType type, const std::string &value) 
-        : line(line), type(type), value(value) {
+    Token::Token(TokenType type, size_t line, const std::string &val) 
+        : type(type), line(line), val(val) {
     }
 
-    Token::operator std::string() const {
-        if(value == "") {
+    std::string Token::str() const {
+        if(val == "") {
             return token_type_str(type);
         }
 
-        return token_type_str(type) + ":" + value;
+        return token_type_str(type) + ":" + val;
     }
 } // namespace eris

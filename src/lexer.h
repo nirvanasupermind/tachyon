@@ -17,11 +17,12 @@ namespace eris {
         size_t pos;
         size_t line;
         char current;
+    private:
+        void advance();
+        Token generate_number();
     public:
         Lexer(const std::string &filename, const std::string& text);
-        void advance();
         std::vector<Token> generate_tokens();
-        Token generate_number();
     };
 } // namespace eris
 

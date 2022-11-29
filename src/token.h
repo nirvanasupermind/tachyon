@@ -16,23 +16,23 @@ namespace eris {
         // Other symbols
         LPAREN,
         RPAREN,
-        SEMICOLON
+        SEMICOLON,
+        // EOF
+        EOF_
     };
 
-    std::string token_type_str(TokenType token_type);
+    std::string token_type_str(TokenType type);
 
     class Token {
     public:
-        size_t line;
-
         TokenType type;
-        std::string value;
+        size_t line;
+        std::string val{};
 
-        Token(size_t line, TokenType type);
+        Token(TokenType type, size_t line);
+        Token(TokenType type, size_t line, const std::string &val);
 
-        Token(size_t line, TokenType type, const std::string &value);
-
-        operator std::string() const;    
+        std::string str() const;    
     };
 } // namespace eris
 

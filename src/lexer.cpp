@@ -35,40 +35,42 @@ namespace eris {
             }
             else if (current == '+') {
                 advance();
-                tokens.push_back(Token(line, TokenType::PLUS));
+                tokens.push_back(Token(TokenType::PLUS, line));
             }
             else if (current == '-') {
                 advance();
-                tokens.push_back(Token(line, TokenType::MINUS));
+                tokens.push_back(Token(TokenType::MINUS, line));
             }
             else if (current == '*') {
                 advance();
-                tokens.push_back(Token(line, TokenType::MUL));
+                tokens.push_back(Token(TokenType::MUL, line));
             }
             else if (current == '/') {
                 advance();
-                tokens.push_back(Token(line, TokenType::DIV));
+                tokens.push_back(Token(TokenType::DIV, line));
             }
             else if (current == '%') {
                 advance();
-                tokens.push_back(Token(line, TokenType::MOD));
+                tokens.push_back(Token(TokenType::MOD, line));
             }
             else if (current == '(') {
                 advance();
-                tokens.push_back(Token(line, TokenType::LPAREN));
+                tokens.push_back(Token(TokenType::LPAREN, line));
             }
             else if (current == ')') {
                 advance();
-                tokens.push_back(Token(line, TokenType::RPAREN));
+                tokens.push_back(Token(TokenType::RPAREN, line));
             }
             else if (current == ';') {
                 advance();
-                tokens.push_back(Token(line, TokenType::SEMICOLON));
+                tokens.push_back(Token(TokenType::SEMICOLON, line));
             }
             else {
-                report_error(filename, line, "illegal character '" + std::string(1, current) + "'");
+                raise_error(filename, line, "illegal character '" + std::string(1, current) + "'");
             }
         }
+        
+        tokens.push_back(Token(TokenType::EOF_, line));
 
         return tokens;
     }
@@ -89,7 +91,7 @@ namespace eris {
             advance();
         }
 
-        return Token(line, TokenType::NUMBER, number_str);
+        return Token(TokenType::NUMBER, line, number_str);
     }
 
 } // namespace eris
