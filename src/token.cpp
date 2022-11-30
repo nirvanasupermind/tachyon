@@ -26,7 +26,7 @@ namespace eris {
             case TokenType::EOF_:
                 return "EOF_";
             default:
-                return "DEFAULT";
+                return "";
         }
     }
     

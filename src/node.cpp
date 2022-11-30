@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -21,7 +20,7 @@ namespace eris {
             case NodeType::PROGRAM:
                 return "PROGRAM";
             default:
-                return "DEFAULT";
+                return "";
         }
     }
     
@@ -57,12 +56,4 @@ namespace eris {
             return s;
         }
     }
-
-    // void Node::free_node(Node *node) {
-    //     for(const Node &child : node->children) {
-    //         free(&child);
-    //     }
-
-    //     delete node;
-    // }
 } // namespace eris
