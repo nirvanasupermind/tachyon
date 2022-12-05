@@ -1,3 +1,4 @@
+#include <cctype>
 #include <string>
 #include <vector>
 
@@ -6,8 +7,8 @@
 #include "error.h"
 
 namespace eris {
-    Lexer::Lexer(const std::string &filename, const std::string& text)
-        : filename(filename), text(text), pos(0), line(1), current(0) {
+    Lexer::Lexer(const std::string& text, const std::string& filename)
+        : text(text), filename(filename),  pos(0), line(1), current(0) {
         advance();
     }
 
@@ -30,8 +31,11 @@ namespace eris {
             if (WHITESPACE.find_first_of(current) != std::string::npos) {
                 advance();
             }
-            else if (current == '.' || DIGITS.find_first_of(current) != std::string::npos) {
+            else if (std::isdigit(current)) {
                 tokens.push_back(generate_number());
+            }
+            else if (current == '_' || std::isalpha(current)) {
+                tokens.push_back(generate_identifier());
             }
             else if (current == '+') {
                 advance();
@@ -53,6 +57,10 @@ namespace eris {
                 advance();
                 tokens.push_back(Token(TokenType::MOD, line));
             }
+            else if (current == '=') {
+                advance();
+                tokens.push_back(Token(TokenType::EQ, line));
+            }
             else if (current == '(') {
                 advance();
                 tokens.push_back(Token(TokenType::LPAREN, line));
@@ -69,7 +77,7 @@ namespace eris {
                 raise_error(filename, line, "illegal character '" + std::string(1, current) + "'");
             }
         }
-        
+
         tokens.push_back(Token(TokenType::EOF_, line));
 
         return tokens;
@@ -80,7 +88,7 @@ namespace eris {
         std::string number_str(1, current);
         advance();
 
-        while (current != 0 && (current == '.' || DIGITS.find_first_of(current) != std::string::npos)) {
+        while (current != 0 && (current == '.' || std::isdigit(current))) {
             if (current == '.') {
                 if (++decimal_point_count > 1) {
                     break;
@@ -91,7 +99,28 @@ namespace eris {
             advance();
         }
 
-        return Token(TokenType::NUMBER, line, number_str);
+        return Token(TokenType::NUMBER, number_str, line);
     }
 
+    Token Lexer::generate_identifier() {
+        std::string identifier(1, current);
+        advance();
+
+        while (current != 0 && (current == '_' | std::isalnum(current))) {
+            identifier += current;
+            advance();
+        }
+
+        if (identifier == "null") {
+            return Token(TokenType::NULL_, line);
+        } else if (identifier == "true") {
+            return Token(TokenType::TRUE, line);
+        } else if (identifier == "false") {
+            return Token(TokenType::FALSE, line);
+        } else if (identifier == "var") {
+            return Token(TokenType::VAR, line);
+        } else {
+            return Token(TokenType::IDENTIFIER, identifier, line);
+        }
+    }
 } // namespace eris

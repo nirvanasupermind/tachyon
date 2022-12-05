@@ -1,11 +1,12 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <memory>
 
 #include "error.h"
 #include "token.h"
 #include "node.h"
-#include "value.h"
+#include "erisval.h"
 #include "interpreter.h"
 
 namespace eris {
@@ -13,106 +14,126 @@ namespace eris {
         : filename(filename) {
     }
 
-    void Interpreter::expect_type(size_t line, const ErisValue &val, ErisValueType type) const {
+    void Interpreter::check_operand_type(const ErisVal& val, ErisValType type, std::size_t line) const {
         if (val.type != type) {
             raise_error(filename, line, "illegal operation");
         }
     }
 
-    ErisValue Interpreter::visit(const Node& node) {
-        switch (node.type) {
+    ErisVal Interpreter::visit(Node* node) {
+        switch (node->type()) {
         case NodeType::NUMBER:
-            return visit_number_node(node);
+            return visit(dynamic_cast<NumberNode*>(node));
+        case NodeType::NULL_:
+            return visit(dynamic_cast<NullNode*>(node));
+        case NodeType::TRUE:
+            return visit(dynamic_cast<TrueNode*>(node));
+        case NodeType::FALSE:
+            return visit(dynamic_cast<FalseNode*>(node));
         case NodeType::UNARY:
-            return visit_unary_node(node);
+            return visit(dynamic_cast<UnaryNode*>(node));
         case NodeType::BINARY:
-            return visit_binary_node(node);
-        case NodeType::EXPR_STATEMENT:
-            return visit_expr_statement_node(node);
+            return visit(dynamic_cast<BinaryNode*>(node));
         case NodeType::PROGRAM:
-            return visit_program_node(node);
+            return visit(dynamic_cast<ProgramNode*>(node));
+        default:
+            raise_error(filename, node->line, "invalid node");
+        }
+    }
+
+    ErisVal Interpreter::visit(NumberNode* node) {
+        return ErisVal(ErisValType::NUMBER, node->val);
+    }
+
+    ErisVal Interpreter::visit(NullNode* node) {
+        return ErisVal(ErisValType::NULL_);
+    }
+
+    ErisVal Interpreter::visit(TrueNode* node) {
+        return ErisVal(ErisValType::BOOL, true);
+    }
+
+    ErisVal Interpreter::visit(FalseNode* node) {
+        return ErisVal(ErisValType::BOOL, false);
+    }
+
+    ErisVal Interpreter::visit(UnaryNode* node) {
+        ErisVal operand = visit(node->operand_node.get());
+
+        switch (node->op) {
+        case TokenType::PLUS: {
+            check_operand_type(operand, ErisValType::NUMBER, node->line);
+            return operand;
+        }
+
+        case TokenType::MINUS: {
+            check_operand_type(operand, ErisValType::NUMBER, node->line);
+            return ErisVal(ErisValType::NUMBER, -operand.number);
+        }
+
         default:
             throw std::runtime_error("invalid node");
         }
     }
-    
-    ErisValue Interpreter::visit_number_node(const Node& node) {
-        return ErisValue(ErisValueType::NUMBER, std::stod(node.val));
-    }
 
-    ErisValue Interpreter::visit_unary_node(const Node& node) {
-        ErisValue operand = visit(node.children.at(0));
+    ErisVal Interpreter::visit(BinaryNode* node) {
+        ErisVal lhs = visit(node->node_a.get());
+        ErisVal rhs = visit(node->node_b.get());
 
-        switch (node.op) {
-            case TokenType::PLUS: {
-                expect_type(node.line, operand, ErisValueType::NUMBER);
-                return operand;
-            }
-                
-            case TokenType::MINUS: {
-                expect_type(node.line, operand, ErisValueType::NUMBER);
-                return ErisValue(ErisValueType::NUMBER, -operand.number);
-            }
+        switch (node->op) {
+        case TokenType::PLUS: {
+            check_operand_type(lhs, ErisValType::NUMBER, node->line);
+            check_operand_type(rhs, ErisValType::NUMBER, node->line);
 
-            default:
-                throw std::runtime_error("invalid node");
+            return ErisVal(ErisValType::NUMBER, lhs.number + rhs.number);
         }
-    }
-    
-    ErisValue Interpreter::visit_binary_node(const Node& node) {
-        ErisValue lhs = visit(node.children.at(0));
-        ErisValue rhs = visit(node.children.at(1));
 
-        switch (node.op) {
-            case TokenType::PLUS: {
-                expect_type(node.line, lhs, ErisValueType::NUMBER);
-                expect_type(node.line, rhs, ErisValueType::NUMBER);
-                return ErisValue(ErisValueType::NUMBER, lhs.number + rhs.number);
-            }
-                
-            case TokenType::MINUS: {
-                expect_type(node.line, lhs, ErisValueType::NUMBER);
-                expect_type(node.line, rhs, ErisValueType::NUMBER);
-                return ErisValue(ErisValueType::NUMBER, lhs.number - rhs.number);
-            }
+        case TokenType::MINUS: {
+            check_operand_type(lhs, ErisValType::NUMBER, node->line);
+            check_operand_type(rhs, ErisValType::NUMBER, node->line);
 
-            case TokenType::MUL: {
-                expect_type(node.line, lhs, ErisValueType::NUMBER);
-                expect_type(node.line, rhs, ErisValueType::NUMBER);
-                return ErisValue(ErisValueType::NUMBER, lhs.number * rhs.number);
+            return ErisVal(ErisValType::NUMBER, lhs.number - rhs.number);
+        }
+
+        case TokenType::MUL: {
+            check_operand_type(lhs, ErisValType::NUMBER, node->line);
+            check_operand_type(rhs, ErisValType::NUMBER, node->line);
+            
+            return ErisVal(ErisValType::NUMBER, lhs.number * rhs.number);
+        }
+
+        case TokenType::DIV: {
+            check_operand_type(lhs, ErisValType::NUMBER, node->line);
+            check_operand_type(rhs, ErisValType::NUMBER, node->line);
+
+            if (rhs.number == 0) {
+                raise_error(filename, node->line, "division by zero");
             }
 
-            case TokenType::DIV: {
-                expect_type(node.line, lhs, ErisValueType::NUMBER);
-                expect_type(node.line, rhs, ErisValueType::NUMBER);
-                
-                if(rhs.number == 0) {
-                    raise_error(filename, node.line, "division by zero");
-                }
+            return ErisVal(ErisValType::NUMBER, lhs.number / rhs.number);
+        }
 
-                return ErisValue(ErisValueType::NUMBER, lhs.number / rhs.number);
+        case TokenType::MOD: {
+            check_operand_type(lhs, ErisValType::NUMBER, node->line);
+            check_operand_type(rhs, ErisValType::NUMBER, node->line);
+
+            if (rhs.number == 0) {
+                raise_error(filename, node->line, "modulo by zero");
             }
 
-            case TokenType::MOD: {
-                expect_type(node.line, lhs, ErisValueType::NUMBER);
-                expect_type(node.line, rhs, ErisValueType::NUMBER);
-                return ErisValue(ErisValueType::NUMBER, std::fmod(lhs.number, rhs.number));
-            }
+            return ErisVal(ErisValType::NUMBER, std::fmod(lhs.number, rhs.number));
+        }
 
-            default:
-                throw std::runtime_error("invalid node");
+        default:
+            throw std::runtime_error("invalid node");
         }
     }
 
-    ErisValue Interpreter::visit_expr_statement_node(const Node& node) {
-        return visit(node.children.at(0));
-    }
-
-    ErisValue Interpreter::visit_program_node(const Node& node) {
-        for(const Node &child : node.children) {
-            std::cout << visit(child).str() << '\n';
+    ErisVal Interpreter::visit(ProgramNode* node) {
+        for (std::size_t i = 0; i < node->stmts.size(); i++) {
+            std::cout << visit(node->stmts.at(i).get()).str() << '\n';
         }
 
-        return ErisValue(ErisValueType::NULL_);
+        return ErisVal(ErisValType::NULL_);
     }
 }// namespace eris

@@ -4,33 +4,40 @@
 #include <string>
 
 namespace eris {
+    // Token type
     enum class TokenType {
-        // Literals
         NUMBER,
-        // Operators
+        IDENTIFIER,
+        NULL_,
+        TRUE,
+        FALSE,
+        VAR,
         PLUS,
         MINUS,
         MUL,
         DIV,
         MOD,
-        // Other symbols
+        EQ,
+        EE,
         LPAREN,
         RPAREN,
         SEMICOLON,
-        // EOF
         EOF_
     };
 
     std::string token_type_str(TokenType type);
 
+    // String with an identified meaning like a numeric literal or double-equals operator
     class Token {
     public:
         TokenType type;
-        size_t line;
-        std::string val{};
+        std::string val;
+        std::size_t line;
 
-        Token(TokenType type, size_t line);
-        Token(TokenType type, size_t line, const std::string &val);
+        // For tokens where the string value is inferred (like PLUS)
+        Token(TokenType type, std::size_t line);
+
+        Token(TokenType type, const std::string& val, std::size_t line);
 
         std::string str() const;    
     };

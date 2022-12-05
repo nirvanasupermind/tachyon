@@ -1,1 +1,1 @@
-clang++ src/*.cpp -o ../../../code/binaries/eris -std=c++11
+clang++ src/*.cpp -o ../../../code/binaries/eris -std=c++11 -w

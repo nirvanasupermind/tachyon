@@ -1,4 +1,5 @@
 #include <string>
+#include <memory>
 #include <vector>
 #include <functional>
 
@@ -8,8 +9,8 @@
 #include "error.h"
 
 namespace eris {
-    Parser::Parser(const std::string& filename, const std::vector<Token>& tokens)
-        : filename(filename), tokens(tokens), pos(0), current(Token(TokenType::EOF_, 1)) {
+    Parser::Parser(const std::vector<Token>& tokens, const std::string& filename)
+        : tokens(tokens), pos(0), current(Token(TokenType::EOF_, 1)), filename(filename) {
         advance();
     }
 
@@ -28,16 +29,28 @@ namespace eris {
         }
     }
 
-    Node Parser::basic_expr() {
+    std::shared_ptr<Node> Parser::basic_expr() {
         Token token = current;
         switch (token.type) {
         case TokenType::NUMBER: {
             advance();
-            return Node(NodeType::NUMBER, token.line, token.val);
+            return std::shared_ptr<NumberNode>(new NumberNode(std::stod(token.val), token.line));
+        };
+        case TokenType::NULL_: {
+            advance();
+            return std::shared_ptr<NullNode>(new NullNode(token.line));
+        };
+        case TokenType::TRUE: {
+            advance();
+            return std::shared_ptr<TrueNode>(new TrueNode(token.line));
+        };
+        case TokenType::FALSE: {
+            advance();
+            return std::shared_ptr<FalseNode>(new FalseNode(token.line));
         };
         case TokenType::LPAREN: {
             advance();
-            Node inner_expr = expr();
+            std::shared_ptr<Node> inner_expr = expr();
             eat(TokenType::RPAREN);
             return inner_expr;
         };
@@ -46,70 +59,61 @@ namespace eris {
         }
     }
 
-    Node Parser::unary_expr() {
-        Token op = current;
+    std::shared_ptr<Node> Parser::unary_expr() {
+        Token op = current;    
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
-            return Node(NodeType::UNARY, op.line, op.type, { unary_expr() });
+            return std::shared_ptr<UnaryNode>(new UnaryNode(op.type, unary_expr(), op.line));
         }
         else {
             return basic_expr();
         }
     }
 
-    Node Parser::binary_expr(const std::function<Node()>& operand, TokenType op) {
-        Node result = operand();
+    std::shared_ptr<Node> Parser::binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::vector<TokenType>& op_types) {
+        std::shared_ptr<Node> node_a = operand();
 
-        while (current.type == op && current.type != TokenType::EOF_) {
+        while (std::find(op_types.begin(), op_types.end(), current.type) != op_types.end()
+            && current.type != TokenType::EOF_) {
+            TokenType op = current.type;
             advance();
-            Node temp = operand();
-            result = Node(NodeType::BINARY, result.line, op, { result, temp });
+            std::shared_ptr<Node> node_b = operand();
+            node_a = std::shared_ptr<BinaryNode>(new BinaryNode(op, node_a, node_b, node_a->line));
         }
 
-        return result;
+        return node_a;
     }
 
-    Node Parser::mul_expr() {
-        return binary_expr([this]() { return unary_expr(); }, TokenType::MUL);
+    std::shared_ptr<Node> Parser::multiplicative_expr() {
+        return binary_expr([this]() { return unary_expr(); }, { TokenType::MUL, TokenType::DIV, TokenType::MOD });
     }
 
-    Node Parser::div_expr() {
-        return binary_expr([this]() { return mul_expr(); }, TokenType::DIV);
+    std::shared_ptr<Node> Parser::additive_expr() {
+        return binary_expr([this]() { return multiplicative_expr(); }, { TokenType::PLUS, TokenType::MINUS });
     }
 
-    Node Parser::mod_expr() {
-        return binary_expr([this]() { return div_expr(); }, TokenType::MOD);
+    std::shared_ptr<Node> Parser::expr() {
+        return additive_expr();
     }
 
-    Node Parser::add_expr() {
-        return binary_expr([this]() { return mod_expr(); }, TokenType::PLUS);
-    }
-
-    Node Parser::sub_expr() {
-        return binary_expr([this]() { return add_expr(); }, TokenType::MINUS);
-    }
-
-    Node Parser::expr() {
-        return sub_expr();
-    }
-
-    Node Parser::expr_statement() {
-        Node inner_expr = expr();
+    std::shared_ptr<Node> Parser::expr_stmt() {
+        std::shared_ptr<Node> inner_expr = expr();
         eat(TokenType::SEMICOLON);
-        return Node(NodeType::EXPR_STATEMENT, inner_expr.line, { inner_expr });
+        return inner_expr;
     }
 
-    Node Parser::program() {
-        std::vector<Node> statements;
+    std::shared_ptr<Node> Parser::program() {
+        std::size_t line = current.line;
+        std::vector<std::shared_ptr<Node> > stmts;
 
         while (current.type != TokenType::EOF_) {
-            statements.push_back(expr_statement());
+            stmts.push_back(expr_stmt());
         }
 
-        return Node(NodeType::PROGRAM, statements.at(0).line, statements);
+        return std::shared_ptr<ProgramNode>(new ProgramNode(stmts, line));
     }
 
-    Node Parser::parse() {
+    std::shared_ptr<Node> Parser::parse() {
         return program();
     }
 } // namespace eris

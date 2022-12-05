@@ -5,55 +5,73 @@
 #include "node.h"
 
 namespace eris {
-    std::string node_type_str(NodeType type) {
-        switch(type) {
-            case NodeType::EMPTY:
-                return "EMPTY";
-            case NodeType::NUMBER:
-                return "NUMBER";
-            case NodeType::UNARY:
-                return "UNARY";
-            case NodeType::BINARY:
-                return "BINARY";
-            case NodeType::EXPR_STATEMENT:
-                return "EXPR_STATEMENT";
-            case NodeType::PROGRAM:
-                return "PROGRAM";
-            default:
-                return "";
-        }
-    }
-    
-    Node::Node(NodeType type, size_t line, const std::string &val) 
-        : type(type), line(line), op(TokenType::EOF_), val(val), children{} {
+    EmptyNode::EmptyNode(std::size_t line) {
+        this->line = line;
     }
 
-    Node::Node(NodeType type, size_t line, const std::vector<Node>& children)
-        : type(type), line(line), op(TokenType::EOF_), val(""), children(children) {
+    NodeType EmptyNode::type() const {
+        return NodeType::EMPTY;
     }
 
-    Node::Node(NodeType type, size_t line, TokenType op, const std::vector<Node>& children)
-        : type(type), line(line), op(op), children(children) {
+    NumberNode::NumberNode(double val, std::size_t line)
+        : val(val) {
+        this->line = line;
     }
 
-    std::string Node::str() const {
-        std::string s = node_type_str(type) + '(';
-
-        if(children.empty()) {
-            s += val + ')';
-            return s;
-        } else {
-            if(op != TokenType::EOF_) {
-                s += token_type_str(op) + ',';
-            }
-
-            for(const Node& child : children) {
-                s += child.str() + ',';
-            }
-
-            s.pop_back();
-            s += ')';
-            return s;
-        }
+    NodeType NumberNode::type() const {
+        return NodeType::NUMBER;
     }
-} // namespace eris
+
+    NullNode::NullNode(std::size_t line) {
+        this->line = line;
+    }
+
+    NodeType NullNode::type() const {
+        return NodeType::NULL_;
+    }
+
+    TrueNode::TrueNode(std::size_t line) {
+        this->line = line;
+    }
+
+    NodeType TrueNode::type() const {
+        return NodeType::TRUE;
+    }
+
+    FalseNode::FalseNode(std::size_t line) {
+        this->line = line;
+    }
+
+    NodeType FalseNode::type() const {
+        return NodeType::FALSE;
+    }
+
+    UnaryNode::UnaryNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line)
+        : op(op), operand_node(operand_node) {
+        this->line = line;
+    }
+
+    NodeType UnaryNode::type() const {
+        return NodeType::UNARY;
+    }
+
+    BinaryNode::BinaryNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
+        : op(op), node_a(node_a), node_b(node_b) {
+        this->line = line;
+    }
+
+    NodeType BinaryNode::type() const {
+        return NodeType::BINARY;
+    }
+
+    ProgramNode::ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line)
+        : stmts(stmts) {
+        this->line = line;
+    }
+
+    NodeType ProgramNode::type() const {
+        return NodeType::PROGRAM;
+    }
+
+
+} // namespace eri
