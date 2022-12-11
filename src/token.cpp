@@ -6,7 +6,9 @@ namespace eris {
     std::string token_type_str(TokenType type) {
         switch (type) {
         case TokenType::NUMBER:
-            return "NUMBER"; 
+            return "NUMBER";
+        case TokenType::STRING:
+            return "STRING";
         case TokenType::IDENTIFIER:
             return "IDENTIFIER";
         case TokenType::NULL_:
@@ -27,10 +29,21 @@ namespace eris {
             return "DIV";
         case TokenType::MOD:
             return "MOD";
+        case TokenType::LT:
+            return "LT";
+        case TokenType::LE:
+            return "LE";
+        case TokenType::GT:
+            return "GT";
+        case TokenType::GE:
+            return "GE";
         case TokenType::EQ:
             return "EQ";
         case TokenType::EE:
-            return "EQ";
+            return "EE";
+        case TokenType::NE:
+            return "NE";
+            return "GE";
         case TokenType::LPAREN:
             return "LPAREN";
         case TokenType::RPAREN:
@@ -53,9 +66,10 @@ namespace eris {
     }
 
     std::string Token::str() const {
-        if(val == "") {
-            return token_type_str(type);            
-        } else {
+        if (val == "") {
+            return token_type_str(type);
+        }
+        else {
             return token_type_str(type) + ":" + val;
         }
     }

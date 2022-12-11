@@ -22,6 +22,24 @@ namespace eris {
         return NodeType::NUMBER;
     }
 
+    StringNode::StringNode(const std::string& val, std::size_t line)
+        : val(val) {
+        this->line = line;
+    }
+
+    NodeType StringNode::type() const {
+        return NodeType::STRING;
+    }
+
+    IdentifierNode::IdentifierNode(const std::string& val, std::size_t line)
+        : val(val) {
+        this->line = line;
+    }
+
+    NodeType IdentifierNode::type() const {
+        return NodeType::IDENTIFIER;
+    }
+
     NullNode::NullNode(std::size_t line) {
         this->line = line;
     }
@@ -62,6 +80,15 @@ namespace eris {
 
     NodeType BinaryNode::type() const {
         return NodeType::BINARY;
+    }
+
+    VarDeclNode::VarDeclNode(const std::string& name, std::shared_ptr<Node> val, std::size_t line)
+        : name(name), val(val) {
+        this->line = line;
+    }
+
+    NodeType VarDeclNode::type() const {
+        return NodeType::VAR_DECL;
     }
 
     ProgramNode::ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line)

@@ -21,8 +21,8 @@ void run(const std::string& filename, const std::string& text) {
         eris::Interpreter interpreter(filename);
         interpreter.visit(node.get());
     }
-    catch (const std::string& e) {
-        std::cerr << e << '\n';
+    catch (const std::runtime_error& e) {
+        std::cerr << e.what() << '\n';
     }
 }
 

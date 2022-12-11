@@ -7,6 +7,7 @@ namespace eris {
     // Token type
     enum class TokenType {
         NUMBER,
+        STRING,
         IDENTIFIER,
         NULL_,
         TRUE,
@@ -17,8 +18,13 @@ namespace eris {
         MUL,
         DIV,
         MOD,
+        LT,
+        LE,
+        GT,
+        GE,
         EQ,
         EE,
+        NE,
         LPAREN,
         RPAREN,
         SEMICOLON,
@@ -27,18 +33,14 @@ namespace eris {
 
     std::string token_type_str(TokenType type);
 
-    // String with an identified meaning like a numeric literal or double-equals operator
     class Token {
     public:
         TokenType type;
         std::string val;
         std::size_t line;
 
-        // For tokens where the string value is inferred (like PLUS)
         Token(TokenType type, std::size_t line);
-
         Token(TokenType type, const std::string& val, std::size_t line);
-
         std::string str() const;    
     };
 } // namespace eris

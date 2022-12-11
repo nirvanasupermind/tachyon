@@ -34,6 +34,9 @@ namespace eris {
             else if (std::isdigit(current)) {
                 tokens.push_back(generate_number());
             }
+            else if (current == '"') {
+                tokens.push_back(generate_string());
+            }
             else if (current == '_' || std::isalpha(current)) {
                 tokens.push_back(generate_identifier());
             }
@@ -51,15 +54,60 @@ namespace eris {
             }
             else if (current == '/') {
                 advance();
-                tokens.push_back(Token(TokenType::DIV, line));
+                
+                if(current == '/') {
+                    // Single-line comment
+                    while(current && current != '\n') {
+                        advance();
+                    }
+                } else {
+                    tokens.push_back(Token(TokenType::DIV, line));
+                }
             }
             else if (current == '%') {
                 advance();
                 tokens.push_back(Token(TokenType::MOD, line));
             }
-            else if (current == '=') {
+            else if (current == '<') {
                 advance();
-                tokens.push_back(Token(TokenType::EQ, line));
+                
+                if(current == '=') {
+                    advance();
+                    tokens.push_back(Token(TokenType::LE, line));
+                } else {
+                    tokens.push_back(Token(TokenType::LT, line));
+                }
+            }
+            else if (current == '>') {
+                advance();
+                
+                if(current == '=') {
+                    advance();
+                    tokens.push_back(Token(TokenType::GE, line));
+                } else {
+                    tokens.push_back(Token(TokenType::GT, line));
+                }
+            }
+            else if (current == '=') {
+                int token_line = line;
+
+                advance();
+                
+                if(current == '=') {
+                    advance();
+                    tokens.push_back(Token(TokenType::EE, line));
+                } else {
+                    tokens.push_back(Token(TokenType::EQ, line));
+                }
+            }
+
+            else if (current == '!') {
+                advance();
+
+                if(current == '=') {
+                    advance();
+                    tokens.push_back(Token(TokenType::NE, line));
+                }
             }
             else if (current == '(') {
                 advance();
@@ -88,7 +136,7 @@ namespace eris {
         std::string number_str(1, current);
         advance();
 
-        while (current != 0 && (current == '.' || std::isdigit(current))) {
+        while (current && (current == '.' || std::isdigit(current))) {
             if (current == '.') {
                 if (++decimal_point_count > 1) {
                     break;
@@ -102,23 +150,31 @@ namespace eris {
         return Token(TokenType::NUMBER, number_str, line);
     }
 
+    Token Lexer::generate_string() {
+        std::size_t decimal_point_count = 0;
+        std::string str;
+        advance();
+
+        while (current && current != '"') {
+            str += current;
+            advance();
+        }
+
+        advance();
+        return Token(TokenType::STRING, str, line);
+    }
+
     Token Lexer::generate_identifier() {
         std::string identifier(1, current);
         advance();
 
-        while (current != 0 && (current == '_' | std::isalnum(current))) {
+        while (current && (current == '_' | std::isalnum(current))) {
             identifier += current;
             advance();
         }
 
-        if (identifier == "null") {
-            return Token(TokenType::NULL_, line);
-        } else if (identifier == "true") {
-            return Token(TokenType::TRUE, line);
-        } else if (identifier == "false") {
-            return Token(TokenType::FALSE, line);
-        } else if (identifier == "var") {
-            return Token(TokenType::VAR, line);
+        if (KEYWORDS.count(identifier)) {
+            return Token(KEYWORDS.at(identifier), line);
         } else {
             return Token(TokenType::IDENTIFIER, identifier, line);
         }

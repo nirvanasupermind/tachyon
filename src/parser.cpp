@@ -36,6 +36,14 @@ namespace eris {
             advance();
             return std::shared_ptr<NumberNode>(new NumberNode(std::stod(token.val), token.line));
         };
+        case TokenType::STRING: {
+            advance();
+            return std::shared_ptr<StringNode>(new StringNode(token.val, token.line));
+        };
+        case TokenType::IDENTIFIER: {
+            advance();
+            return std::shared_ptr<IdentifierNode>(new IdentifierNode(token.val, token.line));
+        };
         case TokenType::NULL_: {
             advance();
             return std::shared_ptr<NullNode>(new NullNode(token.line));
@@ -60,7 +68,7 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::unary_expr() {
-        Token op = current;    
+        Token op = current;
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
             return std::shared_ptr<UnaryNode>(new UnaryNode(op.type, unary_expr(), op.line));
@@ -92,9 +100,18 @@ namespace eris {
         return binary_expr([this]() { return multiplicative_expr(); }, { TokenType::PLUS, TokenType::MINUS });
     }
 
-    std::shared_ptr<Node> Parser::expr() {
-        return additive_expr();
+    std::shared_ptr<Node> Parser::comparison_expr() {
+        return binary_expr([this]() { return additive_expr(); }, { TokenType::LT, TokenType::LE, TokenType::GT, TokenType::GE });
     }
+
+    std::shared_ptr<Node> Parser::equality_expr() {
+        return binary_expr([this]() { return comparison_expr(); }, { TokenType::EE, TokenType::NE });
+    }
+
+    std::shared_ptr<Node> Parser::expr() {
+        return equality_expr();
+    }
+
 
     std::shared_ptr<Node> Parser::expr_stmt() {
         std::shared_ptr<Node> inner_expr = expr();
@@ -102,12 +119,31 @@ namespace eris {
         return inner_expr;
     }
 
+    std::shared_ptr<Node> Parser::var_decl_stmt() {
+        std::size_t line = current.line;
+        eat(TokenType::VAR);
+        std::string name = eat(TokenType::IDENTIFIER).val;
+        eat(TokenType::EQ);
+        std::shared_ptr<Node> val = expr();
+        eat(TokenType::SEMICOLON);
+        return std::shared_ptr<VarDeclNode>(new VarDeclNode(name, val, line));
+    }
+
+    std::shared_ptr<Node> Parser::stmt() {
+        if (current.type == TokenType::VAR) {
+            return var_decl_stmt();
+        }
+        else {
+            return expr_stmt();
+        }
+    }
+
     std::shared_ptr<Node> Parser::program() {
         std::size_t line = current.line;
         std::vector<std::shared_ptr<Node> > stmts;
 
         while (current.type != TokenType::EOF_) {
-            stmts.push_back(expr_stmt());
+            stmts.push_back(stmt());
         }
 
         return std::shared_ptr<ProgramNode>(new ProgramNode(stmts, line));

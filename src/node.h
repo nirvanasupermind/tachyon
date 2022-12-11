@@ -8,19 +8,20 @@
 #include "token.h"
 
 namespace eris {
-    // AST node type
     enum class NodeType {
         EMPTY,
         NUMBER,
+        STRING,
+        IDENTIFIER,
         NULL_,
         TRUE,
         FALSE,
         UNARY,
         BINARY,
+        VAR_DECL,
         PROGRAM
     };
 
-    // Base class for AST nodes
     class Node {
     public:
         std::size_t line;
@@ -33,7 +34,6 @@ namespace eris {
         NodeType type() const;
     };
 
-    // Numeric literal
     class NumberNode : public Node {
     public:
         double val;
@@ -41,28 +41,38 @@ namespace eris {
         NodeType type() const;
     };
 
-    // Null literal
+    class StringNode : public Node {
+    public:
+        std::string val;
+        StringNode(const std::string &val, std::size_t line);
+        NodeType type() const;
+    };
+
+    class IdentifierNode : public Node {
+    public:
+        std::string val;
+        IdentifierNode(const std::string &val, std::size_t line);
+        NodeType type() const;
+    };
+
     class NullNode : public Node {
     public:
         NullNode(std::size_t line);
         NodeType type() const;
     };
 
-    // True literal
     class TrueNode : public Node {
     public:
         TrueNode(std::size_t line);
         NodeType type() const;
     };
 
-    // False literal
     class FalseNode : public Node {
     public:
         FalseNode(std::size_t line);
         NodeType type() const;
     };
 
-    // Unary operation
     class UnaryNode : public Node {
     public:
         TokenType op;
@@ -71,23 +81,27 @@ namespace eris {
         NodeType type() const;
     };
 
-   // Bnary operation
     class BinaryNode : public Node {
     public:
         TokenType op;
         std::shared_ptr<Node> node_a;
         std::shared_ptr<Node> node_b;
         BinaryNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line);
-        std::string str() const;
         NodeType type() const;
     };
 
-    // Program or statement list
+    class VarDeclNode : public Node {
+    public:
+        std::string name;
+        std::shared_ptr<Node> val;
+        VarDeclNode(const std::string& name, std::shared_ptr<Node> val, std::size_t line) ;
+        NodeType type() const; 
+    };
+
     class ProgramNode : public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;
         ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line);
-        std::string str() const;
         NodeType type() const;
     };
 

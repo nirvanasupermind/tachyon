@@ -8,17 +8,15 @@
 #include "token.h"
 
 namespace eris {
-    // Whitespace characters
     const std::string WHITESPACE = " \n\t";
 
-    // Map of reserved words to token types
-    const std::map<std::string, TokenType> RESERVED{
+    const std::map<std::string, TokenType> KEYWORDS{
         {"null", TokenType::NULL_},
-        {"null", TokenType::NULL_},
+        {"true", TokenType::TRUE},
+        {"false", TokenType::FALSE},
         {"var", TokenType::VAR},
     };
 
-    // Converts the source code into a sequence of tokens
     class Lexer {
     private:
         std::string text{};
@@ -29,6 +27,7 @@ namespace eris {
         
         void advance();
         Token generate_number();
+        Token generate_string();
         Token generate_identifier();
     public:
         Lexer(const std::string& text, const std::string &filename);
