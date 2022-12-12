@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -25,7 +26,7 @@ namespace eris {
             return token;
         }
         else {
-            raise_error(filename, current.line, "invalid syntax (unexpected token " + current.str() + ")");
+            raise_error(filename, current.line, "invalid syntax (unexpected token " + current.str() + ", expected " + token_type_str(type) + ")");
         }
     }
 
@@ -58,9 +59,9 @@ namespace eris {
         };
         case TokenType::LPAREN: {
             advance();
-            std::shared_ptr<Node> inner_expr = expr();
+            std::shared_ptr<Node> expr_node = expr();
             eat(TokenType::RPAREN);
-            return inner_expr;
+            return expr_node;
         };
         default:
             raise_error(filename, token.line, "invalid syntax (unexpected token " + token.str() + ")");
@@ -108,15 +109,26 @@ namespace eris {
         return binary_expr([this]() { return comparison_expr(); }, { TokenType::EE, TokenType::NE });
     }
 
+    std::shared_ptr<Node> Parser::assignment_expr() {
+        std::shared_ptr<Node> node_a = equality_expr();
+
+        if (current.type == TokenType::EQ) {
+            TokenType op = current.type;
+            advance();
+            std::shared_ptr<Node> node_b = assignment_expr();
+            node_a = std::shared_ptr<BinaryNode>(new BinaryNode(op, node_a, node_b, node_a->line));
+        }
+
+        return node_a;
+    }
     std::shared_ptr<Node> Parser::expr() {
-        return equality_expr();
+        return assignment_expr();
     }
 
-
     std::shared_ptr<Node> Parser::expr_stmt() {
-        std::shared_ptr<Node> inner_expr = expr();
+        std::shared_ptr<Node> expr_node = expr();
         eat(TokenType::SEMICOLON);
-        return inner_expr;
+        return expr_node;
     }
 
     std::shared_ptr<Node> Parser::var_decl_stmt() {
@@ -132,8 +144,7 @@ namespace eris {
     std::shared_ptr<Node> Parser::stmt() {
         if (current.type == TokenType::VAR) {
             return var_decl_stmt();
-        }
-        else {
+        } else {
             return expr_stmt();
         }
     }

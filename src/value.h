@@ -7,6 +7,8 @@
 #include "object.h"
 
 namespace eris {
+    class Object;
+
     enum class ValueType {
         NULL_,
         NUMBER,
@@ -16,7 +18,7 @@ namespace eris {
 
     class Value {
     public:
-        ValueType type;
+        ValueType type: 1;
 
         union {
             double number;

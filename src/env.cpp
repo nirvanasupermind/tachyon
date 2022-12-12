@@ -23,7 +23,7 @@ namespace eris {
             return parent->find_env(name);
         }
         else {
-            return nullptr;
+            throw std::exception();
         }
     }
 
@@ -32,12 +32,18 @@ namespace eris {
     }
 
     void Env::set(const std::string& name, const Value& val) {
-        assert(record.count(name));
+        if(!record.count(name)) {
+            throw std::exception();
+        }
+
         record[name] = val;
     }
 
     void Env::def(const std::string& name, const Value& val) {
-        assert(!record.count(name));
+        if(record.count(name)) {
+            throw std::exception();
+        }
+
         record[name] = val;
     }
 } // namespace eris

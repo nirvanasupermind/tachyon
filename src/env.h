@@ -8,6 +8,8 @@
 #include "value.h"
 
 namespace eris {
+    class Value;
+
     class Env {
     private:
         std::map<std::string, Value> record{};

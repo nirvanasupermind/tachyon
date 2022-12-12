@@ -19,6 +19,7 @@ namespace eris {
         UNARY,
         BINARY,
         VAR_DECL,
+        VAR_ASSIGN,
         PROGRAM
     };
 
@@ -28,52 +29,52 @@ namespace eris {
         virtual NodeType type() const = 0;
     };
 
-    class EmptyNode : public Node {
+    class EmptyNode: public Node {
     public:
         EmptyNode(std::size_t line);
         NodeType type() const;
     };
 
-    class NumberNode : public Node {
+    class NumberNode: public Node {
     public:
         double val;
         NumberNode(double val, std::size_t line);
         NodeType type() const;
     };
 
-    class StringNode : public Node {
+    class StringNode: public Node {
     public:
         std::string val;
-        StringNode(const std::string &val, std::size_t line);
+        StringNode(const std::string& val, std::size_t line);
         NodeType type() const;
     };
 
-    class IdentifierNode : public Node {
+    class IdentifierNode: public Node {
     public:
         std::string val;
-        IdentifierNode(const std::string &val, std::size_t line);
+        IdentifierNode(const std::string& val, std::size_t line);
         NodeType type() const;
     };
 
-    class NullNode : public Node {
+    class NullNode: public Node {
     public:
         NullNode(std::size_t line);
         NodeType type() const;
     };
 
-    class TrueNode : public Node {
+    class TrueNode: public Node {
     public:
         TrueNode(std::size_t line);
         NodeType type() const;
     };
 
-    class FalseNode : public Node {
+    class FalseNode: public Node {
     public:
         FalseNode(std::size_t line);
         NodeType type() const;
     };
 
-    class UnaryNode : public Node {
+    class UnaryNode: public Node {
     public:
         TokenType op;
         std::shared_ptr<Node> operand_node;
@@ -81,7 +82,7 @@ namespace eris {
         NodeType type() const;
     };
 
-    class BinaryNode : public Node {
+    class BinaryNode: public Node {
     public:
         TokenType op;
         std::shared_ptr<Node> node_a;
@@ -90,15 +91,15 @@ namespace eris {
         NodeType type() const;
     };
 
-    class VarDeclNode : public Node {
+    class VarDeclNode: public Node {
     public:
         std::string name;
         std::shared_ptr<Node> val;
-        VarDeclNode(const std::string& name, std::shared_ptr<Node> val, std::size_t line) ;
-        NodeType type() const; 
+        VarDeclNode(const std::string& name, std::shared_ptr<Node> val, std::size_t line);
+        NodeType type() const;
     };
 
-    class ProgramNode : public Node {
+    class ProgramNode: public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;
         ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line);

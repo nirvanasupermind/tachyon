@@ -26,6 +26,7 @@ namespace eris {
         std::shared_ptr<Node> additive_expr();
         std::shared_ptr<Node> comparison_expr();
         std::shared_ptr<Node> equality_expr();
+        std::shared_ptr<Node> assignment_expr();
         std::shared_ptr<Node> expr();
         std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> var_decl_stmt();

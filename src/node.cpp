@@ -90,7 +90,7 @@ namespace eris {
     NodeType VarDeclNode::type() const {
         return NodeType::VAR_DECL;
     }
-
+    
     ProgramNode::ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line)
         : stmts(stmts) {
         this->line = line;

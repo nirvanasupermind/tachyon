@@ -59,8 +59,9 @@ namespace eris {
     Value Interpreter::visit(IdentifierNode* node) {
         try {
             return global_env.get(node->val);
-        } catch(const std::exception &e) {
-            throw std::runtime_error("");
+        }
+        catch (const std::exception& e) {
+            raise_error(filename, node->line, "'" + node->val + "' is not defined");
         }
     }
 
@@ -181,8 +182,24 @@ namespace eris {
         case TokenType::NE: {
             check_operand_type(lhs, ValueType::NUMBER, node->line);
             check_operand_type(rhs, ValueType::NUMBER, node->line);
-            
+
             return Value(ValueType::BOOL, lhs.number != rhs.number);
+        }
+
+        case TokenType::EQ: {
+            if (node->node_a->type() == NodeType::IDENTIFIER) {
+                std::string name = std::dynamic_pointer_cast<IdentifierNode>(node->node_a)->val;
+                try {
+                    Value val = visit(node->node_b.get());
+                    global_env.set(name, val);
+                    return val;
+                }
+                catch (const std::exception& e) {
+                    raise_error(filename, node->line, "'" + name + "' is not defined");
+                }
+            } else {
+                raise_error(filename, node->line, "invalid left-hand side in assignment");
+            }
         }
 
         default:
@@ -190,10 +207,14 @@ namespace eris {
         }
     }
 
-
     Value Interpreter::visit(VarDeclNode* node) {
-        global_env.def(node->name, visit(node->val.get()));
-        return Value(ValueType::NULL_);
+        try {
+            global_env.def(node->name, visit(node->val.get()));
+            return Value(ValueType::NULL_);
+        }
+        catch (const std::exception& e) {
+            raise_error(filename, node->line, "'" + node->name + "' is already defined in this scope");
+        }
     }
 
     Value Interpreter::visit(ProgramNode* node) {

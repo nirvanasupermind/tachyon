@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "env.h"
+
 namespace eris {
     enum class ObjectType {
         STRING
@@ -10,6 +12,8 @@ namespace eris {
 
     class Object {
     public:
+        Env* env = nullptr;
+        Object() = default;
         virtual ObjectType type() const = 0;
         virtual std::string str() const = 0;
     };

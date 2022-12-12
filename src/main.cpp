@@ -20,6 +20,7 @@ void run(const std::string& filename, const std::string& text) {
         std::shared_ptr<eris::Node> node = parser.parse();
         eris::Interpreter interpreter(filename);
         interpreter.visit(node.get());
+        std::cout << sizeof(eris::Value) << '\n';
     }
     catch (const std::runtime_error& e) {
         std::cerr << e.what() << '\n';
