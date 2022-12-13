@@ -219,9 +219,10 @@ namespace eris {
 
     Value Interpreter::visit(ProgramNode* node) {
         for (std::size_t i = 0; i < node->stmts.size(); i++) {
+            std::cout << "E" << '\n';
             std::cout << visit(node->stmts.at(i).get()).str() << '\n';
         }
 
         return Value(ValueType::NULL_);
     }
-}// namespace eris
+}// namespace erisi
