@@ -30,8 +30,13 @@ namespace eris {
         std::shared_ptr<Node> expr();
         std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> var_decl_stmt();
+        std::shared_ptr<Node> block_stmt();
+        std::shared_ptr<Node> if_stmt();        
+        std::shared_ptr<Node> while_stmt();
+        std::shared_ptr<Node> for_stmt();
+        std::shared_ptr<Node> func_decl_stmt();
         std::shared_ptr<Node> stmt();
-        std::shared_ptr<Node> program();
+        std::shared_ptr<Node> program(TokenType end = TokenType::EOF_);
     public:
         Parser(const std::vector<Token>& tokens, const std::string& filename);
         std::shared_ptr<Node> parse();

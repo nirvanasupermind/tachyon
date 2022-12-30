@@ -1,0 +1,1 @@
+clang++ src/*.cpp -o ../../../code/binaries/erisc -std=c++11 -w

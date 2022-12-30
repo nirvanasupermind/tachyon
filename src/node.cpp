@@ -40,12 +40,12 @@ namespace eris {
         return NodeType::IDENTIFIER;
     }
 
-    NullNode::NullNode(std::size_t line) {
+    NilNode::NilNode(std::size_t line) {
         this->line = line;
     }
 
-    NodeType NullNode::type() const {
-        return NodeType::NULL_;
+    NodeType NilNode::type() const {
+        return NodeType::NIL;
     }
 
     TrueNode::TrueNode(std::size_t line) {
@@ -64,33 +64,97 @@ namespace eris {
         return NodeType::FALSE;
     }
 
-    UnaryNode::UnaryNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line)
+    UnaryExprNode::UnaryExprNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line)
         : op(op), operand_node(operand_node) {
         this->line = line;
     }
 
-    NodeType UnaryNode::type() const {
-        return NodeType::UNARY;
+    NodeType UnaryExprNode::type() const {
+        return NodeType::UNARY_EXPR;
     }
 
-    BinaryNode::BinaryNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
+    BinaryExprNode::BinaryExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
         : op(op), node_a(node_a), node_b(node_b) {
         this->line = line;
     }
 
-    NodeType BinaryNode::type() const {
-        return NodeType::BINARY;
+    NodeType BinaryExprNode::type() const {
+        return NodeType::BINARY_EXPR;
     }
 
-    VarDeclNode::VarDeclNode(const std::string& name, std::shared_ptr<Node> val, std::size_t line)
+    AssignmentExprNode::AssignmentExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
+        : op(op), node_a(node_a), node_b(node_b) {
+        this->line = line;
+    }
+
+    NodeType AssignmentExprNode::type() const {
+        return NodeType::ASSIGNMENT_EXPR;
+    }
+
+    ExprStmtNode::ExprStmtNode(std::shared_ptr<Node> expr_node, std::size_t line)
+        : expr_node(expr_node) {
+        this->line = line;
+    }
+
+    NodeType ExprStmtNode::type() const {
+        return NodeType::EXPR_STMT;
+    }
+
+    VarDeclStmtNode::VarDeclStmtNode(const std::string& name, std::shared_ptr<Node> val, std::size_t line)
         : name(name), val(val) {
         this->line = line;
     }
 
-    NodeType VarDeclNode::type() const {
-        return NodeType::VAR_DECL;
+    NodeType VarDeclStmtNode::type() const {
+        return NodeType::VAR_DECL_STMT;
     }
-    
+
+    BlockStmtNode::BlockStmtNode(std::shared_ptr<Node> program_node, std::size_t line)
+        : program_node(program_node) {
+        this->line = line;
+    }
+
+    NodeType BlockStmtNode::type() const {
+        return NodeType::BLOCK_STMT;
+    }
+
+    IfStmtNode::IfStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, std::size_t line)
+        : test(test), body(body) {
+        this->line = line;
+    }
+
+    NodeType IfStmtNode::type() const {
+        return NodeType::IF_STMT;
+    }
+
+    IfElseStmtNode::IfElseStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, std::shared_ptr<Node> alternate, std::size_t line)
+        : test(test), body(body), alternate(alternate) {
+        this->line = line;
+    }
+
+    NodeType IfElseStmtNode::type() const {
+        return NodeType::IF_ELSE_STMT;
+    }
+
+    WhileStmtNode::WhileStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, std::size_t line)
+        : test(test), body(body) {
+        this->line = line;
+    }
+
+    NodeType WhileStmtNode::type() const {
+        return NodeType::WHILE_STMT;
+    }
+
+    ForStmtNode::ForStmtNode(std::shared_ptr<Node> decl, std::shared_ptr<Node> test,
+        std::shared_ptr<Node> assignment, std::shared_ptr<Node> body, std::size_t line)
+        : decl(decl), test(test), assignment(assignment), body(body) {
+        this->line = line;
+    }
+
+    NodeType ForStmtNode::type() const {
+        return NodeType::FOR_STMT;
+    }
+
     ProgramNode::ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line)
         : stmts(stmts) {
         this->line = line;
@@ -99,6 +163,5 @@ namespace eris {
     NodeType ProgramNode::type() const {
         return NodeType::PROGRAM;
     }
-
 
 } // namespace eri

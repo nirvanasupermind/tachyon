@@ -42,7 +42,13 @@ namespace eris {
             }
             else if (current == '+') {
                 advance();
-                tokens.push_back(Token(TokenType::PLUS, line));
+                
+                if(current == '=') {
+                    advance();
+                    tokens.push_back(Token(TokenType::PE, line));
+                } else {
+                    tokens.push_back(Token(TokenType::PLUS, line));
+                }
             }
             else if (current == '-') {
                 advance();
@@ -100,7 +106,6 @@ namespace eris {
                     tokens.push_back(Token(TokenType::EQ, line));
                 }
             }
-
             else if (current == '!') {
                 advance();
 
@@ -117,7 +122,19 @@ namespace eris {
                 advance();
                 tokens.push_back(Token(TokenType::RPAREN, line));
             }
+            else if (current == '{') {
+                advance();
+                tokens.push_back(Token(TokenType::LCURLY, line));
+            }
+            else if (current == '}') {
+                advance();
+                tokens.push_back(Token(TokenType::RCURLY, line));
+            }
             else if (current == ';') {
+                advance();
+                tokens.push_back(Token(TokenType::SEMICOLON, line));
+            }
+            else if (current == '{') {
                 advance();
                 tokens.push_back(Token(TokenType::SEMICOLON, line));
             }

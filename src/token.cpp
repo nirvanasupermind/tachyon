@@ -11,7 +11,7 @@ namespace eris {
             return "STRING";
         case TokenType::IDENTIFIER:
             return "IDENTIFIER";
-        case TokenType::NULL_:
+        case TokenType::NIL:
             return "NULL";
         case TokenType::TRUE:
             return "TRUE";
@@ -19,6 +19,16 @@ namespace eris {
             return "FALSE";
         case TokenType::VAR:
             return "VAR";
+        case TokenType::IF:
+            return "IF";
+        case TokenType::ELSE:
+            return "ELSE";
+        case TokenType::WHILE:
+            return "WHILE";
+        case TokenType::FOR:
+            return "FOR";
+        case TokenType::DEF:
+            return "DEF";
         case TokenType::PLUS:
             return "PLUS";
         case TokenType::MINUS:
@@ -39,11 +49,12 @@ namespace eris {
             return "GE";
         case TokenType::EQ:
             return "EQ";
+        case TokenType::PE:
+            return "PE";
         case TokenType::EE:
             return "EE";
         case TokenType::NE:
             return "NE";
-            return "GE";
         case TokenType::LPAREN:
             return "LPAREN";
         case TokenType::RPAREN:

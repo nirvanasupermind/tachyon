@@ -1,31 +1,42 @@
-# Eris 
-**Version 1.0.0**
+![Eris](logo.png)
 
-C++ interpreter for the Eris programming language with a header-only implementation.
+**Version 2.0.0-dev**
 
-Eris is a general-purpose, lightweight, dynamic programming language with class-based object-oriented programming support.
+Eris is a fast, lightweight dynamic programming language that supports multithreading and class-based object-oriented programming. Eris transpiles to C++17, making it highly performant compared to most other dynamic languages that rely on an interpreter or bytecode VM. Eris supports full multithreading, unlike other languages that have global interpreter locks or use non-thread coroutines.
 
-Compile `src/main.cpp` to get an executable that can run Eris programs on the command-line like `eris filename.eris` (make sure to compile on C++11).
-
+# Example
 ```
-class Point {
-    def constructor(self, x, y) {
-        self.x = x;
-        self.y = y;
+class Vec2 {
+    def Vec2(x, y) {
+        this.x = x;
+        this.y = y;
     }
 
-    def calc(self) {
-        return Math::pow(self.x, 2.0) + Math::pow(self.y, 2.0);
+    def mag() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 }
 
-let p = Point(5, 6);
-print(p.calc()); // 61.0
+var vec2 = Vec2(3, 4);
+IO.print(vec2.mag()); // 5
 ```
 
-## Status
+```
+var myThread = Thread(lambda () {
+    for(var i = 0; i < 10; i += 1;) {
+        IO.print(String.join("myThread: ", i));
+    }
+});
+
+myThread.start();
+
+for(var i = 0; i < 10; i += 1;) {
+    IO.print(String.join("Main thread: ", i));
+}
+```
+
+# Status
 Currently, the interpreter is mostly working, but the implementation is old and unstable, and thus may contain bugs, and documentation is sparse.
 A refactoring of the interpreter, the addition of hash maps, and many stability and performance updates, are slated for Eris 2.0.
 
-## Example programs
-See the [#examples](examples) directory for example programs.
+# Documentation

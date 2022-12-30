@@ -11,10 +11,15 @@ namespace eris {
     const std::string WHITESPACE = " \n\t";
 
     const std::map<std::string, TokenType> KEYWORDS{
-        {"null", TokenType::NULL_},
+        {"nil", TokenType::NIL},
         {"true", TokenType::TRUE},
         {"false", TokenType::FALSE},
         {"var", TokenType::VAR},
+        {"if", TokenType::IF},
+        {"else", TokenType::ELSE},
+        {"while", TokenType::WHILE},
+        {"for", TokenType::FOR},
+        {"def", TokenType::DEF},
     };
 
     class Lexer {
