@@ -23,9 +23,3 @@ eris::print(vec2.mag()); // 5
 
 ```
 
-
-# Status
-Currently, the interpreter is mostly working, but the implementation is old and unstable, and thus may contain bugs, and documentation is sparse.
-A refactoring of the interpreter, the addition of hash maps, and many stability and performance updates, are slated for Eris 2.0.
-
-# Documentation
