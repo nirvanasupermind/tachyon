@@ -73,6 +73,15 @@ namespace eris {
         return NodeType::CALL_EXPR;
     }
 
+    MemberExprNode::MemberExprNode(TokenType op, std::shared_ptr<Node> object, const std::string& member, std::size_t line)
+        : op(op), object(object), member(member) {
+        this->line = line;
+    }
+
+    NodeType MemberExprNode::type() const {
+        return NodeType::MEMBER_EXPR;
+    }
+
     UnaryExprNode::UnaryExprNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line)
         : op(op), operand_node(operand_node) {
         this->line = line;

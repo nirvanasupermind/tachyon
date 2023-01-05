@@ -36,8 +36,10 @@ namespace eris {
         RPAREN,
         LCURLY,
         RCURLY,
+        DOUBLE_COLON,
         SEMICOLON,
         COMMA,
+        PERIOD,
         EOF_
     };
 

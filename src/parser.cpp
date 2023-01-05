@@ -68,36 +68,47 @@ namespace eris {
         }
     }
 
-    std::shared_ptr<Node> Parser::call_expr() {
-        std::shared_ptr<Node> callee = basic_expr();
-        std::vector<std::shared_ptr<Node> > params;
-        while (current.type == TokenType::LPAREN) {
-            if (tokens.at(pos).type == TokenType::RPAREN) {
-                advance();
-                advance();
-            } else {
-                while (true) {
-                    params.push_back(basic_expr());
-                    if (current.type != TokenType::COMMA) {
-                        break;
+    std::shared_ptr<Node> Parser::call_member_expr() {
+        std::shared_ptr<Node> result = basic_expr();
+        while (current.type == TokenType::LPAREN || current.type == TokenType::PERIOD
+            || current.type == TokenType::DOUBLE_COLON) {
+            if (current.type == TokenType::LPAREN) {
+                std::vector<std::shared_ptr<Node> > params;
+                if (tokens.at(pos).type == TokenType::RPAREN) {
+                    advance();
+                    advance();
+                }
+                else {
+                    while (current.type != TokenType::RPAREN) {
+                        advance();
+                        params.push_back(expr());
+                        if (current.type != TokenType::COMMA) {
+                            break;
+                        }
                     }
                     advance();
                 }
+                result = std::shared_ptr<CallExprNode>(new CallExprNode(result, params, result->line));
             }
-            callee = std::shared_ptr<CallExprNode>(new CallExprNode(callee, params, callee->line));
+            else {
+                TokenType op = current.type;
+                advance();
+                std::string member = eat(TokenType::IDENTIFIER).val;
+                result = std::shared_ptr<MemberExprNode>(new MemberExprNode(op, result, member, result->line));
+            }
         }
-        return callee;
+        return result;
     }
 
     std::shared_ptr<Node> Parser::unary_expr() {
         Token op = current;
-        
+
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
             return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op.type, unary_expr(), op.line));
         }
         else {
-            return call_expr();
+            return call_member_expr();
         }
     }
 
@@ -227,7 +238,7 @@ namespace eris {
         }
 
         advance();
-        
+
         std::shared_ptr<Node> body = block_stmt();
         return std::shared_ptr<FuncDeclStmtNode>(new FuncDeclStmtNode(name, params, body, line));
     }

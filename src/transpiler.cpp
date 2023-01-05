@@ -13,6 +13,7 @@ namespace eris {
         "#include <string>\n"
         "#include <variant>\n"
         "#include <vector>\n"
+        "#include <cmath>\n"
         "struct _Nil {};\n"
         "struct _Func;\n"
         "struct _make_print_functor {\n"
@@ -24,8 +25,12 @@ namespace eris {
         "};\n"
         "using _Val = std::variant<double, bool, std::string, _Nil, _Func>;\n"
         "struct _Func { std::function<_Val (const std::vector<_Val>&)> func; };\n"
-        "_Val print = _Val(_Func{.func = [](const std::vector<_Val>& params) { \n"
+        "namespace eris{\n"
+        "_Val print = _Val(_Func{.func = [](const std::vector<_Val>& params){\n"
         "std::cout << std::visit(_make_print_functor(),params.at(0)) << '\\n'; return _Val(_Nil());}});\n"
+        "_Val sin = _Val(_Func{.func = [](const std::vector<_Val>& params){\n"
+        "return _Val(std::sin(std::get<double>(params.at(0))));}});\n"
+        "}\n"
         "int main() {";
 
     Transpiler::Transpiler(const std::string& filename)
@@ -54,6 +59,9 @@ namespace eris {
             break;
         case NodeType::CALL_EXPR:
             visit(dynamic_cast<CallExprNode*>(node));
+            break;
+        case NodeType::MEMBER_EXPR:
+            visit(dynamic_cast<MemberExprNode*>(node));
             break;
         case NodeType::UNARY_EXPR:
             visit(dynamic_cast<UnaryExprNode*>(node));
@@ -106,9 +114,9 @@ namespace eris {
     }
 
     void Transpiler::visit(StringNode* node) {
-        body.push_back("_Val(\"");
+        body.push_back("_Val(std::string(\"");
         body.push_back(node->val);
-        body.push_back("\")");
+        body.push_back("\"))");
     }
 
     void Transpiler::visit(IdentifierNode* node) {
@@ -139,6 +147,21 @@ namespace eris {
             }
         }
         body.push_back("})");
+    }
+
+    void Transpiler::visit(MemberExprNode* node) {
+        visit(node->object.get());
+        switch (node->op) {
+        case TokenType::PERIOD:
+            body.push_back(".");
+            break;
+        case TokenType::DOUBLE_COLON:
+            body.push_back("::");
+            break;
+        default:
+            break;
+        } 
+        body.push_back(node->member);
     }
 
     void Transpiler::visit(UnaryExprNode* node) {

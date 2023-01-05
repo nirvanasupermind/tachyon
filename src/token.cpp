@@ -61,10 +61,14 @@ namespace eris {
             return "LPAREN";
         case TokenType::RPAREN:
             return "RPAREN";
+        case TokenType::DOUBLE_COLON:
+            return "DOUBLE_COLON";
         case TokenType::SEMICOLON:
             return "SEMICOLON";
         case TokenType::COMMA:
             return "COMMA";
+        case TokenType::PERIOD:
+            return "PERIOD";
         case TokenType::EOF_:
             return "EOF";
         default:

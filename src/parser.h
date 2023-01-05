@@ -20,7 +20,7 @@ namespace eris {
         void advance();
         Token eat(TokenType type);
         std::shared_ptr<Node> basic_expr();
-        std::shared_ptr<Node> call_expr();
+        std::shared_ptr<Node> call_member_expr();
         std::shared_ptr<Node> unary_expr();
         std::shared_ptr<Node> binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::vector<TokenType>& op_types);
         std::shared_ptr<Node> multiplicative_expr();

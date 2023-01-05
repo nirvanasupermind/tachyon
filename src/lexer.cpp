@@ -134,9 +134,23 @@ namespace eris {
                 advance();
                 tokens.push_back(Token(TokenType::SEMICOLON, line));
             }
+            else if (current == ':') {
+                int token_line = line;
+
+                advance();
+                
+                if(current == ':') {
+                    advance();
+                    tokens.push_back(Token(TokenType::DOUBLE_COLON, line));
+                }
+            }
             else if (current == ',') {
                 advance();
                 tokens.push_back(Token(TokenType::COMMA, line));
+            }
+            else if (current == '.') {
+                advance();
+                tokens.push_back(Token(TokenType::PERIOD, line));
             }
             else {
                 raise_error(filename, line, "illegal character '" + std::string(1, current) + "'");

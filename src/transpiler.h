@@ -20,6 +20,7 @@ namespace eris {
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
         void visit(CallExprNode* node);
+        void visit(MemberExprNode* node);
         void visit(AssignmentExprNode* node);
         void visit(ExprStmtNode* node);
         void visit(VarDeclStmtNode* node);

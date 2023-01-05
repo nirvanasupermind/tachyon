@@ -17,6 +17,7 @@ namespace eris {
         TRUE,
         FALSE,
         CALL_EXPR,
+        MEMBER_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
         ASSIGNMENT_EXPR,
@@ -91,6 +92,15 @@ namespace eris {
         NodeType type() const;
     };
 
+    class MemberExprNode: public Node {
+    public:
+        TokenType op;
+        std::shared_ptr<Node> object;
+        std::string member;
+        MemberExprNode(TokenType op, std::shared_ptr<Node> object, const std::string& member, std::size_t line);
+        NodeType type() const;
+    };
+    
     class UnaryExprNode: public Node {
     public:
         TokenType op;
