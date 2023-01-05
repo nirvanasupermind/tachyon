@@ -7,18 +7,18 @@ Eris is a fast, lightweight dynamic programming language that supports multithre
 # Example
 ```
 class Vec2 {
-    def Vec2(x, y) {
+    func Vec2(x, y) {
         this.x = x;
         this.y = y;
     }
 
-    def mag() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+    func mag() {
+        return eris::sqrt(this.x * this.x + this.y * this.y);
     }
 }
 
 var vec2 = Vec2(3, 4);
-IO.print(vec2.mag()); // 5
+eris::print(vec2.mag()); // 5
 ```
 
 ```
