@@ -27,8 +27,10 @@ namespace eris {
             return "WHILE";
         case TokenType::FOR:
             return "FOR";
-        case TokenType::DEF:
-            return "DEF";
+        case TokenType::FUNC:
+            return "FUNC";
+        case TokenType::RETURN:
+            return "RETURN";
         case TokenType::PLUS:
             return "PLUS";
         case TokenType::MINUS:
@@ -61,6 +63,8 @@ namespace eris {
             return "RPAREN";
         case TokenType::SEMICOLON:
             return "SEMICOLON";
+        case TokenType::COMMA:
+            return "COMMA";
         case TokenType::EOF_:
             return "EOF";
         default:

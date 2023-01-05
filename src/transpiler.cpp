@@ -8,11 +8,24 @@
 
 namespace eris {
     const std::string Transpiler::boilerplate =
+        "#include <functional>\n"
         "#include <iostream>\n"
         "#include <string>\n"
         "#include <variant>\n"
-        "class _Nil {};\n"
-        "using _Val = std::variant<double, bool, std::string, _Nil>;\n"
+        "#include <vector>\n"
+        "struct _Nil {};\n"
+        "struct _Func;\n"
+        "struct _make_print_functor {\n"
+        "std::string operator()(double x) const { return std::to_string(x); }\n"
+        "std::string operator()(bool x) const { return x ? \"true\" : \"false\"; }\n"
+        "std::string operator()(const std::string& x) const { return x; }\n"
+        "std::string operator()(const _Nil& x) const { return \"nil\"; }\n"
+        "std::string operator()(const _Func& x) const { return \"<function>\" ;}\n"
+        "};\n"
+        "using _Val = std::variant<double, bool, std::string, _Nil, _Func>;\n"
+        "struct _Func { std::function<_Val (const std::vector<_Val>&)> func; };\n"
+        "_Val print = _Val(_Func{.func = [](const std::vector<_Val>& params) { \n"
+        "std::cout << std::visit(_make_print_functor(),params.at(0)) << '\\n'; return _Val(_Nil());}});\n"
         "int main() {";
 
     Transpiler::Transpiler(const std::string& filename)
@@ -23,6 +36,9 @@ namespace eris {
         switch (node->type()) {
         case NodeType::NUMBER:
             visit(dynamic_cast<NumberNode*>(node));
+            break;
+        case NodeType::STRING:
+            visit(dynamic_cast<StringNode*>(node));
             break;
         case NodeType::IDENTIFIER:
             visit(dynamic_cast<IdentifierNode*>(node));
@@ -35,6 +51,9 @@ namespace eris {
             break;
         case NodeType::FALSE:
             visit(dynamic_cast<FalseNode*>(node));
+            break;
+        case NodeType::CALL_EXPR:
+            visit(dynamic_cast<CallExprNode*>(node));
             break;
         case NodeType::UNARY_EXPR:
             visit(dynamic_cast<UnaryExprNode*>(node));
@@ -66,6 +85,12 @@ namespace eris {
         case NodeType::FOR_STMT:
             visit(dynamic_cast<ForStmtNode*>(node));
             break;
+        case NodeType::FUNC_DECL_STMT:
+            visit(dynamic_cast<FuncDeclStmtNode*>(node));
+            break;
+        case NodeType::RETURN_STMT:
+            visit(dynamic_cast<ReturnStmtNode*>(node));
+            break;
         case NodeType::PROGRAM:
             visit(dynamic_cast<ProgramNode*>(node));
             break;
@@ -78,6 +103,12 @@ namespace eris {
         body.push_back("_Val(");
         body.push_back(std::to_string(node->val));
         body.push_back(")");
+    }
+
+    void Transpiler::visit(StringNode* node) {
+        body.push_back("_Val(\"");
+        body.push_back(node->val);
+        body.push_back("\")");
     }
 
     void Transpiler::visit(IdentifierNode* node) {
@@ -96,6 +127,19 @@ namespace eris {
         body.push_back("_Val(false)");
     }
 
+    void Transpiler::visit(CallExprNode* node) {
+        body.push_back("std::get<_Func>(");
+        visit(node->callee.get());
+        body.push_back(")");
+        body.push_back(".func(std::vector<_Val>{");
+        for (int i = 0; i < node->params.size(); i++) {
+            visit(node->params.at(i).get());
+            if (i < node->params.size() - 1) {
+                body.push_back(",");
+            }
+        }
+        body.push_back("})");
+    }
 
     void Transpiler::visit(UnaryExprNode* node) {
         body.push_back("_Val(");
@@ -106,6 +150,8 @@ namespace eris {
         case TokenType::PLUS:
         case TokenType::MINUS:
             variant_cast_type = "double";
+            break;
+        default:
             break;
         }
 
@@ -200,9 +246,9 @@ namespace eris {
 
 
     void Transpiler::visit(AssignmentExprNode* node) {
-        if (node->node_a->type() != NodeType::IDENTIFIER) {
-            raise_error(filename, node->line, "invalid left-hand side in assignment");
-        }
+        // if (node->node_a->type() != NodeType::IDENTIFIER) {
+        //     raise_error(filename, node->line, "invalid left-hand side in assignment");
+        // }
 
         visit(node->node_a.get());
 
@@ -279,6 +325,30 @@ namespace eris {
         visit(node->body.get());
     }
 
+    void Transpiler::visit(FuncDeclStmtNode* node) {
+        body.push_back("_Val ");
+        body.push_back(node->name);
+        body.push_back("=_Val(_Func{.func = [&");
+        body.push_back(node->name);
+        body.push_back("](const std::vector<_Val>& params){");
+        for (int i = 0; i < node->params.size(); i++) {
+            body.push_back("_Val ");
+            body.push_back(node->params.at(i));
+            body.push_back("=params.at(");
+            body.push_back(std::to_string(i));
+            body.push_back(");");
+        }
+        visit(node->body.get());
+        body.push_back("return _Val(_Nil());}});");
+    }
+
+
+    void Transpiler::visit(ReturnStmtNode* node) {
+        body.push_back("return ");
+        visit(node->expr_node.get());
+        body.push_back(";");
+    }
+
     void Transpiler::visit(ProgramNode* node) {
         for (std::shared_ptr<Node> stmt : node->stmts) {
             visit(stmt.get());
@@ -287,9 +357,10 @@ namespace eris {
 
     std::string Transpiler::postprocess(std::string& code) {
         std::regex rx1("std::get<double>\\(_Val\\(([0-9]+\\.[0-9]+)\\)\\)");
-
+        std::regex rx2("std::get<bool>\\(_Val\\((.*?)([<>=!]=|[<>]|&&|\\|\\|)(.*?)\\)\\)");
         code = Transpiler::boilerplate + code;
         code = std::regex_replace(code, rx1, "$1");
+        code = std::regex_replace(code, rx2, "$1$2$3");
         code = code + " return 0; }";
         return code;
     }
@@ -308,4 +379,4 @@ namespace eris {
         return code;
     }
 
-} // namespace eriss
+} // namespace eris

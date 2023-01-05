@@ -12,12 +12,14 @@ namespace eris {
         std::vector<std::string> body{};
         void visit(Node* node);
         void visit(NumberNode* node);
+        void visit(StringNode* node);
         void visit(IdentifierNode* node);
         void visit(NilNode* node);
         void visit(TrueNode* node);
         void visit(FalseNode* node);
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
+        void visit(CallExprNode* node);
         void visit(AssignmentExprNode* node);
         void visit(ExprStmtNode* node);
         void visit(VarDeclStmtNode* node);
@@ -26,6 +28,8 @@ namespace eris {
         void visit(IfElseStmtNode* node);
         void visit(WhileStmtNode* node);
         void visit(ForStmtNode* node);
+        void visit(FuncDeclStmtNode* node);
+        void visit(ReturnStmtNode* node);
         void visit(ProgramNode* node);
         std::string postprocess(std::string& code);
     public:

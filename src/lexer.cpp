@@ -134,9 +134,9 @@ namespace eris {
                 advance();
                 tokens.push_back(Token(TokenType::SEMICOLON, line));
             }
-            else if (current == '{') {
+            else if (current == ',') {
                 advance();
-                tokens.push_back(Token(TokenType::SEMICOLON, line));
+                tokens.push_back(Token(TokenType::COMMA, line));
             }
             else {
                 raise_error(filename, line, "illegal character '" + std::string(1, current) + "'");
@@ -185,7 +185,7 @@ namespace eris {
         std::string identifier(1, current);
         advance();
 
-        while (current && (current == '_' | std::isalnum(current))) {
+        while (current && (current == '_' || std::isalnum(current))) {
             identifier += current;
             advance();
         }

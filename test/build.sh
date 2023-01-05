@@ -1,1 +1,1 @@
-clang++ src/*.cpp -o ../../../code/binaries/erisc -std=c++11 -w
+clang++ -std=c++17 src/*.cpp -o ../../binaries/erisc -w

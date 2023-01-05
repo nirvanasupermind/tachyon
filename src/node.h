@@ -16,6 +16,7 @@ namespace eris {
         NIL,
         TRUE,
         FALSE,
+        CALL_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
         ASSIGNMENT_EXPR,
@@ -27,6 +28,7 @@ namespace eris {
         WHILE_STMT,
         FOR_STMT,
         FUNC_DECL_STMT,
+        RETURN_STMT,
         PROGRAM
     };
 
@@ -78,6 +80,14 @@ namespace eris {
     class FalseNode: public Node {
     public:
         FalseNode(std::size_t line);
+        NodeType type() const;
+    };
+
+    class CallExprNode: public Node {
+    public:
+        std::shared_ptr<Node> callee;
+        std::vector<std::shared_ptr<Node> > params;
+        CallExprNode(std::shared_ptr<Node> callee, const std::vector<std::shared_ptr<Node> >& params, std::size_t line);
         NodeType type() const;
     };
 
@@ -164,6 +174,24 @@ namespace eris {
         std::shared_ptr<Node> body;
         ForStmtNode(std::shared_ptr<Node> decl, std::shared_ptr<Node> test,
             std::shared_ptr<Node> assignment, std::shared_ptr<Node> body, std::size_t line);
+        NodeType type() const;
+    };
+
+    class FuncDeclStmtNode: public Node {
+    public:
+        std::string name;
+        std::vector<std::string> params;
+        std::shared_ptr<Node> body;
+
+        FuncDeclStmtNode(const std::string& name, const std::vector<std::string>& params, std::shared_ptr<Node> body, std::size_t line);
+        NodeType type() const;
+    };
+
+    class ReturnStmtNode: public Node {
+    public:
+        TokenType op;
+        std::shared_ptr<Node> expr_node;
+        ReturnStmtNode(std::shared_ptr<Node> expr_node, std::size_t line);
         NodeType type() const;
     };
 

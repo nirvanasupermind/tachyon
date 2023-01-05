@@ -64,6 +64,15 @@ namespace eris {
         return NodeType::FALSE;
     }
 
+    CallExprNode::CallExprNode(std::shared_ptr<Node> callee, const std::vector<std::shared_ptr<Node> >& params, std::size_t line)
+        : callee(callee), params(params) {
+        this->line = line;
+    }
+
+    NodeType CallExprNode::type() const {
+        return NodeType::CALL_EXPR;
+    }
+
     UnaryExprNode::UnaryExprNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line)
         : op(op), operand_node(operand_node) {
         this->line = line;
@@ -155,6 +164,25 @@ namespace eris {
         return NodeType::FOR_STMT;
     }
 
+    FuncDeclStmtNode::FuncDeclStmtNode(const std::string& name, const std::vector<std::string>& params,
+        std::shared_ptr<Node> body, std::size_t line)
+        : name(name), params(params), body(body) {
+        this->line = line;
+    }
+
+    NodeType FuncDeclStmtNode::type() const {
+        return NodeType::FUNC_DECL_STMT;
+    }
+
+    ReturnStmtNode::ReturnStmtNode(std::shared_ptr<Node> expr_node, std::size_t line)
+        : expr_node(expr_node) {
+        this->line = line;
+    }
+
+    NodeType ReturnStmtNode::type() const {
+        return NodeType::RETURN_STMT;
+    }
+
     ProgramNode::ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line)
         : stmts(stmts) {
         this->line = line;
@@ -164,4 +192,4 @@ namespace eris {
         return NodeType::PROGRAM;
     }
 
-} // namespace eri
+} // namespace eris

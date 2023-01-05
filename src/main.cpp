@@ -28,7 +28,7 @@ void transpile(const std::string& in_filename, const std::string& out_filename, 
 
 int main(int argc, char** argv) {
     if ((argc < 4)) {
-        std::cerr << "Usage: eris [script]" << '\n';
+        std::cerr << "Usage: erisc [infile] -o [outfile]" << '\n';
         return 1;
     }
     else {

@@ -19,7 +19,8 @@ namespace eris {
         {"else", TokenType::ELSE},
         {"while", TokenType::WHILE},
         {"for", TokenType::FOR},
-        {"def", TokenType::DEF},
+        {"func", TokenType::FUNC},
+        {"return", TokenType::RETURN}
     };
 
     class Lexer {

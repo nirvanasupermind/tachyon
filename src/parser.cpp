@@ -68,16 +68,39 @@ namespace eris {
         }
     }
 
+    std::shared_ptr<Node> Parser::call_expr() {
+        std::shared_ptr<Node> callee = basic_expr();
+        std::vector<std::shared_ptr<Node> > params;
+        while (current.type == TokenType::LPAREN) {
+            if (tokens.at(pos).type == TokenType::RPAREN) {
+                advance();
+                advance();
+            } else {
+                while (true) {
+                    params.push_back(basic_expr());
+                    if (current.type != TokenType::COMMA) {
+                        break;
+                    }
+                    advance();
+                }
+            }
+            callee = std::shared_ptr<CallExprNode>(new CallExprNode(callee, params, callee->line));
+        }
+        return callee;
+    }
+
     std::shared_ptr<Node> Parser::unary_expr() {
         Token op = current;
+        
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
             return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op.type, unary_expr(), op.line));
         }
         else {
-            return basic_expr();
+            return call_expr();
         }
     }
+
 
     std::shared_ptr<Node> Parser::binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::vector<TokenType>& op_types) {
         std::shared_ptr<Node> node_a = operand();
@@ -142,7 +165,6 @@ namespace eris {
         return std::shared_ptr<VarDeclStmtNode>(new VarDeclStmtNode(name, val, line));
     }
 
-
     std::shared_ptr<Node> Parser::block_stmt() {
         std::size_t line = current.line;
         eat(TokenType::LCURLY);
@@ -189,18 +211,32 @@ namespace eris {
         return std::shared_ptr<ForStmtNode>(new ForStmtNode(decl, test, assignment, body, line));
     }
 
-
     std::shared_ptr<Node> Parser::func_decl_stmt() {
         std::size_t line = current.line;
-        eat(TokenType::FOR);
+        eat(TokenType::FUNC);
+        std::string name = eat(TokenType::IDENTIFIER).val;
         eat(TokenType::LPAREN);
-        std::shared_ptr<Node> decl = var_decl_stmt();
-        std::shared_ptr<Node> test = expr();
-        eat(TokenType::SEMICOLON);
-        std::shared_ptr<Node> assignment = expr();
-        eat(TokenType::RPAREN);
+        std::vector<std::string> params;
+
+        while (current.type != TokenType::RPAREN) {
+            params.push_back(eat(TokenType::IDENTIFIER).val);
+            if (current.type != TokenType::COMMA) {
+                break;
+            }
+            advance();
+        }
+
+        advance();
+        
         std::shared_ptr<Node> body = block_stmt();
-        return std::shared_ptr<ForStmtNode>(new ForStmtNode(decl, test, assignment, body, line));
+        return std::shared_ptr<FuncDeclStmtNode>(new FuncDeclStmtNode(name, params, body, line));
+    }
+
+    std::shared_ptr<Node> Parser::return_stmt() {
+        eat(TokenType::RETURN);
+        std::shared_ptr<Node> expr_node = expr();
+        eat(TokenType::SEMICOLON);
+        return std::shared_ptr<ReturnStmtNode>(new ReturnStmtNode(expr_node, expr_node->line));
     }
 
     std::shared_ptr<Node> Parser::stmt() {
@@ -218,6 +254,12 @@ namespace eris {
         }
         else if (current.type == TokenType::FOR) {
             return for_stmt();
+        }
+        else if (current.type == TokenType::FUNC) {
+            return func_decl_stmt();
+        }
+        else if (current.type == TokenType::RETURN) {
+            return return_stmt();
         }
         else {
             return expr_stmt();

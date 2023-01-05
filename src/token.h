@@ -17,7 +17,8 @@ namespace eris {
         ELSE,
         WHILE,
         FOR,
-        DEF,
+        FUNC,
+        RETURN,
         PLUS,
         MINUS,
         MUL,
@@ -36,6 +37,7 @@ namespace eris {
         LCURLY,
         RCURLY,
         SEMICOLON,
+        COMMA,
         EOF_
     };
 
