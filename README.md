@@ -22,18 +22,7 @@ eris::print(vec2.mag()); // 5
 ```
 
 ```
-var myThread = Thread(lambda () {
-    for(var i = 0; i < 10; i += 1;) {
-        IO.print(String.join("myThread: ", i));
-    }
-});
 
-myThread.start();
-
-for(var i = 0; i < 10; i += 1;) {
-    IO.print(String.join("Main thread: ", i));
-}
-```
 
 # Status
 Currently, the interpreter is mostly working, but the implementation is old and unstable, and thus may contain bugs, and documentation is sparse.
