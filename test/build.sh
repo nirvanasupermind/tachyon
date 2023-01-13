@@ -1,1 +1,1 @@
-clang++ -std=c++17 src/*.cpp -o ../../binaries/erisc -w
+clang++ -std=c++11 src/*.cpp -o ../../binaries/erisc -Wno-return-type

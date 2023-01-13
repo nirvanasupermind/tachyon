@@ -73,7 +73,16 @@ namespace eris {
         return NodeType::CALL_EXPR;
     }
 
-    MemberExprNode::MemberExprNode(TokenType op, std::shared_ptr<Node> object, const std::string& member, std::size_t line)
+    ParenExprNode::ParenExprNode(std::shared_ptr<Node> expr_node, std::size_t line)
+        : expr_node(expr_node) {
+        this->line = line;
+    }
+
+    NodeType ParenExprNode::type() const {
+        return NodeType::PAREN_EXPR;
+    }
+
+    MemberExprNode::MemberExprNode(Token op, std::shared_ptr<Node> object, const std::string& member, std::size_t line)
         : op(op), object(object), member(member) {
         this->line = line;
     }
@@ -82,7 +91,7 @@ namespace eris {
         return NodeType::MEMBER_EXPR;
     }
 
-    UnaryExprNode::UnaryExprNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line)
+    UnaryExprNode::UnaryExprNode(Token op, std::shared_ptr<Node> operand_node, std::size_t line)
         : op(op), operand_node(operand_node) {
         this->line = line;
     }
@@ -91,7 +100,7 @@ namespace eris {
         return NodeType::UNARY_EXPR;
     }
 
-    BinaryExprNode::BinaryExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
+    BinaryExprNode::BinaryExprNode(Token op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
         : op(op), node_a(node_a), node_b(node_b) {
         this->line = line;
     }
@@ -100,7 +109,7 @@ namespace eris {
         return NodeType::BINARY_EXPR;
     }
 
-    AssignmentExprNode::AssignmentExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
+    AssignmentExprNode::AssignmentExprNode(Token op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line)
         : op(op), node_a(node_a), node_b(node_b) {
         this->line = line;
     }

@@ -61,7 +61,7 @@ namespace eris {
             advance();
             std::shared_ptr<Node> expr_node = expr();
             eat(TokenType::RPAREN);
-            return expr_node;
+            return std::shared_ptr<ParenExprNode>(new ParenExprNode(expr_node, token.line));
         };
         default:
             raise_error(filename, token.line, "invalid syntax (unexpected token " + token.str() + ")");
@@ -91,7 +91,7 @@ namespace eris {
                 result = std::shared_ptr<CallExprNode>(new CallExprNode(result, params, result->line));
             }
             else {
-                TokenType op = current.type;
+                Token op = current;
                 advance();
                 std::string member = eat(TokenType::IDENTIFIER).val;
                 result = std::shared_ptr<MemberExprNode>(new MemberExprNode(op, result, member, result->line));
@@ -105,7 +105,7 @@ namespace eris {
 
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
-            return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op.type, unary_expr(), op.line));
+            return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op, unary_expr(), op.line));
         }
         else {
             return call_member_expr();
@@ -118,7 +118,7 @@ namespace eris {
 
         while (std::find(op_types.begin(), op_types.end(), current.type) != op_types.end()
             && current.type != TokenType::EOF_) {
-            TokenType op = current.type;
+            Token op = current;
             advance();
             std::shared_ptr<Node> node_b = operand();
             node_a = std::shared_ptr<BinaryExprNode>(new BinaryExprNode(op, node_a, node_b, node_a->line));
@@ -147,7 +147,7 @@ namespace eris {
         std::shared_ptr<Node> node_a = equality_expr();
 
         if (current.type == TokenType::EQ || current.type == TokenType::PE) {
-            TokenType op = current.type;
+            Token op = current;
             advance();
             std::shared_ptr<Node> node_b = assignment_expr();
             node_a = std::shared_ptr<AssignmentExprNode>(new AssignmentExprNode(op, node_a, node_b, node_a->line));

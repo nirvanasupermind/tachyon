@@ -1,40 +1,14 @@
 #include <string>
-#include <regex>
 #include <vector>
+#include <cmath>
 
 #include "error.h"
 #include "node.h"
 #include "transpiler.h"
 
 namespace eris {
-    const std::string Transpiler::boilerplate =
-        "#include <functional>\n"
-        "#include <iostream>\n"
-        "#include <string>\n"
-        "#include <variant>\n"
-        "#include <vector>\n"
-        "#include <cmath>\n"
-        "struct _Nil {};\n"
-        "struct _Func;\n"
-        "struct _make_print_functor {\n"
-        "std::string operator()(double x) const { return std::to_string(x); }\n"
-        "std::string operator()(bool x) const { return x ? \"true\" : \"false\"; }\n"
-        "std::string operator()(const std::string& x) const { return x; }\n"
-        "std::string operator()(const _Nil& x) const { return \"nil\"; }\n"
-        "std::string operator()(const _Func& x) const { return \"<function>\" ;}\n"
-        "};\n"
-        "using _Val = std::variant<double, bool, std::string, _Nil, _Func>;\n"
-        "struct _Func { std::function<_Val (const std::vector<_Val>&)> func; };\n"
-        "namespace eris{\n"
-        "_Val print = _Val(_Func{.func = [](const std::vector<_Val>& params){\n"
-        "std::cout << std::visit(_make_print_functor(),params.at(0)) << '\\n'; return _Val(_Nil());}});\n"
-        "_Val sin = _Val(_Func{.func = [](const std::vector<_Val>& params){\n"
-        "return _Val(std::sin(std::get<double>(params.at(0))));}});\n"
-        "}\n"
-        "int main() {";
-
     Transpiler::Transpiler(const std::string& filename)
-        : filename(filename) {
+        : filename(filename), include_val_t(false) {
     }
 
     void Transpiler::visit(Node* node) {
@@ -57,11 +31,8 @@ namespace eris {
         case NodeType::FALSE:
             visit(dynamic_cast<FalseNode*>(node));
             break;
-        case NodeType::CALL_EXPR:
-            visit(dynamic_cast<CallExprNode*>(node));
-            break;
-        case NodeType::MEMBER_EXPR:
-            visit(dynamic_cast<MemberExprNode*>(node));
+        case NodeType::PAREN_EXPR:
+            visit(dynamic_cast<ParenExprNode*>(node));
             break;
         case NodeType::UNARY_EXPR:
             visit(dynamic_cast<UnaryExprNode*>(node));
@@ -96,9 +67,6 @@ namespace eris {
         case NodeType::FUNC_DECL_STMT:
             visit(dynamic_cast<FuncDeclStmtNode*>(node));
             break;
-        case NodeType::RETURN_STMT:
-            visit(dynamic_cast<ReturnStmtNode*>(node));
-            break;
         case NodeType::PROGRAM:
             visit(dynamic_cast<ProgramNode*>(node));
             break;
@@ -108,268 +76,132 @@ namespace eris {
     }
 
     void Transpiler::visit(NumberNode* node) {
-        body.push_back("_Val(");
-        body.push_back(std::to_string(node->val));
-        body.push_back(")");
+        post_main_section << node->val;
+        if(std::fmod(node->val, 1) == 0) {
+            post_main_section << ".0";
+        }
     }
 
     void Transpiler::visit(StringNode* node) {
-        body.push_back("_Val(std::string(\"");
-        body.push_back(node->val);
-        body.push_back("\"))");
+        post_main_section << node->val;
     }
 
     void Transpiler::visit(IdentifierNode* node) {
-        body.push_back(node->val);
+        if (!include_val_t) {
+            include_val_t = true;
+        }
+
+        post_main_section << node->val;
     }
 
     void Transpiler::visit(NilNode* node) {
-        body.push_back("_Val(_Nil())");
+        post_main_section << "val_t()";
     }
 
     void Transpiler::visit(TrueNode* node) {
-        body.push_back("_Val(true)");
+        post_main_section << "true";
     }
 
     void Transpiler::visit(FalseNode* node) {
-        body.push_back("_Val(false)");
+        post_main_section << "false";
     }
 
-    void Transpiler::visit(CallExprNode* node) {
-        body.push_back("std::get<_Func>(");
-        visit(node->callee.get());
-        body.push_back(")");
-        body.push_back(".func(std::vector<_Val>{");
-        for (int i = 0; i < node->params.size(); i++) {
-            visit(node->params.at(i).get());
-            if (i < node->params.size() - 1) {
-                body.push_back(",");
-            }
-        }
-        body.push_back("})");
-    }
-
-    void Transpiler::visit(MemberExprNode* node) {
-        visit(node->object.get());
-        switch (node->op) {
-        case TokenType::PERIOD:
-            body.push_back(".");
-            break;
-        case TokenType::DOUBLE_COLON:
-            body.push_back("::");
-            break;
-        default:
-            break;
-        } 
-        body.push_back(node->member);
+    void Transpiler::visit(ParenExprNode* node) {
+        post_main_section << '(';
+        visit(node->expr_node.get());
+        post_main_section << ')';
     }
 
     void Transpiler::visit(UnaryExprNode* node) {
-        body.push_back("_Val(");
-
-        std::string variant_cast_type;
-
-        switch (node->op) {
-        case TokenType::PLUS:
-        case TokenType::MINUS:
-            variant_cast_type = "double";
-            break;
-        default:
-            break;
-        }
-
-        switch (node->op) {
-        case TokenType::PLUS:
-            body.push_back("+");
-            break;
-        case TokenType::MINUS:
-            body.push_back("-");
-            break;
-        default:
-            break;
-        }
-
-        body.push_back("std::get<");
-        body.push_back(variant_cast_type);
-        body.push_back(">(");
+        post_main_section << node->op.val;
         visit(node->operand_node.get());
-        body.push_back("))");
     }
 
     void Transpiler::visit(BinaryExprNode* node) {
-        body.push_back("_Val(");
-
-        std::string variant_cast_type;
-
-        switch (node->op) {
-        case TokenType::PLUS:
-        case TokenType::MINUS:
-        case TokenType::MUL:
-        case TokenType::DIV:
-        case TokenType::LT:
-        case TokenType::LE:
-        case TokenType::GT:
-        case TokenType::GE:
-        case TokenType::EE:
-        case TokenType::NE:
-            variant_cast_type = "double";
-            break;
-        default:
-            break;
-        }
-
-        body.push_back("std::get<");
-        body.push_back(variant_cast_type);
-        body.push_back(">");
-        body.push_back("(");
         visit(node->node_a.get());
-        body.push_back(")");
-
-        switch (node->op) {
-        case TokenType::PLUS:
-            body.push_back("+");
-            break;
-        case TokenType::MINUS:
-            body.push_back("-");
-            break;
-        case TokenType::MUL:
-            body.push_back("*");
-            break;
-        case TokenType::DIV:
-            body.push_back("/");
-            break;
-        case TokenType::LT:
-            body.push_back("<");
-            break;
-        case TokenType::LE:
-            body.push_back("<=");
-            break;
-        case TokenType::GT:
-            body.push_back(">");
-            break;
-        case TokenType::GE:
-            body.push_back(">=");
-            break;
-        case TokenType::EE:
-            body.push_back("==");
-            break;
-        case TokenType::NE:
-            body.push_back("!=");
-            break;
-        default:
-            break;
-        }
-
-        body.push_back("std::get<");
-        body.push_back(variant_cast_type);
-        body.push_back(">(");
+        post_main_section << node->op.val;
         visit(node->node_b.get());
-        body.push_back("))");
     }
 
-
     void Transpiler::visit(AssignmentExprNode* node) {
-        // if (node->node_a->type() != NodeType::IDENTIFIER) {
-        //     raise_error(filename, node->line, "invalid left-hand side in assignment");
-        // }
-
         visit(node->node_a.get());
-
-        switch (node->op) {
-        case TokenType::EQ: {
-            body.push_back("=");
+        if(node->op.type == TokenType::EQ) {
+            post_main_section << '=';
             visit(node->node_b.get());
-            break;
-        }
-        case TokenType::PE: {
-            body.push_back("=");
-            body.push_back("_Val(std::get<double>(");
+        } else {
+            post_main_section << '=';
             visit(node->node_a.get());
-            body.push_back(")+std::get<double>(");
-            visit(node->node_b.get());
-            body.push_back("))");
-            break;
-        }
-        default:
-            break;
+            post_main_section << node->op.val.front();
+            visit(node->node_b.get());            
         }
     }
 
     void Transpiler::visit(ExprStmtNode* node) {
         visit(node->expr_node.get());
-        body.push_back(";");
+        post_main_section << ";\n";
     }
 
     void Transpiler::visit(VarDeclStmtNode* node) {
-        body.push_back("_Val ");
-        body.push_back(node->name);
-        body.push_back("=");
+        if (!include_val_t) {
+            include_val_t = true;
+        }
+
+        post_main_section << "val_t " << node->name << " = ";
         visit(node->val.get());
-        body.push_back(";");
+        post_main_section << ";\n";
     }
 
     void Transpiler::visit(BlockStmtNode* node) {
-        body.push_back("{");
+        post_main_section << "{\n";
         visit(node->program_node.get());
-        body.push_back("}");
+        post_main_section << "}\n";
     }
 
     void Transpiler::visit(IfStmtNode* node) {
-        body.push_back("if (std::get<bool>(");
+        post_main_section << "if(";
         visit(node->test.get());
-        body.push_back("))");
+        post_main_section << ")";
         visit(node->body.get());
     }
 
     void Transpiler::visit(IfElseStmtNode* node) {
-        body.push_back("if (std::get<bool>(");
+        post_main_section << "if(";
         visit(node->test.get());
-        body.push_back("))");
+        post_main_section << ")";
         visit(node->body.get());
-        body.push_back("else");
+        post_main_section << "else";
         visit(node->alternate.get());
     }
 
     void Transpiler::visit(WhileStmtNode* node) {
-        body.push_back("while (std::get<bool>(");
+        post_main_section << "while(";
         visit(node->test.get());
-        body.push_back("))");
+        post_main_section << ")";
         visit(node->body.get());
     }
 
     void Transpiler::visit(ForStmtNode* node) {
-        body.push_back("for (");
+        post_main_section << "for(";
         visit(node->decl.get());
-        body.push_back("std::get<bool>(");
         visit(node->test.get());
-        body.push_back(");");
+        post_main_section << ';';
         visit(node->assignment.get());
-        body.push_back(")");
+        post_main_section << ")";
         visit(node->body.get());
     }
 
     void Transpiler::visit(FuncDeclStmtNode* node) {
-        body.push_back("_Val ");
-        body.push_back(node->name);
-        body.push_back("=_Val(_Func{.func = [&");
-        body.push_back(node->name);
-        body.push_back("](const std::vector<_Val>& params){");
-        for (int i = 0; i < node->params.size(); i++) {
-            body.push_back("_Val ");
-            body.push_back(node->params.at(i));
-            body.push_back("=params.at(");
-            body.push_back(std::to_string(i));
-            body.push_back(");");
+        if (!include_val_t) {
+            include_val_t = true;
+        }
+
+        post_main_section << "val_t " << node->name << "=[&" << node->name << "](const std::vector<val_t>& params) {\n";
+        for(int i = 0; i < node->params.size(); i++) {
+            post_main_section << "val_t " << node->params.at(i) << "=params.at(" << i << ");\n";
         }
         visit(node->body.get());
-        body.push_back("return _Val(_Nil());}});");
-    }
-
-
-    void Transpiler::visit(ReturnStmtNode* node) {
-        body.push_back("return ");
-        visit(node->expr_node.get());
-        body.push_back(";");
+        post_main_section << "return val_t();";
+        post_main_section << "};\n";
     }
 
     void Transpiler::visit(ProgramNode* node) {
@@ -378,28 +210,59 @@ namespace eris {
         }
     }
 
-    std::string Transpiler::postprocess(std::string& code) {
-        std::regex rx1("std::get<double>\\(_Val\\(([0-9]+\\.[0-9]+)\\)\\)");
-        std::regex rx2("std::get<bool>\\(_Val\\((.*?)([<>=!]=|[<>]|&&|\\|\\|)(.*?)\\)\\)");
-        code = Transpiler::boilerplate + code;
-        code = std::regex_replace(code, rx1, "$1");
-        code = std::regex_replace(code, rx2, "$1$2$3");
-        code = code + " return 0; }";
-        return code;
-    }
-
     std::string Transpiler::generate_code(Node* node) {
         visit(node);
-
-        std::string code = "";
-
-        for (const std::string& str : body) {
-            code = code + str;
+        if (include_val_t) {
+            include_section << "#include <functional>\n";
+            include_section << "#include <string>\n";
+            include_section << "#include <vector>\n";
+            
+            pre_main_section
+                << "struct val_t;\n"
+                << "using func_t = std::function<val_t(const std::vector<val_t>&)};\n"
+                << "struct val_t {\n"
+                << "    enum { NIL, DOUBLE, BOOL, STRING, FUNC } tag;\n"
+                << "    void *ptr; \n"
+                << "    val_t() { tag = NIL; ptr = nullptr; }\n" 
+                << "    val_t(double d) { tag = DOUBLE; ptr = &d; }\n" 
+                << "    val_t(bool b) { tag = BOOL; ptr = &b; } \n" 
+                << "    val_t(std::string s) { tag = STRING; ptr = &s; }\n"
+                << "    val_t(func_t f) { tag = FUNC; ptr = &f; }\n"
+                << "    val_t(const val_t& v) {\n"
+                << "        tag = v.tag;\n"
+                << "        switch(tag) {\n"
+                << "        case NIL: {\n"
+                << "            break;\n"
+                << "        }\n"
+                << "        case DOUBLE: {\n"
+                << "            double d = *(double *)v.ptr;\n"
+                << "            ptr = &d;\n"
+                << "            break;\n"
+                << "        }\n"
+                << "        case BOOL: {\n"
+                << "            bool b = *(bool *)v.ptr;\n"
+                << "            ptr = &b;\n"
+                << "            break;\n"
+                << "        }\n"
+                << "        case STRING: {\n"
+                << "            std::string s = *(std::string *)v.ptr;\n"
+                << "            ptr = &s;\n"
+                << "            break;\n"
+                << "        }\n"
+                << "        case FUNC: {\n"
+                << "            func_t f = *(func_t *)v.ptr;\n"
+                << "            ptr = &f;\n"
+                << "            break;\n"
+                << "        }\n"
+                << "        }\n"
+                << "    }\n"
+                << "    operator double() const { return *(double *)ptr; }\n"
+                << "    operator std::string() const { return *(std::string *)ptr; }\n"
+                << "    operator func_t() const { return *(func_t *)ptr;}\n"
+                << "};\n\n";
         }
-
-        code = postprocess(code);
-
-        return code;
+        return include_section.str() + "\n" + pre_main_section.str() + "int main() {\n"
+            + post_main_section.str() + "return 0;\n}";
     }
 
 } // namespace eris

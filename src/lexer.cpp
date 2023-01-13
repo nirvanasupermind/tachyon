@@ -45,18 +45,18 @@ namespace eris {
                 
                 if(current == '=') {
                     advance();
-                    tokens.push_back(Token(TokenType::PE, line));
+                    tokens.push_back(Token(TokenType::PE, "+=", line));
                 } else {
-                    tokens.push_back(Token(TokenType::PLUS, line));
+                    tokens.push_back(Token(TokenType::PLUS, "+", line));
                 }
             }
             else if (current == '-') {
                 advance();
-                tokens.push_back(Token(TokenType::MINUS, line));
+                tokens.push_back(Token(TokenType::MINUS, "-", line));
             }
             else if (current == '*') {
                 advance();
-                tokens.push_back(Token(TokenType::MUL, line));
+                tokens.push_back(Token(TokenType::MUL, "*", line));
             }
             else if (current == '/') {
                 advance();
@@ -67,21 +67,21 @@ namespace eris {
                         advance();
                     }
                 } else {
-                    tokens.push_back(Token(TokenType::DIV, line));
+                    tokens.push_back(Token(TokenType::DIV, "/", line));
                 }
             }
             else if (current == '%') {
                 advance();
-                tokens.push_back(Token(TokenType::MOD, line));
+                tokens.push_back(Token(TokenType::MOD, "%", line));
             }
             else if (current == '<') {
                 advance();
                 
                 if(current == '=') {
                     advance();
-                    tokens.push_back(Token(TokenType::LE, line));
+                    tokens.push_back(Token(TokenType::LE, "<=", line));
                 } else {
-                    tokens.push_back(Token(TokenType::LT, line));
+                    tokens.push_back(Token(TokenType::LT, "<", line));
                 }
             }
             else if (current == '>') {
@@ -89,9 +89,9 @@ namespace eris {
                 
                 if(current == '=') {
                     advance();
-                    tokens.push_back(Token(TokenType::GE, line));
+                    tokens.push_back(Token(TokenType::GE, ">=", line));
                 } else {
-                    tokens.push_back(Token(TokenType::GT, line));
+                    tokens.push_back(Token(TokenType::GT, ">", line));
                 }
             }
             else if (current == '=') {
@@ -101,9 +101,9 @@ namespace eris {
                 
                 if(current == '=') {
                     advance();
-                    tokens.push_back(Token(TokenType::EE, line));
+                    tokens.push_back(Token(TokenType::EE, "==", line));
                 } else {
-                    tokens.push_back(Token(TokenType::EQ, line));
+                    tokens.push_back(Token(TokenType::EQ, "=", line));
                 }
             }
             else if (current == '!') {
@@ -111,28 +111,28 @@ namespace eris {
 
                 if(current == '=') {
                     advance();
-                    tokens.push_back(Token(TokenType::NE, line));
+                    tokens.push_back(Token(TokenType::NE, "!=", line));
                 }
             }
             else if (current == '(') {
                 advance();
-                tokens.push_back(Token(TokenType::LPAREN, line));
+                tokens.push_back(Token(TokenType::LPAREN, "(", line));
             }
             else if (current == ')') {
                 advance();
-                tokens.push_back(Token(TokenType::RPAREN, line));
+                tokens.push_back(Token(TokenType::RPAREN, ")", line));
             }
             else if (current == '{') {
                 advance();
-                tokens.push_back(Token(TokenType::LCURLY, line));
+                tokens.push_back(Token(TokenType::LCURLY, "{", line));
             }
             else if (current == '}') {
                 advance();
-                tokens.push_back(Token(TokenType::RCURLY, line));
+                tokens.push_back(Token(TokenType::RCURLY, "}", line));
             }
             else if (current == ';') {
                 advance();
-                tokens.push_back(Token(TokenType::SEMICOLON, line));
+                tokens.push_back(Token(TokenType::SEMICOLON, ";", line));
             }
             else if (current == ':') {
                 int token_line = line;
@@ -141,16 +141,16 @@ namespace eris {
                 
                 if(current == ':') {
                     advance();
-                    tokens.push_back(Token(TokenType::DOUBLE_COLON, line));
+                    tokens.push_back(Token(TokenType::DOUBLE_COLON, "::", line));
                 }
             }
             else if (current == ',') {
                 advance();
-                tokens.push_back(Token(TokenType::COMMA, line));
+                tokens.push_back(Token(TokenType::COMMA, ",", line));
             }
             else if (current == '.') {
                 advance();
-                tokens.push_back(Token(TokenType::PERIOD, line));
+                tokens.push_back(Token(TokenType::PERIOD, ".", line));
             }
             else {
                 raise_error(filename, line, "illegal character '" + std::string(1, current) + "'");

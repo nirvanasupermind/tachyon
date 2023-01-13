@@ -3,13 +3,17 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 #include "node.h"
 
 namespace eris {
     class Transpiler {
     private:
-        std::string filename;
-        std::vector<std::string> body{};
+        std::string filename{};
+        std::ostringstream include_section{};
+        std::ostringstream pre_main_section{};
+        std::ostringstream post_main_section{};
+        bool include_val_t;
         void visit(Node* node);
         void visit(NumberNode* node);
         void visit(StringNode* node);
@@ -17,10 +21,11 @@ namespace eris {
         void visit(NilNode* node);
         void visit(TrueNode* node);
         void visit(FalseNode* node);
-        void visit(UnaryExprNode* node);
-        void visit(BinaryExprNode* node);
+        void visit(ParenExprNode* node);
         void visit(CallExprNode* node);
         void visit(MemberExprNode* node);
+        void visit(UnaryExprNode* node);
+        void visit(BinaryExprNode* node);
         void visit(AssignmentExprNode* node);
         void visit(ExprStmtNode* node);
         void visit(VarDeclStmtNode* node);
@@ -32,9 +37,7 @@ namespace eris {
         void visit(FuncDeclStmtNode* node);
         void visit(ReturnStmtNode* node);
         void visit(ProgramNode* node);
-        std::string postprocess(std::string& code);
     public:
-        static const std::string boilerplate;
         Transpiler(const std::string& filename);
         std::string generate_code(Node* node);
     };

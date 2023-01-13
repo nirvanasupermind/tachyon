@@ -16,6 +16,7 @@ namespace eris {
         NIL,
         TRUE,
         FALSE,
+        PAREN_EXPR,
         CALL_EXPR,
         MEMBER_EXPR,
         UNARY_EXPR,
@@ -84,6 +85,13 @@ namespace eris {
         NodeType type() const;
     };
 
+    class ParenExprNode: public Node {
+    public:
+        std::shared_ptr<Node> expr_node;
+        ParenExprNode(std::shared_ptr<Node> expr_node, std::size_t line);
+        NodeType type() const;
+    };
+
     class CallExprNode: public Node {
     public:
         std::shared_ptr<Node> callee;
@@ -94,42 +102,41 @@ namespace eris {
 
     class MemberExprNode: public Node {
     public:
-        TokenType op;
+        Token op;
         std::shared_ptr<Node> object;
         std::string member;
-        MemberExprNode(TokenType op, std::shared_ptr<Node> object, const std::string& member, std::size_t line);
+        MemberExprNode(Token op, std::shared_ptr<Node> object, const std::string& member, std::size_t line);
         NodeType type() const;
     };
     
     class UnaryExprNode: public Node {
     public:
-        TokenType op;
+        Token op;
         std::shared_ptr<Node> operand_node;
-        UnaryExprNode(TokenType op, std::shared_ptr<Node> operand_node, std::size_t line);
+        UnaryExprNode(Token op, std::shared_ptr<Node> operand_node, std::size_t line);
         NodeType type() const;
     };
 
     class BinaryExprNode: public Node {
     public:
-        TokenType op;
+        Token op;
         std::shared_ptr<Node> node_a;
         std::shared_ptr<Node> node_b;
-        BinaryExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line);
+        BinaryExprNode(Token op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line);
         NodeType type() const;
     };
 
     class AssignmentExprNode: public Node {
     public:
-        TokenType op;
+        Token op;
         std::shared_ptr<Node> node_a;
         std::shared_ptr<Node> node_b;
-        AssignmentExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line);
+        AssignmentExprNode(Token op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, std::size_t line);
         NodeType type() const;
     };
 
     class ExprStmtNode: public Node {
     public:
-        TokenType op;
         std::shared_ptr<Node> expr_node;
         ExprStmtNode(std::shared_ptr<Node> expr_node, std::size_t line);
         NodeType type() const;
@@ -145,7 +152,6 @@ namespace eris {
 
     class BlockStmtNode: public Node {
     public:
-        TokenType op;
         std::shared_ptr<Node> program_node;
         BlockStmtNode(std::shared_ptr<Node> program_node, std::size_t line);
         NodeType type() const;
@@ -199,7 +205,6 @@ namespace eris {
 
     class ReturnStmtNode: public Node {
     public:
-        TokenType op;
         std::shared_ptr<Node> expr_node;
         ReturnStmtNode(std::shared_ptr<Node> expr_node, std::size_t line);
         NodeType type() const;
@@ -211,7 +216,6 @@ namespace eris {
         ProgramNode(const std::vector<std::shared_ptr<Node> >& stmts, std::size_t line);
         NodeType type() const;
     };
-
 } // namespace eris
 
 #endif // NODE_H

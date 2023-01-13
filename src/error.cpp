@@ -1,6 +1,4 @@
-#include <iostream>
 #include <string>
-
 #include "error.h"
 
 namespace eris {

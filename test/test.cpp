@@ -1,24 +1,54 @@
 #include <functional>
-#include <iostream>
 #include <string>
-#include <variant>
 #include <vector>
-#include <cmath>
-struct _Nil {};
-struct _Func;
-struct _make_print_functor {
-std::string operator()(double x) const { return std::to_string(x); }
-std::string operator()(bool x) const { return x ? "true" : "false"; }
-std::string operator()(const std::string& x) const { return x; }
-std::string operator()(const _Nil& x) const { return "nil"; }
-std::string operator()(const _Func& x) const { return "<function>" ;}
+
+struct val_t;
+using func_t = std::function<val_t(const std::vector<val_t>&)};
+struct val_t {
+    enum { NIL, DOUBLE, BOOL, STRING, FUNC } tag;
+    void *ptr; 
+    val_t() { tag = NIL; ptr = nullptr; }
+    val_t(double d) { tag = DOUBLE; ptr = &d; }
+    val_t(bool b) { tag = BOOL; ptr = &b; } 
+    val_t(std::string s) { tag = STRING; ptr = &s; }
+    val_t(func_t f) { tag = FUNC; ptr = &f; }
+    val_t(const val_t& v) {
+        tag = v.tag;
+        switch(tag) {
+        case NIL: {
+            break;
+        }
+        case DOUBLE: {
+            double d = *(double *)v.ptr;
+            ptr = &d;
+            break;
+        }
+        case BOOL: {
+            bool b = *(bool *)v.ptr;
+            ptr = &b;
+            break;
+        }
+        case STRING: {
+            std::string s = *(std::string *)v.ptr;
+            ptr = &s;
+            break;
+        }
+        case FUNC: {
+            func_t f = *(func_t *)v.ptr;
+            ptr = &f;
+            break;
+        }
+        }
+    }
+    operator double() const { return *(double *)ptr; }
+    operator std::string() const { return *(std::string *)ptr; }
+    operator func_t() const { return *(func_t *)ptr;}
 };
-using _Val = std::variant<double, bool, std::string, _Nil, _Func>;
-struct _Func { std::function<_Val (const std::vector<_Val>&)> func; };
-namespace eris{
-_Val print = _Val(_Func{.func = [](const std::vector<_Val>& params){
-std::cout << std::visit(_make_print_functor(),params.at(0)) << '\n'; return _Val(_Nil());}});
-_Val sin = _Val(_Func{.func = [](const std::vector<_Val>& params){
-return _Val(std::sin(std::get<double>(params.at(0))));}});
+
+int main() {
+{
+val_tx = 5.0;
+x;
 }
-int main() {std::get<_Func>(eris::print).func(std::vector<_Val>{std::get<_Func>(eris::sin).func(std::vector<_Val>{_Val(3.140000)})}); return 0; }
+return 0;
+}

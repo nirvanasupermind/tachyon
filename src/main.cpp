@@ -11,6 +11,7 @@
 #include "node.h"
 #include "parser.h"
 #include "parser.h"
+#include "analyzer.h"
 #include "transpiler.h"
 
 void transpile(const std::string& in_filename, const std::string& out_filename, const std::string& text) {
@@ -18,6 +19,8 @@ void transpile(const std::string& in_filename, const std::string& out_filename, 
     std::vector<eris::Token> tokens = lexer.generate_tokens();
     eris::Parser parser(tokens, in_filename);
     std::shared_ptr<eris::Node> node = parser.parse();
+    eris::Analyzer analyzer(in_filename);
+    analyzer.analyze(node.get());
     eris::Transpiler tranpsiler(in_filename);
 
     std::ofstream out_file;
