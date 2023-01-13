@@ -6,9 +6,6 @@
 #include <memory>
 
 namespace eris {
-    // Global environment
-    //     Function environment
-    
     class Env {
     private:
         std::set<std::string> scope{};
