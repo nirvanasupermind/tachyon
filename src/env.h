@@ -7,14 +7,12 @@
 
 namespace eris {
     class Env {
-    private:
+    public:
         std::set<std::string> scope{};
         std::shared_ptr<Env> parent{};
-    public:
         Env();
         Env(std::shared_ptr<Env> parent);
         void check_name(const std::string& name, const std::string& filename, size_t line);
-        void add_name(const std::string& name);
     };
 } // namespace eris
 

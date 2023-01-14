@@ -1,44 +1,68 @@
-#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
 struct val_t;
-using func_t = std::function<val_t(const std::vector<val_t>&)};
+using func_t = std::function<val_t(const std::vector<val_t>&)>;
 struct val_t {
-    enum { NIL, DOUBLE, BOOL, STRING, FUNC } tag;
+    enum { NIL, NUMBER, BOOL, STRING, FUNC } tag;
     void *ptr; 
     val_t() { tag = NIL; ptr = nullptr; }
-    val_t(double d) { tag = DOUBLE; ptr = &d; }
-    val_t(bool b) { tag = BOOL; ptr = &b; } 
-    val_t(std::string s) { tag = STRING; ptr = &s; }
-    val_t(func_t f) { tag = FUNC; ptr = &f; }
+    val_t(double d) {
+        tag = NUMBER;
+        ptr = malloc(sizeof(double));
+        *(double *)ptr = d;
+    }
+    val_t(bool b) {
+        tag = BOOL;
+        ptr = malloc(sizeof(bool));
+        *(bool *)ptr = b;
+    }
+    val_t(const std::string& s) {
+        tag = STRING;
+        ptr = malloc(sizeof(std::string));
+        *(std::string *)ptr = s;
+    }
+    val_t(const func_t& f) {
+        tag = FUNC;
+        ptr = malloc(sizeof(func_t));
+        *(func_t *)ptr = f;
+    }
     val_t(const val_t& v) {
         tag = v.tag;
         switch(tag) {
         case NIL: {
             break;
         }
-        case DOUBLE: {
+        case NUMBER: {
             double d = *(double *)v.ptr;
-            ptr = &d;
+            ptr = malloc(sizeof(double));
+            *(double *)ptr = d;
             break;
         }
         case BOOL: {
             bool b = *(bool *)v.ptr;
-            ptr = &b;
+            ptr = malloc(sizeof(bool));
+            *(bool *)ptr = b;
             break;
         }
         case STRING: {
             std::string s = *(std::string *)v.ptr;
+            ptr = malloc(sizeof(std::string));
+            *(std::string *)ptr = s;
             ptr = &s;
             break;
         }
         case FUNC: {
             func_t f = *(func_t *)v.ptr;
-            ptr = &f;
+            ptr = malloc(sizeof(func_t));
+            *(func_t *)ptr = f;
             break;
         }
         }
+    }
+    ~val_t() {
+        free(ptr);
     }
     operator double() const { return *(double *)ptr; }
     operator std::string() const { return *(std::string *)ptr; }
@@ -46,9 +70,8 @@ struct val_t {
 };
 
 int main() {
-{
-val_tx = 5.0;
-x;
-}
+val_t x=5.0;
+val_t y=3.0;
+std::cout << x+y << '\n';
 return 0;
 }

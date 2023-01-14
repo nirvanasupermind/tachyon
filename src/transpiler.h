@@ -1,10 +1,12 @@
 #ifndef TRANSPILER_H
 #define TRANSPILER_H
 
-#include <string>
-#include <vector>
+#include <memory>
+#include <set>
 #include <sstream>
+#include <string>
 #include "node.h"
+#include "env.h"
 
 namespace eris {
     class Transpiler {
@@ -14,29 +16,31 @@ namespace eris {
         std::ostringstream pre_main_section{};
         std::ostringstream post_main_section{};
         bool include_val_t;
-        void visit(Node* node);
-        void visit(NumberNode* node);
-        void visit(StringNode* node);
-        void visit(IdentifierNode* node);
-        void visit(NilNode* node);
-        void visit(TrueNode* node);
-        void visit(FalseNode* node);
-        void visit(ParenExprNode* node);
-        void visit(CallExprNode* node);
-        void visit(MemberExprNode* node);
-        void visit(UnaryExprNode* node);
-        void visit(BinaryExprNode* node);
-        void visit(AssignmentExprNode* node);
-        void visit(ExprStmtNode* node);
-        void visit(VarDeclStmtNode* node);
-        void visit(BlockStmtNode* node);
-        void visit(IfStmtNode* node);
-        void visit(IfElseStmtNode* node);
-        void visit(WhileStmtNode* node);
-        void visit(ForStmtNode* node);
-        void visit(FuncDeclStmtNode* node);
-        void visit(ReturnStmtNode* node);
-        void visit(ProgramNode* node);
+        std::shared_ptr<Env> global_env;
+        std::set<std::string> obj_props;
+        void visit(std::shared_ptr<Env> env, Node* node);
+        void visit(std::shared_ptr<Env> env, NumberNode* node);
+        void visit(std::shared_ptr<Env> env, StringNode* node);
+        void visit(std::shared_ptr<Env> env, IdentifierNode* node);
+        void visit(std::shared_ptr<Env> env, NilNode* node);
+        void visit(std::shared_ptr<Env> env, TrueNode* node);
+        void visit(std::shared_ptr<Env> env, FalseNode* node);
+        void visit(std::shared_ptr<Env> env, ParenExprNode* node);
+        void visit(std::shared_ptr<Env> env, CallExprNode* node);
+        void visit(std::shared_ptr<Env> env, MemberExprNode* node);
+        void visit(std::shared_ptr<Env> env, UnaryExprNode* node);
+        void visit(std::shared_ptr<Env> env, BinaryExprNode* node);
+        void visit(std::shared_ptr<Env> env, AssignmentExprNode* node);
+        void visit(std::shared_ptr<Env> env, ExprStmtNode* node);
+        void visit(std::shared_ptr<Env> env, VarDeclStmtNode* node);
+        void visit(std::shared_ptr<Env> env, BlockStmtNode* node);
+        void visit(std::shared_ptr<Env> env, IfStmtNode* node);
+        void visit(std::shared_ptr<Env> env, IfElseStmtNode* node);
+        void visit(std::shared_ptr<Env> env, WhileStmtNode* node);
+        void visit(std::shared_ptr<Env> env, ForStmtNode* node);
+        void visit(std::shared_ptr<Env> env, FuncDeclStmtNode* node);
+        void visit(std::shared_ptr<Env> env, ReturnStmtNode* node);
+        void visit(std::shared_ptr<Env> env, ProgramNode* node);
     public:
         Transpiler(const std::string& filename);
         std::string generate_code(Node* node);

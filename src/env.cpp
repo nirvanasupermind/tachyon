@@ -24,8 +24,4 @@ namespace eris {
             raise_error(filename, line, name + " is not defined");
         }
     }
-
-    void Env::add_name(const std::string& name) {
-        scope.insert(name);
-    }
 } // namespace eris
