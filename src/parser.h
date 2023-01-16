@@ -37,6 +37,7 @@ namespace eris {
         std::shared_ptr<Node> for_stmt();
         std::shared_ptr<Node> func_decl_stmt();
         std::shared_ptr<Node> return_stmt();
+        std::shared_ptr<Node> extern_stmt();
         std::shared_ptr<Node> stmt();
         std::shared_ptr<Node> program(TokenType end = TokenType::EOF_);
     public:

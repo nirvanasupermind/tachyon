@@ -16,6 +16,7 @@ namespace eris {
         std::ostringstream pre_main_section{};
         std::ostringstream post_main_section{};
         bool include_val_t;
+        bool include_print;
         std::shared_ptr<Env> global_env;
         std::set<std::string> obj_props;
         void visit(std::shared_ptr<Env> env, Node* node);
@@ -41,6 +42,7 @@ namespace eris {
         void visit(std::shared_ptr<Env> env, FuncDeclStmtNode* node);
         void visit(std::shared_ptr<Env> env, ReturnStmtNode* node);
         void visit(std::shared_ptr<Env> env, ProgramNode* node);
+        std::string escape(const std::string& your_string) const;
     public:
         Transpiler(const std::string& filename);
         std::string generate_code(Node* node);

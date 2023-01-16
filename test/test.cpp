@@ -1,4 +1,6 @@
-#include <iostream>
+#include <cstdio>
+#include <cmath>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -62,7 +64,6 @@ struct val_t {
         }
     }
     ~val_t() {
-        free(ptr);
     }
     operator double() const { return *(double *)ptr; }
     operator std::string() const { return *(std::string *)ptr; }
@@ -70,8 +71,13 @@ struct val_t {
 };
 
 int main() {
-val_t x=5.0;
-val_t y=3.0;
-std::cout << x+y << '\n';
+val_t printf = (func_t)([](const std::vector<val_t>& params) -> val_t {
+    std::printf("%s", ((std::string)(params.at(0))).c_str());
+    return val_t();
+});
+val_t sin = (func_t)([](const std::vector<val_t>& params) -> val_t {
+    return std::sin(params.at(0));
+});
+((func_t)printf)({((func_t)sin)({(double)3.14})});
 return 0;
 }

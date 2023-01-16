@@ -244,10 +244,11 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::return_stmt() {
+        std::size_t line = current.line;
         eat(TokenType::RETURN);
         std::shared_ptr<Node> expr_node = expr();
         eat(TokenType::SEMICOLON);
-        return std::shared_ptr<ReturnStmtNode>(new ReturnStmtNode(expr_node, expr_node->line));
+        return std::shared_ptr<ReturnStmtNode>(new ReturnStmtNode(expr_node, line));
     }
 
     std::shared_ptr<Node> Parser::stmt() {

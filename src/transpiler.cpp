@@ -1,6 +1,9 @@
+#include <memory>
 #include <string>
 #include <vector>
 #include <cmath>
+#include <cctype>
+#include <sstream>
 
 #include "error.h"
 #include "node.h"
@@ -33,6 +36,9 @@ namespace eris {
             break;
         case NodeType::PAREN_EXPR:
             visit(env, dynamic_cast<ParenExprNode*>(node));
+            break;
+        case NodeType::CALL_EXPR:
+            visit(env, dynamic_cast<CallExprNode*>(node));
             break;
         case NodeType::UNARY_EXPR:
             visit(env, dynamic_cast<UnaryExprNode*>(node));
@@ -79,18 +85,25 @@ namespace eris {
     }
 
     void Transpiler::visit(std::shared_ptr<Env> env, NumberNode* node) {
-        post_main_section << node->val;
-        if(std::fmod(node->val, 1) == 0) {
-            post_main_section << ".0";
-        }
+        post_main_section << "(double)" << node->val;
     }
 
     void Transpiler::visit(std::shared_ptr<Env> env, StringNode* node) {
-        post_main_section << node->val;
+        post_main_section << "std::string(\"" << escape(node->val) << "\")";
     }
 
     void Transpiler::visit(std::shared_ptr<Env> env, IdentifierNode* node) {
-        env->check_name(node->val, filename, node->line); 
+        try {
+        env->check_name(node->val, filename, node->line);
+        } catch(const std::exception &e) {
+            if(node->val == "print") {
+                include_val_t = true;
+                include_print = true;
+
+            } else {
+                throw e;
+            }
+        }
         post_main_section << node->val;
     }
 
@@ -112,6 +125,24 @@ namespace eris {
         post_main_section << ')';
     }
 
+    void Transpiler::visit(std::shared_ptr<Env> env, CallExprNode* node) {
+        if (!include_val_t) {
+            include_val_t = true;
+        }
+
+        std::shared_ptr<Env> func_env(new Env(env));
+
+        post_main_section << "((func_t)";
+        visit(env, node->callee.get());
+        post_main_section << ")({";
+        for (std::shared_ptr<Node> param : node->params) {
+            visit(env, param.get());
+            post_main_section << ',';
+        }
+        post_main_section.seekp(-1, std::ios_base::end);
+        post_main_section << "})";
+    }
+
     void Transpiler::visit(std::shared_ptr<Env> env, UnaryExprNode* node) {
         post_main_section << node->op.val;
         visit(env, node->operand_node.get());
@@ -125,14 +156,15 @@ namespace eris {
 
     void Transpiler::visit(std::shared_ptr<Env> env, AssignmentExprNode* node) {
         visit(env, node->node_a.get());
-        if(node->op.type == TokenType::EQ) {
+        if (node->op.type == TokenType::EQ) {
             post_main_section << '=';
             visit(env, node->node_b.get());
-        } else {
+        }
+        else {
             post_main_section << '=';
             visit(env, node->node_a.get());
             post_main_section << node->op.val.front();
-            visit(env, node->node_b.get());            
+            visit(env, node->node_b.get());
         }
     }
 
@@ -153,7 +185,7 @@ namespace eris {
     }
 
     void Transpiler::visit(std::shared_ptr<Env> env, BlockStmtNode* node) {
-        std::shared_ptr<Env> block_env(new Env(env));        
+        std::shared_ptr<Env> block_env(new Env(env));
         post_main_section << "{\n";
         visit(block_env, node->program_node.get());
         post_main_section << "}\n";
@@ -196,19 +228,19 @@ namespace eris {
         if (!include_val_t) {
             include_val_t = true;
         }
-        
+
         std::shared_ptr<Env> func_env(new Env(env));
 
-        post_main_section << "val_t " << node->name << "=func_t([&" << node->name << ',';
-        while(env->parent != nullptr) {
-            for(const std::string& name : env->scope) {
+        post_main_section << "val_t " << node->name << "=(func_t)([&" << node->name << ',';
+        while (env->parent != nullptr) {
+            for (const std::string& name : env->scope) {
                 post_main_section << '&' << name << ',';
             }
             env = env->parent;
         }
         post_main_section.seekp(-1, std::ios_base::end);
         post_main_section << "](const std::vector<val_t>& params)->val_t {\n";
-        for(int i = 0; i < node->params.size(); i++) {
+        for (int i = 0; i < node->params.size(); i++) {
             post_main_section << "val_t " << node->params.at(i) << "=params.at(" << i << ");\n";
             func_env->scope.insert(node->params.at(i));
         }
@@ -222,44 +254,69 @@ namespace eris {
         visit(env, node->expr_node.get());
         post_main_section << ';';
     }
-
+    
     void Transpiler::visit(std::shared_ptr<Env> env, ProgramNode* node) {
         for (std::shared_ptr<Node> stmt : node->stmts) {
             visit(env, stmt.get());
         }
     }
 
+    // Taken from StackOverflow
+    std::string Transpiler::escape(const std::string& your_string) const {
+        // s is our escaped output string
+        std::string s = "";
+        // loop through all characters
+        for (char c : your_string) {
+            // check if a given character is printable
+            // the cast is necessary to avoid undefined behaviour
+            if (isprint((unsigned char)c))
+                s += c;
+            else {
+                std::stringstream stream;
+                // if the character is not printable
+                // we'll convert it to a hex string using a stringstream
+                // note that since char is signed we have to cast it to unsigned first
+                stream << std::hex << (unsigned int)(unsigned char)(c);
+                std::string code = stream.str();
+                s += std::string("\\x") + (code.size() < 2 ? "0" : "") + code;
+                // alternatively for URL encodings:
+                //s += std::string("%")+(code.size()<2?"0":"")+code;
+            }
+        }
+        return s;
+    }
+
     std::string Transpiler::generate_code(Node* node) {
         visit(global_env, node);
         if (include_val_t) {
-            // include_section << "#include <functional>\n";
+            include_section << "#include <functional>\n";
             include_section << "#include <string>\n";
             include_section << "#include <vector>\n";
-            
+
             pre_main_section
                 << "struct val_t;\n"
                 << "using func_t = std::function<val_t(const std::vector<val_t>&)>;\n"
                 << "struct val_t {\n"
                 << "    enum { NIL, NUMBER, BOOL, STRING, FUNC } tag;\n"
                 << "    void *ptr; \n"
-                << "    val_t() { tag = NIL; ptr = nullptr; }\n" 
+                << "    val_t() { tag = NIL; ptr = nullptr; }\n"
                 << "    val_t(double d) {\n"
-                << "        tag = NUMBER;\n" 
+                << "        tag = NUMBER;\n"
                 << "        ptr = malloc(sizeof(double));\n"
                 << "        *(double *)ptr = d;\n"
                 << "    }\n"
                 << "    val_t(bool b) {\n"
-                << "        tag = BOOL;\n" 
+                << "        tag = BOOL;\n"
                 << "        ptr = malloc(sizeof(bool));\n"
                 << "        *(bool *)ptr = b;\n"
                 << "    }\n"
                 << "    val_t(const std::string& s) {\n"
-                << "        tag = STRING;\n" 
+                << "        tag = STRING;\n"
                 << "        ptr = malloc(sizeof(std::string));\n"
                 << "        *(std::string *)ptr = s;\n"
                 << "    }\n"
                 << "    val_t(const func_t& f) {\n"
-                << "        tag = FUNC;\n" 
+                << "        tag = FUNC;\n"
                 << "        ptr = malloc(sizeof(func_t));\n"
                 << "        *(func_t *)ptr = f;\n"
                 << "    }\n"
@@ -297,13 +354,17 @@ namespace eris {
                 << "        }\n"
                 << "    }\n"
                 << "    ~val_t() {\n"
-                << "        free(ptr);\n"
                 << "    }\n"
                 << "    operator double() const { return *(double *)ptr; }\n"
                 << "    operator std::string() const { return *(std::string *)ptr; }\n"
                 << "    operator func_t() const { return *(func_t *)ptr;}\n"
                 << "};\n\n";
         }
+
+        if (include_print) {
+ 
+        }
+
         return include_section.str() + "\n" + pre_main_section.str() + "int main() {\n"
             + post_main_section.str() + "return 0;\n}";
     }
