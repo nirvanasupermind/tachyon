@@ -5,24 +5,16 @@
 #include <sstream>
 #include <vector>
 
-#include "error.h"
-#include "token.h"
-#include "lexer.h"
-#include "node.h"
-#include "parser.h"
-#include "parser.h"
-#include "transpiler.h"
-
 void transpile(const std::string& in_filename, const std::string& out_filename, const std::string& text) {
-    eris::Lexer lexer(text, in_filename);
-    std::vector<eris::Token> tokens = lexer.generate_tokens();
-    eris::Parser parser(tokens, in_filename);
-    std::shared_ptr<eris::Node> node = parser.parse();
-    eris::Transpiler tranpsiler(in_filename);
-
+    // eris::Lexer lexer(text, in_filename);
+    // std::vector<eris::Token> tokens = lexer.generate_tokens();
+    // eris::Parser parser(tokens, in_filename);
+    // std::shared_ptr<eris::Node> tree = parser.parse();
+    // eris::Analyzer analyzer(in_filename);
+    // analyzer.visit(tree);
     std::ofstream out_file;
     out_file.open(out_filename);
-    out_file << tranpsiler.generate_code(node.get());
+    // out_file << tranpsiler.generate_code(node.get());
     out_file.close();
 }
 
