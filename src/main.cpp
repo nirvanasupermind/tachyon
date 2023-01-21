@@ -4,17 +4,21 @@
 #include <memory>
 #include <sstream>
 #include <vector>
+#include "lexer.h"
 
 void transpile(const std::string& in_filename, const std::string& out_filename, const std::string& text) {
-    // eris::Lexer lexer(text, in_filename);
-    // std::vector<eris::Token> tokens = lexer.generate_tokens();
+    eris::Lexer lexer(text, in_filename);
+    std::vector<eris::Token> tokens = lexer.generate_tokens();
     // eris::Parser parser(tokens, in_filename);
     // std::shared_ptr<eris::Node> tree = parser.parse();
     // eris::Analyzer analyzer(in_filename);
     // analyzer.visit(tree);
+    for (int i = 0; i < tokens.size(); i++) {
+        
+        std::cout << tokens.at(i).str() << '\n';
+    }
     std::ofstream out_file;
     out_file.open(out_filename);
-    // out_file << tranpsiler.generate_code(node.get());
     out_file.close();
 }
 
@@ -45,12 +49,11 @@ int main(int argc, char** argv) {
             transpile(in_filename, out_filename, text);
             in_file.close();
         }
-        catch (const std::runtime_error& e) {
-            std::cerr << e.what() << '\n';
-            return 0;
+        catch (const std::string& e) {
+            std::cerr << e << '\n';
+            return 1;
         }
     }
 
     return 0;
 }
-
