@@ -3,7 +3,7 @@
 #include "token.h"
 
 namespace eris {
-    Token::Token(TokenType type, const std::string& val, std::size_t line)
+    Token::Token(TokenType type, const std::string& val, int line)
         : type(type), val(val), line(line) {
     }
 
@@ -33,6 +33,9 @@ namespace eris {
             break;
         case TokenType::SEMICOLON:
             result += "SEMICOLON";
+            break;
+        case TokenType::EOF_:
+            result += "EOF";
             break;
         }
         result += ':';

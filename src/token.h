@@ -12,15 +12,16 @@ namespace eris {
         DIV,
         LPAREN,
         RPAREN,
-        SEMICOLON
+        SEMICOLON,
+        EOF_
     };
     
     class Token {
     public:
         TokenType type;
         std::string val{};
-        size_t line;
-        Token(TokenType type, const std::string& val, size_t line);
+        int line;
+        Token(TokenType type, const std::string& val, int line);
         std::string str() const;  
     };
 } // namespace eris

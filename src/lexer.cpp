@@ -30,7 +30,7 @@ namespace eris {
                 advance();
             } else if (isdigit(current)) {
                 tokens.push_back(generate_number());
-                advance();
+                // advance();
             }
             else if (current == '+') {
                 tokens.push_back(Token(TokenType::PLUS, "+", line));
@@ -57,10 +57,14 @@ namespace eris {
                 advance();
             }
             else if (current == ';') {
-                tokens.push_back(Token(TokenType::SEMICOLON, ")", line));
+                tokens.push_back(Token(TokenType::SEMICOLON, ";", line));
                 advance();
+            } else {
+                throw std::string(filename + ":" + std::to_string(line) + ": illegal character '" + current + "'");
             }
         }
+
+        tokens.push_back(Token(TokenType::EOF_, "<eof>", line));
 
         return tokens;
     }
