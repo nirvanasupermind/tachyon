@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <set>
 #include <functional>
 
 #include "token.h"
@@ -20,8 +21,9 @@ namespace eris {
         void raise_error() const;
         Token eat(TokenType type);
         void advance();
+        std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> expr();
-        std::shared_ptr<Node> binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::vector<TokenType>& op_types);
+        std::shared_ptr<Node> binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types);
         std::shared_ptr<Node> additive_expr();
         std::shared_ptr<Node> multiplicative_expr();
         std::shared_ptr<Node> unary_expr();

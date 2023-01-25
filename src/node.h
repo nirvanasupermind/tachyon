@@ -12,7 +12,7 @@ namespace eris {
         PAREN_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
-        
+        EXPR_STMT
     };
 
     class Node {
@@ -40,19 +40,27 @@ namespace eris {
 
     class UnaryExprNode: public Node {
     public:
-        TokenType op;
+        Token op;
         std::shared_ptr<Node> node;
-        explicit UnaryExprNode(TokenType op, std::shared_ptr<Node> node, int line);
+        explicit UnaryExprNode(Token op, std::shared_ptr<Node> node, int line);
         NodeKind kind() const;
         std::string str() const;
     };
 
     class BinaryExprNode: public Node {
     public:
-        TokenType op;
+        Token op;
         std::shared_ptr<Node> node_a;
         std::shared_ptr<Node> node_b;
-        explicit BinaryExprNode(TokenType op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, int line);
+        explicit BinaryExprNode(Token op, std::shared_ptr<Node> node_a, std::shared_ptr<Node> node_b, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class ExprStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> node;
+        explicit ExprStmtNode(std::shared_ptr<Node> node, int line);
         NodeKind kind() const;
         std::string str() const;
     };

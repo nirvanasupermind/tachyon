@@ -8,18 +8,17 @@
 #include "lexer.h"
 #include "node.h"
 #include "parser.h"
+#include "transpiler.h"
 
 void transpile(const std::string& in_filename, const std::string& out_filename, const std::string& text) {
     eris::Lexer lexer(text, in_filename);
     std::vector<eris::Token> tokens = lexer.generate_tokens();
-    for (int i = 0; i < tokens.size(); i++) {
-        
-        std::cout << tokens.at(i).str() << '\n';
-    }
     eris::Parser parser(tokens, in_filename);
     std::shared_ptr<eris::Node> tree = parser.parse();
+    eris::Transpiler transpiler(in_filename);
     std::ofstream out_file;
     out_file.open(out_filename);
+    out_file << transpiler.generate_code(tree.get());
     out_file.close();
 }
 
