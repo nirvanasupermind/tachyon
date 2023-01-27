@@ -14,7 +14,7 @@ namespace eris {
         if (pos < (int)text.length()) {
             current = text.at(pos);
             pos++;
-            if(current == '\n') {
+            if (current == '\n') {
                 line++;
             }
         }
@@ -26,10 +26,15 @@ namespace eris {
     std::vector<Token> Lexer::generate_tokens() {
         std::vector<Token> tokens;
         while (current != '\0') {
-            if(current == ' ') {
+            if (current == ' ') {
                 advance();
-            } else if (isdigit(current)) {
+            }
+            else if (isdigit(current)) {
                 tokens.push_back(generate_number());
+                // advance();
+            }
+            else if (current == '_' || current == '$' || isalpha(current)) {
+                tokens.push_back(generate_identifier());
                 // advance();
             }
             else if (current == '+') {
@@ -53,13 +58,14 @@ namespace eris {
                 advance();
             }
             else if (current == ')') {
-                tokens.push_back(Token(TokenType::LPAREN, ")", line));
+                tokens.push_back(Token(TokenType::RPAREN, ")", line));
                 advance();
             }
             else if (current == ';') {
                 tokens.push_back(Token(TokenType::SEMICOLON, ";", line));
                 advance();
-            } else {
+            }
+            else {
                 throw std::string(filename + ":" + std::to_string(line) + ": illegal character '" + current + "'");
             }
         }
@@ -73,9 +79,9 @@ namespace eris {
         std::string number_str;
         int decimal_point_count = 0;
         while (current != '\0' && (current == '.' || isdigit(current))) {
-            if(current == '.') {
+            if (current == '.') {
                 decimal_point_count++;
-                if(decimal_point_count >= 2) {
+                if (decimal_point_count >= 2) {
                     break;
                 }
             }
@@ -84,5 +90,14 @@ namespace eris {
             advance();
         }
         return Token(TokenType::NUMBER, number_str, line);
+    }
+
+    Token Lexer::generate_identifier() {
+        std::string identifier_str;
+        while (current != '\0' && (current == '_' || current == '$' || isalpha(current))) {
+            identifier_str = identifier_str + current;
+            advance();
+        }
+        return Token(TokenType::IDENTIFIER, identifier_str, line);
     }
 } // namespace eris

@@ -96,7 +96,7 @@ namespace eris {
 
     void Transpiler::visit(ExprStmtNode* node) {
         visit(node->node.get());
-        post_main_code << ';';
+        post_main_code << ";\n";
     }
 
     std::string Transpiler::generate_code(Node* node) {

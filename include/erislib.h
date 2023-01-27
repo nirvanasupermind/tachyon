@@ -96,7 +96,7 @@ public:
         return ValType::OBJECT;
     }
 
-    std::string str() const {
+    virtual std::string str() const {
         std::ostringstream ss;
         ss << "object: " << this;
         return ss.str();

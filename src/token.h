@@ -6,6 +6,7 @@
 namespace eris {
     enum class TokenType {
         NUMBER,
+        IDENTIFIER,
         PLUS,
         MINUS,
         MUL,

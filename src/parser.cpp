@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -16,7 +15,7 @@ namespace eris {
     }
 
     void Parser::raise_error() const {
-        throw std::string(filename + ":" + std::to_string(current.line) + ": invalid syntax (unexpected " + current.val + "");
+        throw std::string(filename + ":" + std::to_string(current.line) + ": invalid syntax (unexpected '" + current.val + "')");
     }
 
     void Parser::advance() {
@@ -60,6 +59,7 @@ namespace eris {
             node_a = std::shared_ptr<BinaryExprNode>(new BinaryExprNode(op, node_a, node_b, node_a->line));
         }
 
+
         return node_a;
     }
 
@@ -76,8 +76,7 @@ namespace eris {
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
             return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op, unary_expr(), op.line));
-        }
-        else {
+        } else {
             return primary_expr();
         }
     }
