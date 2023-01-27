@@ -14,7 +14,3 @@ var Vec2 = {
 
 var vec2 = {x: 3, y: 4, proto: Vec2};
 System.print(vec2.mag()); // 5
-```
-
-```
-
