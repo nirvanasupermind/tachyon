@@ -26,7 +26,7 @@ namespace eris {
     std::vector<Token> Lexer::generate_tokens() {
         std::vector<Token> tokens;
         while (current != '\0') {
-            if (current == ' ') {
+            if (isspace(current)) {
                 advance();
             }
             else if (isdigit(current)) {

@@ -18,6 +18,7 @@ namespace eris {
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
         void visit(ExprStmtNode* node);
+        void visit(StmtListNode* node);
     public:
         static std::string boilerplate;
         Transpiler(const std::string& filename);

@@ -48,5 +48,15 @@ namespace eris {
 
     NodeKind ExprStmtNode::kind() const {
         return NodeKind::EXPR_STMT;
-    }    
+    }   
+    
+    StmtListNode::StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line)
+        : stmts(stmts) {
+        this->line = line;
+    }
+
+    NodeKind StmtListNode::kind() const {
+        return NodeKind::STMT_LIST;
+    }
+     
 } // namespace eris

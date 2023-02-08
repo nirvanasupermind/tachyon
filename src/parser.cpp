@@ -36,7 +36,16 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::parse() {
-        return expr_stmt();
+        return stmt_list();
+    }
+
+    std::shared_ptr<Node> Parser::stmt_list() {
+        int line = current.line;
+        std::vector<std::shared_ptr<Node> > stmts;
+        while(current.type != TokenType::EOF_) {
+            stmts.push_back(expr_stmt());
+        }
+        return std::shared_ptr<StmtListNode>(new StmtListNode(stmts, line));
     }
 
     std::shared_ptr<Node> Parser::expr_stmt() {

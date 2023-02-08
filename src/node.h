@@ -1,8 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 #include "token.h"
 
 namespace eris {
@@ -12,7 +13,8 @@ namespace eris {
         PAREN_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
-        EXPR_STMT
+        EXPR_STMT,
+        STMT_LIST
     };
 
     class Node {
@@ -61,6 +63,14 @@ namespace eris {
     public:
         std::shared_ptr<Node> node;
         explicit ExprStmtNode(std::shared_ptr<Node> node, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class StmtListNode: public Node {
+    public:
+        std::vector<std::shared_ptr<Node> > stmts;
+        explicit StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line);
         NodeKind kind() const;
         std::string str() const;
     };

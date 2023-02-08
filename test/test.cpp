@@ -1,6 +1,6 @@
-#include "erislib.h"
+#include "../src/eris.h"
 int main(int argc, char** argv) {
-    eris_init();
-(new Number(1+static_cast<Number*>((new Number(2*3)))->val));
+(ErisVal::make_num(1)+ErisVal::make_num(2))*ErisVal::make_num(3);
+ErisVal::make_num(4);
     return 0;
 }
