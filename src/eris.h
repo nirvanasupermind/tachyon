@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cmath>
 
 // A copy of this file will be included in every transpiled program
 
@@ -64,6 +65,36 @@ public:
     ErisVal operator/(const ErisVal& other) const {
         assert(tag == NUM && other.tag == NUM);
         return ErisVal::make_num(n / other.n);
+    }
+
+    ErisVal operator%(const ErisVal& other) const {
+        assert(tag == NUM && other.tag == NUM);
+        return ErisVal::make_num(std::fmod(n, other.n));
+    }
+
+    ErisVal operator<<(const ErisVal& other) const {
+        assert(tag == NUM && other.tag == NUM);
+        return ErisVal::make_num((int)n << (int)other.n);
+    }
+
+    ErisVal operator>>(const ErisVal& other) const {
+        assert(tag == NUM && other.tag == NUM);
+        return ErisVal::make_num((int)n >> (int)other.n);
+    }
+
+    ErisVal operator&(const ErisVal& other) const {
+        assert(tag == NUM && other.tag == NUM);
+        return ErisVal::make_num((int)n & (int)other.n);
+    }
+
+    ErisVal operator|(const ErisVal& other) const {
+        assert(tag == NUM && other.tag == NUM);
+        return ErisVal::make_num((int)n | (int)other.n);
+    }
+
+    ErisVal operator^(const ErisVal& other) const {
+        assert(tag == NUM && other.tag == NUM);
+        return ErisVal::make_num((int)n ^ (int)other.n);
     }
 
     ErisVal operator<(const ErisVal& other) const {

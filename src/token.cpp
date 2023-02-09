@@ -28,6 +28,18 @@ namespace eris {
         case TokenType::DIV:
             result += "DIV";
             break;
+        case TokenType::MOD:
+            result += "MOD";
+        case TokenType::SL:
+            result += "SL";
+        case TokenType::SR:
+            result += "SR";
+        case TokenType::BITAND:
+            result += "BITAND";
+        case TokenType::BITOR:
+            result += "BITOR";
+        case TokenType::BITXOR:
+            result += "BITXOR";
         case TokenType::LPAREN:
             result += "LPAREN";
             break;

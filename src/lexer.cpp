@@ -53,6 +53,38 @@ namespace eris {
                 tokens.push_back(Token(TokenType::DIV, "/", line));
                 advance();
             }
+            else if (current == '%') {
+                tokens.push_back(Token(TokenType::MOD, "%", line));
+                advance();
+            }
+            else if (current == '<') {
+                int ln = line;
+                advance();
+                if (current == '<') {
+                    tokens.push_back(Token(TokenType::SR, "<<", ln));
+                    advance();
+                }
+            }
+            else if (current == '>') {
+                int ln = line;
+                advance();
+                if (current == '>') {
+                    tokens.push_back(Token(TokenType::SL, ">>", ln));
+                    advance();
+                }
+            }
+            else if (current == '&') {
+                tokens.push_back(Token(TokenType::BITAND, "&", line));
+                advance();
+            }
+            else if (current == '|') {
+                tokens.push_back(Token(TokenType::BITOR, "|", line));
+                advance();
+            }
+            else if (current == '^') {
+                tokens.push_back(Token(TokenType::BITXOR, "^", line));
+                advance();
+            }
             else if (current == '(') {
                 tokens.push_back(Token(TokenType::LPAREN, "(", line));
                 advance();

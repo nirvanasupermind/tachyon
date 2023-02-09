@@ -55,7 +55,7 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::expr() {
-        return additive_expr();
+        return bitor_expr();
     }
 
     std::shared_ptr<Node> Parser::binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types) {
@@ -72,12 +72,28 @@ namespace eris {
         return node_a;
     }
 
+    std::shared_ptr<Node> Parser::bitor_expr() {
+        return binary_expr([this]() { return bitxor_expr(); }, { TokenType::BITOR });
+    }
+
+    std::shared_ptr<Node> Parser::bitxor_expr() {
+        return binary_expr([this]() { return bitand_expr(); }, { TokenType::BITXOR });
+    }
+
+    std::shared_ptr<Node> Parser::bitand_expr() {
+        return binary_expr([this]() { return shift_expr(); }, { TokenType::BITAND });
+    }
+
+    std::shared_ptr<Node> Parser::shift_expr() {
+        return binary_expr([this]() { return additive_expr(); }, { TokenType::SL, TokenType::SR });
+    }
+
     std::shared_ptr<Node> Parser::additive_expr() {
         return binary_expr([this]() { return multiplicative_expr(); }, { TokenType::PLUS, TokenType::MINUS });
     }
 
     std::shared_ptr<Node> Parser::multiplicative_expr() {
-        return binary_expr([this]() { return unary_expr(); }, { TokenType::MUL, TokenType::DIV });
+        return binary_expr([this]() { return unary_expr(); }, { TokenType::MUL, TokenType::DIV, TokenType::MOD });
     }
 
     std::shared_ptr<Node> Parser::unary_expr() {
