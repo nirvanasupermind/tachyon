@@ -55,7 +55,7 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::expr() {
-        return bitor_expr();
+        return or_expr();
     }
 
     std::shared_ptr<Node> Parser::binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types) {
@@ -70,6 +70,18 @@ namespace eris {
 
 
         return node_a;
+    }
+
+    std::shared_ptr<Node> Parser::or_expr() {
+        return binary_expr([this]() { return xor_expr(); }, { TokenType::OR });
+    }
+
+    std::shared_ptr<Node> Parser::xor_expr() {
+        return binary_expr([this]() { return and_expr(); }, { TokenType::XOR });
+    }
+
+    std::shared_ptr<Node> Parser::and_expr() {
+        return binary_expr([this]() { return bitor_expr(); }, { TokenType::AND });
     }
 
     std::shared_ptr<Node> Parser::bitor_expr() {

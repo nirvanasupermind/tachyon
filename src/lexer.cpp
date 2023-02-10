@@ -109,16 +109,34 @@ namespace eris {
                 }
             }
             else if (current == '&') {
-                tokens.push_back(Token(TokenType::BITAND, "&", line));
+                int ln = line;
                 advance();
+                if (current == '&') {
+                    tokens.push_back(Token(TokenType::AND, "&&", ln));
+                    advance();
+                } else {
+                    tokens.push_back(Token(TokenType::BITAND, "&", ln));
+                }
             }
             else if (current == '|') {
-                tokens.push_back(Token(TokenType::BITOR, "|", line));
+                int ln = line;
                 advance();
+                if (current == '|') {
+                    tokens.push_back(Token(TokenType::OR, "||", ln));
+                    advance();
+                } else {
+                    tokens.push_back(Token(TokenType::BITOR, "|", ln));
+                }
             }
             else if (current == '^') {
-                tokens.push_back(Token(TokenType::BITXOR, "^", line));
+                int ln = line;
                 advance();
+                if (current == '^') {
+                    tokens.push_back(Token(TokenType::XOR, "^^", ln));
+                    advance();
+                } else {
+                    tokens.push_back(Token(TokenType::BITXOR, "^", ln));
+                }
             }
             else if (current == '(') {
                 tokens.push_back(Token(TokenType::LPAREN, "(", line));

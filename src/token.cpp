@@ -52,6 +52,12 @@ namespace eris {
             result += "BITOR";
         case TokenType::BITXOR:
             result += "BITXOR";
+        case TokenType::AND:
+            result += "BITAND";
+        case TokenType::OR:
+            result += "BITOR";
+        case TokenType::XOR:
+            result += "BITXOR";
         case TokenType::EQ:
             result += "EQ";
             break;

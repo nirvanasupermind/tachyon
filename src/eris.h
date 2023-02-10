@@ -107,6 +107,16 @@ public:
         return ErisVal::make_num((int)n ^ (int)other.n);
     }
 
+    ErisVal operator&&(const ErisVal& other) const {
+        assert(tag == BOOL && other.tag == BOOL);
+        return ErisVal::make_bool(n && other.n);
+    }
+
+    ErisVal operator||(const ErisVal& other) const {
+        assert(tag == BOOL && other.tag == BOOL);
+        return ErisVal::make_bool(n || other.n);
+    }
+
     ErisVal operator<(const ErisVal& other) const {
         assert(tag == NUM && other.tag == NUM);
         return ErisVal::make_bool(n < other.n);

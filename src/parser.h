@@ -25,6 +25,9 @@ namespace eris {
         std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> expr();
         std::shared_ptr<Node> binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types);
+        std::shared_ptr<Node> xor_expr();
+        std::shared_ptr<Node> or_expr();
+        std::shared_ptr<Node> and_expr();
         std::shared_ptr<Node> bitor_expr();
         std::shared_ptr<Node> bitxor_expr();
         std::shared_ptr<Node> bitand_expr();

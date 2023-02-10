@@ -46,11 +46,11 @@ namespace eris {
     }
 
     void Transpiler::visit(TrueNode* node) {
-        post_main_code << "ErisVal::make_true()";
+        post_main_code << "ErisVal::make_bool(true)";
     }
 
     void Transpiler::visit(FalseNode* node) {
-        post_main_code << "ErisVal::make_false()";
+        post_main_code << "ErisVal::make_bool(false)";
     }
 
     void Transpiler::visit(CharNode* node) {
@@ -73,10 +73,13 @@ namespace eris {
     }
 
     void Transpiler::visit(BinaryExprNode* node) {
-        std::cout << "A" << '\n';
         post_main_code << '(';
         visit(node->node_a.get());
+        if(node->op.val == "^^") {
+            post_main_code << "!=";
+        } else {
         post_main_code << node->op.val;
+        }
         visit(node->node_b.get());
         post_main_code << ')';
     }
