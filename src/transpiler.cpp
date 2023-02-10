@@ -20,6 +20,8 @@ namespace eris {
             return visit(static_cast<TrueNode*>(node));
         case NodeKind::FALSE:
             return visit(static_cast<FalseNode*>(node));
+        case NodeKind::CHAR:
+            return visit(static_cast<CharNode*>(node));
         case NodeKind::PAREN_EXPR:
             return visit(static_cast<ParenExprNode*>(node));
         case NodeKind::BINARY_EXPR:
@@ -49,6 +51,12 @@ namespace eris {
 
     void Transpiler::visit(FalseNode* node) {
         post_main_code << "ErisVal::make_false()";
+    }
+
+    void Transpiler::visit(CharNode* node) {
+        post_main_code << "ErisVal::make_char('";
+        post_main_code << node->val;
+        post_main_code << "')";
     }
 
     void Transpiler::visit(ParenExprNode* node) {

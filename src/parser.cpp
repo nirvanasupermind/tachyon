@@ -122,6 +122,10 @@ namespace eris {
             advance();
             return std::shared_ptr<NilNode>(new NilNode(token.line));
         };
+        case TokenType::CHAR: {
+            advance();
+            return std::shared_ptr<CharNode>(new CharNode(token.val.at(1), token.line));
+        };
         case TokenType::TRUE: {
             advance();
             return std::shared_ptr<TrueNode>(new TrueNode(token.line));

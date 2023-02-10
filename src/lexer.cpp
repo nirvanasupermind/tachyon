@@ -37,6 +37,15 @@ namespace eris {
                 tokens.push_back(generate_identifier());
                 // advance();
             }
+            else if (current == '\'') {
+                advance();
+                char val = current;
+                advance();
+                if(current == '\'') {
+                    tokens.push_back(Token(TokenType::CHAR, std::string("'") + val + std::string("'"), line));
+                    advance();
+                }
+            }
             else if (current == '+') {
                 tokens.push_back(Token(TokenType::PLUS, "+", line));
                 advance();

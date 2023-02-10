@@ -13,6 +13,7 @@ namespace eris {
         NUMBER,
         TRUE,
         FALSE,
+        CHAR,
         PAREN_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
@@ -52,6 +53,14 @@ namespace eris {
     class FalseNode: public Node {
     public:
         explicit FalseNode(int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class CharNode: public Node {
+    public:
+        char val;
+        explicit CharNode(char val, int line);
         NodeKind kind() const;
         std::string str() const;
     };

@@ -37,6 +37,15 @@ namespace eris {
         return NodeKind::FALSE;
     }
 
+    CharNode::CharNode(char val, int line)
+        : val(val) {
+        this->line = line;
+    }
+
+    NodeKind CharNode::kind() const {
+        return NodeKind::CHAR;
+    }
+
     ParenExprNode::ParenExprNode(std::shared_ptr<Node> node, int line)
         : node(node) {
         this->line = line;

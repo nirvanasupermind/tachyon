@@ -13,6 +13,9 @@ namespace eris {
         case TokenType::NUMBER:
             result += "NUMBER";
             break;
+        case TokenType::CHAR:
+            result += "CHAR";
+            break;
         case TokenType::IDENTIFIER:
             result += "IDENTIFIER";
             break;
