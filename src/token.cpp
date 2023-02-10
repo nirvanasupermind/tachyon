@@ -16,6 +16,15 @@ namespace eris {
         case TokenType::IDENTIFIER:
             result += "IDENTIFIER";
             break;
+        case TokenType::NIL:
+            result += "NIL";
+            break;
+        case TokenType::TRUE:
+            result += "TRUE";
+            break;
+        case TokenType::FALSE:
+            result += "FALSE";
+            break;
         case TokenType::PLUS:
             result += "PLUS";
             break;
@@ -40,6 +49,24 @@ namespace eris {
             result += "BITOR";
         case TokenType::BITXOR:
             result += "BITXOR";
+        case TokenType::EQ:
+            result += "EQ";
+            break;
+        case TokenType::NE:
+            result += "NE";
+            break;
+        case TokenType::LT:
+            result += "LT";
+            break;
+        case TokenType::LE:
+            result += "LE";
+            break;
+        case TokenType::GT:
+            result += "GT";
+            break;
+        case TokenType::GE:
+            result += "GE";
+            break;
         case TokenType::LPAREN:
             result += "LPAREN";
             break;

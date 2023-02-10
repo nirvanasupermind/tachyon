@@ -9,7 +9,10 @@
 namespace eris {
 
     enum class NodeKind {
+        NIL,
         NUMBER,
+        TRUE,
+        FALSE,
         PAREN_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
@@ -24,10 +27,31 @@ namespace eris {
         virtual ~Node() = default;
     };
 
+    class NilNode: public Node {
+    public:
+        explicit NilNode(int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
     class NumberNode: public Node {
     public:
-        double value;
-        explicit NumberNode(double value, int line);
+        double val;
+        explicit NumberNode(double val, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class TrueNode: public Node {
+    public:
+        explicit TrueNode(int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+    
+    class FalseNode: public Node {
+    public:
+        explicit FalseNode(int line);
         NodeKind kind() const;
         std::string str() const;
     };

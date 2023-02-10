@@ -9,12 +9,14 @@ public:
     enum {
         NIL,
         NUM,
-        BOOL
+        BOOL,
+        CHAR
     } tag;
 
     union {
         double n;
         bool b;
+        char c;
     };
 
     static ErisVal make_nil() {
@@ -34,6 +36,14 @@ public:
         ErisVal result;
         result.tag = BOOL;
         result.b = b;
+        return result;
+    }
+
+
+    static ErisVal make_char(char c) {
+        ErisVal result;
+        result.tag = CHAR;
+        result.c = c;
         return result;
     }
 

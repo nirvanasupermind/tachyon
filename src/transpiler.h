@@ -13,7 +13,10 @@ namespace eris {
         std::ostringstream post_main_code{};
         std::set<std::string> included_headers{};
         void visit(Node* node);
+        void visit(NilNode* node);
         void visit(NumberNode* node);
+        void visit(TrueNode* node);
+        void visit(FalseNode* node);        
         void visit(ParenExprNode* node);
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);

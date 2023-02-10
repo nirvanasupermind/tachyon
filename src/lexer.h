@@ -3,9 +3,16 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "token.h"
 
 namespace eris {
+    const std::map<std::string, TokenType> KEYWORDS{
+        {"nil", TokenType::NIL},
+        {"true", TokenType::TRUE},
+        {"false", TokenType::FALSE}
+    };
+
     class Lexer {
     private:
         std::string text{};

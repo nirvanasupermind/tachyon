@@ -4,13 +4,37 @@
 #include "node.h"
 
 namespace eris {
-    NumberNode::NumberNode(double value, int line)
-        : value(value) {
+    NilNode::NilNode(int line) {
+        this->line = line;
+    }
+
+    NodeKind NilNode::kind() const {
+        return NodeKind::NIL;
+    }
+
+    NumberNode::NumberNode(double val, int line)
+        : val(val) {
         this->line = line;
     }
 
     NodeKind NumberNode::kind() const {
         return NodeKind::NUMBER;
+    }
+
+    TrueNode::TrueNode(int line) {
+        this->line = line;
+    }
+
+    NodeKind TrueNode::kind() const {
+        return NodeKind::TRUE;
+    }
+
+    FalseNode::FalseNode(int line) {
+        this->line = line;
+    }
+
+    NodeKind FalseNode::kind() const {
+        return NodeKind::FALSE;
     }
 
     ParenExprNode::ParenExprNode(std::shared_ptr<Node> node, int line)

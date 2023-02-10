@@ -42,7 +42,7 @@ namespace eris {
     std::shared_ptr<Node> Parser::stmt_list() {
         int line = current.line;
         std::vector<std::shared_ptr<Node> > stmts;
-        while(current.type != TokenType::EOF_) {
+        while (current.type != TokenType::EOF_) {
             stmts.push_back(expr_stmt());
         }
         return std::shared_ptr<StmtListNode>(new StmtListNode(stmts, line));
@@ -81,7 +81,15 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::bitand_expr() {
-        return binary_expr([this]() { return shift_expr(); }, { TokenType::BITAND });
+        return binary_expr([this]() { return equality_expr(); }, { TokenType::BITAND });
+    }
+
+    std::shared_ptr<Node> Parser::equality_expr() {
+        return binary_expr([this]() { return comp_expr(); }, { TokenType::EQ, TokenType::NE });
+    }
+
+    std::shared_ptr<Node> Parser::comp_expr() {
+        return binary_expr([this]() { return shift_expr(); }, { TokenType::LT, TokenType::LE, TokenType::GT, TokenType::GE });
     }
 
     std::shared_ptr<Node> Parser::shift_expr() {
@@ -101,7 +109,8 @@ namespace eris {
         if (op.type == TokenType::PLUS || op.type == TokenType::MINUS) {
             advance();
             return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op, unary_expr(), op.line));
-        } else {
+        }
+        else {
             return primary_expr();
         }
     }
@@ -109,6 +118,18 @@ namespace eris {
     std::shared_ptr<Node> Parser::primary_expr() {
         Token token = current;
         switch (token.type) {
+        case TokenType::NIL: {
+            advance();
+            return std::shared_ptr<NilNode>(new NilNode(token.line));
+        };
+        case TokenType::TRUE: {
+            advance();
+            return std::shared_ptr<TrueNode>(new TrueNode(token.line));
+        };
+        case TokenType::FALSE: {
+            advance();
+            return std::shared_ptr<FalseNode>(new FalseNode(token.line));
+        };
         case TokenType::NUMBER: {
             advance();
             return std::shared_ptr<NumberNode>(new NumberNode(std::stod(token.val), token.line));

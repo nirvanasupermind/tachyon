@@ -1,6 +1,6 @@
-#include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "token.h"
 #include "lexer.h"
 
@@ -57,12 +57,33 @@ namespace eris {
                 tokens.push_back(Token(TokenType::MOD, "%", line));
                 advance();
             }
+            else if (current == '=') {
+                int ln = line;
+                advance();
+                if (current == '=') {
+                    tokens.push_back(Token(TokenType::EQ, "==", ln));
+                    advance();
+                }
+            }
+            else if (current == '!') {
+                int ln = line;
+                advance();
+                if (current == '=') {
+                    tokens.push_back(Token(TokenType::NE, "!=", ln));
+                    advance();
+                }
+            }
             else if (current == '<') {
                 int ln = line;
                 advance();
                 if (current == '<') {
                     tokens.push_back(Token(TokenType::SR, "<<", ln));
                     advance();
+                } else if(current == '=') {
+                    tokens.push_back(Token(TokenType::LE, "<=", ln));
+                    advance();
+                } else {
+                    tokens.push_back(Token(TokenType::LT, "<", ln));
                 }
             }
             else if (current == '>') {
@@ -71,6 +92,11 @@ namespace eris {
                 if (current == '>') {
                     tokens.push_back(Token(TokenType::SL, ">>", ln));
                     advance();
+                } else if(current == '=') {
+                    tokens.push_back(Token(TokenType::GE, ">=", ln));
+                    advance();
+                } else {
+                    tokens.push_back(Token(TokenType::GT, ">", ln));
                 }
             }
             else if (current == '&') {
@@ -129,6 +155,9 @@ namespace eris {
         while (current != '\0' && (current == '_' || current == '$' || isalpha(current))) {
             identifier_str = identifier_str + current;
             advance();
+        }
+        if (KEYWORDS.count(identifier_str)) {
+            return Token(KEYWORDS.at(identifier_str), identifier_str, line);
         }
         return Token(TokenType::IDENTIFIER, identifier_str, line);
     }

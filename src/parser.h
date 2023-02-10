@@ -28,6 +28,8 @@ namespace eris {
         std::shared_ptr<Node> bitor_expr();
         std::shared_ptr<Node> bitxor_expr();
         std::shared_ptr<Node> bitand_expr();
+        std::shared_ptr<Node> equality_expr();
+        std::shared_ptr<Node> comp_expr();
         std::shared_ptr<Node> shift_expr();
         std::shared_ptr<Node> additive_expr();
         std::shared_ptr<Node> multiplicative_expr();

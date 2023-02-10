@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <set>
@@ -11,8 +12,14 @@ namespace eris {
 
     void Transpiler::visit(Node* node) {
         switch (node->kind()) {
+        case NodeKind::NIL:
+            return visit(static_cast<NilNode*>(node));
         case NodeKind::NUMBER:
             return visit(static_cast<NumberNode*>(node));
+        case NodeKind::TRUE:
+            return visit(static_cast<TrueNode*>(node));
+        case NodeKind::FALSE:
+            return visit(static_cast<FalseNode*>(node));
         case NodeKind::PAREN_EXPR:
             return visit(static_cast<ParenExprNode*>(node));
         case NodeKind::BINARY_EXPR:
@@ -26,10 +33,22 @@ namespace eris {
         }
     }
 
+    void Transpiler::visit(NilNode* node) {
+        post_main_code << "ErisVal::make_nil()";
+    }
+
     void Transpiler::visit(NumberNode* node) {
         post_main_code << "ErisVal::make_num(";
-        post_main_code << node->value;
+        post_main_code << node->val;
         post_main_code << ')';
+    }
+
+    void Transpiler::visit(TrueNode* node) {
+        post_main_code << "ErisVal::make_true()";
+    }
+
+    void Transpiler::visit(FalseNode* node) {
+        post_main_code << "ErisVal::make_false()";
     }
 
     void Transpiler::visit(ParenExprNode* node) {
@@ -46,6 +65,7 @@ namespace eris {
     }
 
     void Transpiler::visit(BinaryExprNode* node) {
+        std::cout << "A" << '\n';
         post_main_code << '(';
         visit(node->node_a.get());
         post_main_code << node->op.val;
