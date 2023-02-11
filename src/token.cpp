@@ -28,6 +28,9 @@ namespace eris {
         case TokenType::FALSE:
             result += "FALSE";
             break;
+        case TokenType::VAR:
+            result += "VAR";
+            break;
         case TokenType::PLUS:
             result += "PLUS";
             break;
@@ -60,6 +63,9 @@ namespace eris {
             result += "BITXOR";
         case TokenType::EQ:
             result += "EQ";
+            break;
+        case TokenType::EE:
+            result += "EE";
             break;
         case TokenType::NE:
             result += "NE";

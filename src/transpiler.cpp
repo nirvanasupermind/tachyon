@@ -28,6 +28,8 @@ namespace eris {
             return visit(static_cast<BinaryExprNode*>(node));
         case NodeKind::EXPR_STMT:
             return visit(static_cast<ExprStmtNode*>(node));
+        case NodeKind::VAR_DECL_STMT:
+            return visit(static_cast<VarDeclStmtNode*>(node));
         case NodeKind::STMT_LIST:
             return visit(static_cast<StmtListNode*>(node));
         default:
@@ -86,6 +88,14 @@ namespace eris {
 
     void Transpiler::visit(ExprStmtNode* node) {
         visit(node->node.get());
+        post_main_code << ";\n";
+    }
+
+    void Transpiler::visit(VarDeclStmtNode* node) {
+        post_main_code << "ErisVal ";
+        post_main_code << node->name;
+        post_main_code << '=';
+        visit(node->val.get());
         post_main_code << ";\n";
     }
 

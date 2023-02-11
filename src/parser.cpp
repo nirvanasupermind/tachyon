@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -43,9 +44,28 @@ namespace eris {
         int line = current.line;
         std::vector<std::shared_ptr<Node> > stmts;
         while (current.type != TokenType::EOF_) {
-            stmts.push_back(expr_stmt());
+            stmts.push_back(stmt());
+            // std::cout << "ejq" << '\n';
         }
         return std::shared_ptr<StmtListNode>(new StmtListNode(stmts, line));
+    }
+
+    std::shared_ptr<Node> Parser::stmt() {
+        if(current.type == TokenType::VAR) {
+            return var_decl_stmt();
+        } else {
+            return expr_stmt();
+        }
+    }
+
+    std::shared_ptr<Node> Parser::var_decl_stmt() {
+        int line = current.line;
+        eat(TokenType::VAR);
+        std::string name = eat(TokenType::IDENTIFIER).val;
+        eat(TokenType::EQ);
+        std::shared_ptr<Node> val = expr();
+        eat(TokenType::SEMICOLON);
+        return std::shared_ptr<VarDeclStmtNode>(new VarDeclStmtNode(name, val, line));
     }
 
     std::shared_ptr<Node> Parser::expr_stmt() {
@@ -67,7 +87,6 @@ namespace eris {
             std::shared_ptr<Node> node_b = operand();
             node_a = std::shared_ptr<BinaryExprNode>(new BinaryExprNode(op, node_a, node_b, node_a->line));
         }
-
 
         return node_a;
     }
@@ -97,7 +116,7 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::equality_expr() {
-        return binary_expr([this]() { return comp_expr(); }, { TokenType::EQ, TokenType::NE });
+        return binary_expr([this]() { return comp_expr(); }, { TokenType::EE, TokenType::NE });
     }
 
     std::shared_ptr<Node> Parser::comp_expr() {

@@ -10,7 +10,8 @@ namespace eris {
     const std::map<std::string, TokenType> KEYWORDS{
         {"nil", TokenType::NIL},
         {"true", TokenType::TRUE},
-        {"false", TokenType::FALSE}
+        {"false", TokenType::FALSE},
+        {"var", TokenType::VAR}
     };
 
     class Lexer {

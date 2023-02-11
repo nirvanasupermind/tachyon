@@ -7,7 +7,6 @@
 #include "token.h"
 
 namespace eris {
-
     enum class NodeKind {
         NIL,
         NUMBER,
@@ -18,6 +17,7 @@ namespace eris {
         UNARY_EXPR,
         BINARY_EXPR,
         EXPR_STMT,
+        VAR_DECL_STMT,
         STMT_LIST
     };
 
@@ -100,6 +100,15 @@ namespace eris {
         std::string str() const;
     };
 
+    class VarDeclStmtNode: public Node {
+    public:
+        std::string name;
+        std::shared_ptr<Node> val;
+        explicit VarDeclStmtNode(const std::string& name, std::shared_ptr<Node> val, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
     class StmtListNode: public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;
@@ -107,6 +116,7 @@ namespace eris {
         NodeKind kind() const;
         std::string str() const;
     };
+
 } // namespace eris
 
 #endif // NODE_H

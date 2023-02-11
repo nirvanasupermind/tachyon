@@ -73,7 +73,6 @@ namespace eris {
         return NodeKind::BINARY_EXPR;
     }  
 
-
     ExprStmtNode::ExprStmtNode(std::shared_ptr<Node> node, int line)
         : node(node) {
         this->line = line;
@@ -82,7 +81,16 @@ namespace eris {
     NodeKind ExprStmtNode::kind() const {
         return NodeKind::EXPR_STMT;
     }   
+
+    VarDeclStmtNode::VarDeclStmtNode(const std::string& name, std::shared_ptr<Node> val, int line)
+        : name(name), val(val) {
+        this->line = line;
+    }
     
+    NodeKind VarDeclStmtNode::kind() const {
+        return NodeKind::VAR_DECL_STMT;
+    }
+
     StmtListNode::StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line)
         : stmts(stmts) {
         this->line = line;

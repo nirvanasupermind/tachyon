@@ -70,8 +70,10 @@ namespace eris {
                 int ln = line;
                 advance();
                 if (current == '=') {
-                    tokens.push_back(Token(TokenType::EQ, "==", ln));
+                    tokens.push_back(Token(TokenType::EE, "==", ln));
                     advance();
+                } else {
+                    tokens.push_back(Token(TokenType::EQ, "=", ln));
                 }
             }
             else if (current == '!') {

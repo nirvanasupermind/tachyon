@@ -22,6 +22,7 @@ namespace eris {
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
         void visit(ExprStmtNode* node);
+        void visit(VarDeclStmtNode* node);
         void visit(StmtListNode* node);
     public:
         static std::string boilerplate;
