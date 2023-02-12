@@ -31,6 +31,15 @@ namespace eris {
         case TokenType::VAR:
             result += "VAR";
             break;
+        case TokenType::BLOCK:
+            result += "BLOCK";
+            break;
+        case TokenType::IF:
+            result += "IF";
+            break;
+        case TokenType::WHILE:
+            result += "WHILE";
+            break;
         case TokenType::PLUS:
             result += "PLUS";
             break;
@@ -45,20 +54,28 @@ namespace eris {
             break;
         case TokenType::MOD:
             result += "MOD";
+            break;
         case TokenType::SL:
             result += "SL";
+            break;
         case TokenType::SR:
             result += "SR";
+            break;
         case TokenType::BITAND:
             result += "BITAND";
+            break;
         case TokenType::BITOR:
             result += "BITOR";
+            break;
         case TokenType::BITXOR:
             result += "BITXOR";
+            break;
         case TokenType::AND:
             result += "BITAND";
+            break;
         case TokenType::OR:
             result += "BITOR";
+            break;
         case TokenType::XOR:
             result += "BITXOR";
         case TokenType::EQ:
@@ -87,6 +104,12 @@ namespace eris {
             break;
         case TokenType::RPAREN:
             result += "RPAREN";
+            break;
+        case TokenType::LCURLY:
+            result += "LCURLY";
+            break;
+        case TokenType::RCURLY:
+            result += "RCURLY";
             break;
         case TokenType::SEMICOLON:
             result += "SEMICOLON";

@@ -16,6 +16,8 @@ namespace eris {
             return visit(static_cast<NilNode*>(node));
         case NodeKind::NUMBER:
             return visit(static_cast<NumberNode*>(node));
+        case NodeKind::IDENTIFIER:
+            return visit(static_cast<IdentifierNode*>(node));
         case NodeKind::TRUE:
             return visit(static_cast<TrueNode*>(node));
         case NodeKind::FALSE:
@@ -30,6 +32,12 @@ namespace eris {
             return visit(static_cast<ExprStmtNode*>(node));
         case NodeKind::VAR_DECL_STMT:
             return visit(static_cast<VarDeclStmtNode*>(node));
+        case NodeKind::BLOCK_STMT:
+            return visit(static_cast<BlockStmtNode*>(node));
+        case NodeKind::IF_STMT:
+            return visit(static_cast<IfStmtNode*>(node));
+         case NodeKind::WHILE_STMT:
+            return visit(static_cast<WhileStmtNode*>(node));
         case NodeKind::STMT_LIST:
             return visit(static_cast<StmtListNode*>(node));
         default:
@@ -45,6 +53,10 @@ namespace eris {
         post_main_code << "ErisVal::make_num(";
         post_main_code << node->val;
         post_main_code << ')';
+    }
+
+    void Transpiler::visit(IdentifierNode* node) {
+        post_main_code << node->val;
     }
 
     void Transpiler::visit(TrueNode* node) {
@@ -97,6 +109,26 @@ namespace eris {
         post_main_code << '=';
         visit(node->val.get());
         post_main_code << ";\n";
+    }
+
+    void Transpiler::visit(BlockStmtNode* node) {
+        post_main_code << "{";
+        visit(node->node.get());
+        post_main_code << "}\n";
+    }
+
+    void Transpiler::visit(IfStmtNode* node) {
+        post_main_code << "if((";
+        visit(node->test.get());
+        post_main_code << ").b)";
+        visit(node->body.get());
+    }
+
+    void Transpiler::visit(WhileStmtNode* node) {
+        post_main_code << "while((";
+        visit(node->test.get());
+        post_main_code << ").b)";
+        visit(node->body.get());
     }
 
     void Transpiler::visit(StmtListNode* node) {

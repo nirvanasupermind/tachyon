@@ -12,6 +12,9 @@ namespace eris {
         TRUE,
         FALSE,
         VAR,
+        BLOCK,
+        IF,
+        WHILE,
         PLUS,
         MINUS,
         MUL,
@@ -34,6 +37,8 @@ namespace eris {
         GE,
         LPAREN,
         RPAREN,
+        LCURLY,
+        RCURLY,
         SEMICOLON,
         EOF_
     };

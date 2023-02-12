@@ -11,7 +11,10 @@ namespace eris {
         {"nil", TokenType::NIL},
         {"true", TokenType::TRUE},
         {"false", TokenType::FALSE},
-        {"var", TokenType::VAR}
+        {"var", TokenType::VAR},
+        {"block", TokenType::BLOCK},
+        {"if", TokenType::IF},
+        {"while", TokenType::WHILE},
     };
 
     class Lexer {

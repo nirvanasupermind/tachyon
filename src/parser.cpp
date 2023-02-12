@@ -40,22 +40,60 @@ namespace eris {
         return stmt_list();
     }
 
-    std::shared_ptr<Node> Parser::stmt_list() {
+    std::shared_ptr<Node> Parser::stmt_list(TokenType end) {
         int line = current.line;
         std::vector<std::shared_ptr<Node> > stmts;
-        while (current.type != TokenType::EOF_) {
+        while (current.type != end) {
             stmts.push_back(stmt());
-            // std::cout << "ejq" << '\n';
         }
         return std::shared_ptr<StmtListNode>(new StmtListNode(stmts, line));
     }
 
     std::shared_ptr<Node> Parser::stmt() {
-        if(current.type == TokenType::VAR) {
+        if (current.type == TokenType::VAR) {
             return var_decl_stmt();
-        } else {
+        }
+        else if(current.type == TokenType::BLOCK) {
+            advance();
+            return block_stmt();
+        }
+        else if(current.type == TokenType::IF) {
+            return if_stmt();
+        }
+        else if(current.type == TokenType::WHILE) {
+            return while_stmt();
+        }
+        else {
             return expr_stmt();
         }
+    }
+
+    std::shared_ptr<Node> Parser::while_stmt() {
+        int line = current.line;
+        eat(TokenType::WHILE);
+        eat(TokenType::LPAREN);
+        std::shared_ptr<Node> test = expr();
+        eat(TokenType::RPAREN);
+        std::shared_ptr<Node> body = block_stmt();
+        return std::shared_ptr<IfStmtNode>(new IfStmtNode(test, body, line));
+    }
+
+    std::shared_ptr<Node> Parser::if_stmt() {
+        int line = current.line;
+        eat(TokenType::IF);
+        eat(TokenType::LPAREN);
+        std::shared_ptr<Node> test = expr();
+        eat(TokenType::RPAREN);
+        std::shared_ptr<Node> body = block_stmt();
+        return std::shared_ptr<IfStmtNode>(new IfStmtNode(test, body, line));
+    }
+    
+    std::shared_ptr<Node> Parser::block_stmt() {
+        int line = current.line;
+        eat(TokenType::LCURLY);
+        std::shared_ptr<Node> node = stmt_list(TokenType::RCURLY);
+        eat(TokenType::RCURLY);
+        return std::shared_ptr<BlockStmtNode>(new BlockStmtNode(node, line));
     }
 
     std::shared_ptr<Node> Parser::var_decl_stmt() {
@@ -75,7 +113,20 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::expr() {
-        return or_expr();
+        return assignment_expr();
+    }
+
+    std::shared_ptr<Node> Parser::assignment_expr() {
+        std::shared_ptr<Node> node_a = or_expr();
+
+        if (current.type == TokenType::EQ) {
+            Token op = current;
+            advance();
+            std::shared_ptr<Node> node_b = expr();
+            node_a = std::shared_ptr<BinaryExprNode>(new BinaryExprNode(op, node_a, node_b, node_a->line));
+        }
+
+        return node_a;
     }
 
     std::shared_ptr<Node> Parser::binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types) {
@@ -153,9 +204,13 @@ namespace eris {
             advance();
             return std::shared_ptr<NilNode>(new NilNode(token.line));
         };
-        case TokenType::CHAR: {
+        case TokenType::NUMBER: {
             advance();
-            return std::shared_ptr<CharNode>(new CharNode(token.val.at(1), token.line));
+            return std::shared_ptr<NumberNode>(new NumberNode(std::stod(token.val), token.line));
+        };
+        case TokenType::IDENTIFIER: {
+            advance();
+            return std::shared_ptr<IdentifierNode>(new IdentifierNode(token.val, token.line));
         };
         case TokenType::TRUE: {
             advance();
@@ -165,9 +220,9 @@ namespace eris {
             advance();
             return std::shared_ptr<FalseNode>(new FalseNode(token.line));
         };
-        case TokenType::NUMBER: {
+        case TokenType::CHAR: {
             advance();
-            return std::shared_ptr<NumberNode>(new NumberNode(std::stod(token.val), token.line));
+            return std::shared_ptr<CharNode>(new CharNode(token.val.at(1), token.line));
         };
         case TokenType::LPAREN: {
             advance();

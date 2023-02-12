@@ -148,6 +148,14 @@ namespace eris {
                 tokens.push_back(Token(TokenType::RPAREN, ")", line));
                 advance();
             }
+            else if (current == '{') {
+                tokens.push_back(Token(TokenType::LCURLY, "{", line));
+                advance();
+            }
+            else if (current == '}') {
+                tokens.push_back(Token(TokenType::RCURLY, "}", line));
+                advance();
+            }
             else if (current == ';') {
                 tokens.push_back(Token(TokenType::SEMICOLON, ";", line));
                 advance();

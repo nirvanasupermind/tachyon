@@ -10,6 +10,7 @@ namespace eris {
     enum class NodeKind {
         NIL,
         NUMBER,
+        IDENTIFIER,
         TRUE,
         FALSE,
         CHAR,
@@ -18,7 +19,10 @@ namespace eris {
         BINARY_EXPR,
         EXPR_STMT,
         VAR_DECL_STMT,
-        STMT_LIST
+        STMT_LIST,
+        BLOCK_STMT,
+        IF_STMT,
+        WHILE_STMT
     };
 
     class Node {
@@ -39,6 +43,14 @@ namespace eris {
     public:
         double val;
         explicit NumberNode(double val, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class IdentifierNode: public Node {
+    public:
+        std::string val;
+        explicit IdentifierNode(const std::string& val, int line);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -117,6 +129,31 @@ namespace eris {
         std::string str() const;
     };
 
+    class BlockStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> node;
+        explicit BlockStmtNode(std::shared_ptr<Node> node, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class IfStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> test;    
+        std::shared_ptr<Node> body;
+        explicit IfStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> node, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class WhileStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> test;    
+        std::shared_ptr<Node> body;
+        explicit WhileStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> node, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
 } // namespace eris
 
 #endif // NODE_H

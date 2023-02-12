@@ -1,3 +1,6 @@
+#ifndef ERIS_H
+#define ERIS_H
+
 #include <cassert>
 #include <cmath>
 
@@ -38,7 +41,6 @@ public:
         result.b = b;
         return result;
     }
-
 
     static ErisVal make_char(char c) {
         ErisVal result;
@@ -153,3 +155,5 @@ public:
         return ErisVal::make_bool(!(operator==(other)).b);
     }
 };
+
+#endif // ERIS_Hs

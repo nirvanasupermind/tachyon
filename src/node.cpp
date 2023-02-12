@@ -21,6 +21,15 @@ namespace eris {
         return NodeKind::NUMBER;
     }
 
+    IdentifierNode::IdentifierNode(const std::string& val, int line)
+        : val(val) {
+        this->line = line;
+    }
+
+    NodeKind IdentifierNode::kind() const {
+        return NodeKind::IDENTIFIER;
+    }
+
     TrueNode::TrueNode(int line) {
         this->line = line;
     }
@@ -100,4 +109,31 @@ namespace eris {
         return NodeKind::STMT_LIST;
     }
      
+    BlockStmtNode::BlockStmtNode(std::shared_ptr<Node> node, int line)
+        : node(node) {
+        this->line = line;
+    }
+
+    NodeKind BlockStmtNode::kind() const {
+        return NodeKind::BLOCK_STMT;
+    }
+
+    IfStmtNode::IfStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, int line)
+        : test(test), body(body) {
+        this->line = line;
+    }
+
+    NodeKind IfStmtNode::kind() const {
+        return NodeKind::IF_STMT;
+    }
+
+    WhileStmtNode::WhileStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, int line)
+        : test(test), body(body) {
+        this->line = line;
+    }
+
+    NodeKind WhileStmtNode::kind() const {
+        return NodeKind::WHILE_STMT;
+    }
+
 } // namespace eris

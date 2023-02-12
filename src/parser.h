@@ -21,11 +21,15 @@ namespace eris {
         void raise_error() const;
         Token eat(TokenType type);
         void advance();
-        std::shared_ptr<Node> stmt_list();
+        std::shared_ptr<Node> stmt_list(TokenType end = TokenType::EOF_);
         std::shared_ptr<Node> stmt();
+        std::shared_ptr<Node> while_stmt();
+        std::shared_ptr<Node> if_stmt();
+        std::shared_ptr<Node> block_stmt();
         std::shared_ptr<Node> var_decl_stmt();
         std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> expr();
+        std::shared_ptr<Node> assignment_expr();
         std::shared_ptr<Node> binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types);
         std::shared_ptr<Node> xor_expr();
         std::shared_ptr<Node> or_expr();
