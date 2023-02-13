@@ -27,7 +27,9 @@ namespace eris {
         void visit(BlockStmtNode* node);
         void visit(StmtListNode* node);
         void visit(IfStmtNode* node);        
+        void visit(IfElseStmtNode* node);
         void visit(WhileStmtNode* node);
+        void visit(ForStmtNode* node);
     public:
         static std::string boilerplate;
         Transpiler(const std::string& filename);

@@ -127,6 +127,24 @@ namespace eris {
         return NodeKind::IF_STMT;
     }
 
+    IfElseStmtNode::IfElseStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, std::shared_ptr<Node> alternate, int line)
+        : test(test), body(body), alternate(alternate) {
+        this->line = line;
+    }
+
+    NodeKind IfElseStmtNode::kind() const {
+        return NodeKind::IF_ELSE_STMT;
+    }
+
+    ForStmtNode::ForStmtNode(std::shared_ptr<Node> init, std::shared_ptr<Node> test, std::shared_ptr<Node> update, std::shared_ptr<Node> body, int line)
+        : init(init), test(test), update(update), body(body) {
+        this->line = line;
+    }
+
+    NodeKind ForStmtNode::kind() const {
+        return NodeKind::FOR_STMT;
+    }
+
     WhileStmtNode::WhileStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, int line)
         : test(test), body(body) {
         this->line = line;

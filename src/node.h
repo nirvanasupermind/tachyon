@@ -22,6 +22,8 @@ namespace eris {
         STMT_LIST,
         BLOCK_STMT,
         IF_STMT,
+        IF_ELSE_STMT,
+        FOR_STMT,
         WHILE_STMT
     };
 
@@ -141,7 +143,17 @@ namespace eris {
     public:
         std::shared_ptr<Node> test;    
         std::shared_ptr<Node> body;
-        explicit IfStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> node, int line);
+        explicit IfStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class IfElseStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> test;    
+        std::shared_ptr<Node> body;
+        std::shared_ptr<Node> alternate;
+        explicit IfElseStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, std::shared_ptr<Node> alternate, int line);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -150,10 +162,22 @@ namespace eris {
     public:
         std::shared_ptr<Node> test;    
         std::shared_ptr<Node> body;
-        explicit WhileStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> node, int line);
+        explicit WhileStmtNode(std::shared_ptr<Node> test, std::shared_ptr<Node> body, int line);
         NodeKind kind() const;
         std::string str() const;
     };
+
+    class ForStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> init;    
+        std::shared_ptr<Node> test;    
+        std::shared_ptr<Node> update;    
+        std::shared_ptr<Node> body;
+        explicit ForStmtNode(std::shared_ptr<Node> init, std::shared_ptr<Node> test, std::shared_ptr<Node> update, std::shared_ptr<Node> body, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
 } // namespace eris
 
 #endif // NODE_H

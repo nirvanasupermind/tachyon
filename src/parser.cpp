@@ -63,9 +63,25 @@ namespace eris {
         else if(current.type == TokenType::WHILE) {
             return while_stmt();
         }
+        else if(current.type == TokenType::FOR) {
+            return for_stmt();
+        }        
         else {
             return expr_stmt();
         }
+    }
+
+    std::shared_ptr<Node> Parser::for_stmt() {
+        int line = current.line;
+        eat(TokenType::FOR);
+        eat(TokenType::LPAREN);
+        std::shared_ptr<Node> init = var_decl_stmt();
+        std::shared_ptr<Node> test = expr();
+        eat(TokenType::SEMICOLON);
+        std::shared_ptr<Node> update = expr();
+        eat(TokenType::RPAREN);
+        std::shared_ptr<Node> body = block_stmt();
+        return std::shared_ptr<ForStmtNode>(new ForStmtNode(init, test, update, body, line));
     }
 
     std::shared_ptr<Node> Parser::while_stmt() {
@@ -85,6 +101,11 @@ namespace eris {
         std::shared_ptr<Node> test = expr();
         eat(TokenType::RPAREN);
         std::shared_ptr<Node> body = block_stmt();
+        if(current.type == TokenType::ELSE) {
+            advance();
+            std::shared_ptr<Node> alternate = block_stmt();            
+            return std::shared_ptr<IfElseStmtNode>(new IfElseStmtNode(test, body, alternate, line));
+        }
         return std::shared_ptr<IfStmtNode>(new IfStmtNode(test, body, line));
     }
     

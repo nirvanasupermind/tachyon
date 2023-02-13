@@ -37,7 +37,13 @@ namespace eris {
         case TokenType::IF:
             result += "IF";
             break;
+        case TokenType::ELSE:
+            result += "IF";
+            break;
         case TokenType::WHILE:
+            result += "WHILE";
+            break;
+        case TokenType::FOR:
             result += "WHILE";
             break;
         case TokenType::PLUS:

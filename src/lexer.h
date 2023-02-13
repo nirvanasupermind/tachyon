@@ -14,7 +14,9 @@ namespace eris {
         {"var", TokenType::VAR},
         {"block", TokenType::BLOCK},
         {"if", TokenType::IF},
+        {"else", TokenType::ELSE},
         {"while", TokenType::WHILE},
+        {"for", TokenType::FOR},
     };
 
     class Lexer {
