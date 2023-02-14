@@ -71,6 +71,25 @@ namespace eris {
         }
     }
 
+    std::shared_ptr<Node> Parser::func_decl_stmt() {
+        int line = current.line;
+        eat(TokenType::DEF);
+        std::string name = eat(TokenType::IDENTIFIER).val;
+        std::vector<std::string> args;
+        eat(TokenType::LPAREN);
+        while(current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
+            args.push_back(eat(TokenType::IDENTIFIER).val);
+            if(current.type == TokenType::RPAREN) {
+                break; 
+            } else {
+                eat(TokenType::COMMA);            
+            }
+        }
+        eat(TokenType::RPAREN);
+        std::shared_ptr<Node> body = block_stmt();
+        return std::shared_ptr<FuncDeclStmtNode>(new FuncDeclStmtNode(name, args, body, line));
+    }
+
     std::shared_ptr<Node> Parser::for_stmt() {
         int line = current.line;
         eat(TokenType::FOR);
@@ -188,7 +207,7 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::equality_expr() {
-        return binary_expr([this]() { return comp_expr(); }, { TokenType::EE, TokenType::NE });
+        return binary_expr([this]() { return bcomp_expr(); }, { TokenType::EE, TokenType::NE });
     }
 
     std::shared_ptr<Node> Parser::comp_expr() {

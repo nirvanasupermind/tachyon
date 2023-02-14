@@ -17,6 +17,8 @@ namespace eris {
         ELSE,
         WHILE,
         FOR,
+        DEF,
+        LAMBDA,
         PLUS,
         MINUS,
         MUL,
@@ -41,6 +43,7 @@ namespace eris {
         RPAREN,
         LCURLY,
         RCURLY,
+        COMMA,
         SEMICOLON,
         EOF_
     };

@@ -19,12 +19,13 @@ namespace eris {
         BINARY_EXPR,
         EXPR_STMT,
         VAR_DECL_STMT,
-        STMT_LIST,
         BLOCK_STMT,
         IF_STMT,
         IF_ELSE_STMT,
+        WHILE_STMT,
         FOR_STMT,
-        WHILE_STMT
+        FUNC_DECL_STMT,
+        STMT_LIST
     };
 
     class Node {
@@ -123,14 +124,6 @@ namespace eris {
         std::string str() const;
     };
 
-    class StmtListNode: public Node {
-    public:
-        std::vector<std::shared_ptr<Node> > stmts;
-        explicit StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line);
-        NodeKind kind() const;
-        std::string str() const;
-    };
-
     class BlockStmtNode: public Node {
     public:
         std::shared_ptr<Node> node;
@@ -178,6 +171,23 @@ namespace eris {
         std::string str() const;
     };
 
+    class FuncDeclStmtNode: public Node {
+    public:
+        std::string name;
+        std::vector<std::string> args;
+        std::shared_ptr<Node> body;
+        explicit FuncDeclStmtNode(const std::string& name, const std::vector<std::string>& args, std::shared_ptr<Node> body, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class StmtListNode: public Node {
+    public:
+        std::vector<std::shared_ptr<Node> > stmts;
+        explicit StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
 } // namespace eris
 
 #endif // NODE_H

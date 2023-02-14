@@ -44,7 +44,10 @@ namespace eris {
             result += "WHILE";
             break;
         case TokenType::FOR:
-            result += "WHILE";
+            result += "FOR";
+            break;
+        case TokenType::DEF:
+            result += "DEF";
             break;
         case TokenType::PLUS:
             result += "PLUS";
@@ -116,6 +119,9 @@ namespace eris {
             break;
         case TokenType::RCURLY:
             result += "RCURLY";
+            break;
+        case TokenType::COMMA:
+            result += "COMMA";
             break;
         case TokenType::SEMICOLON:
             result += "SEMICOLON";

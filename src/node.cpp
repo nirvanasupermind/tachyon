@@ -80,7 +80,7 @@ namespace eris {
 
     NodeKind BinaryExprNode::kind() const {
         return NodeKind::BINARY_EXPR;
-    }  
+    }
 
     ExprStmtNode::ExprStmtNode(std::shared_ptr<Node> node, int line)
         : node(node) {
@@ -89,26 +89,17 @@ namespace eris {
 
     NodeKind ExprStmtNode::kind() const {
         return NodeKind::EXPR_STMT;
-    }   
+    }
 
     VarDeclStmtNode::VarDeclStmtNode(const std::string& name, std::shared_ptr<Node> val, int line)
         : name(name), val(val) {
         this->line = line;
     }
-    
+
     NodeKind VarDeclStmtNode::kind() const {
         return NodeKind::VAR_DECL_STMT;
     }
 
-    StmtListNode::StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line)
-        : stmts(stmts) {
-        this->line = line;
-    }
-
-    NodeKind StmtListNode::kind() const {
-        return NodeKind::STMT_LIST;
-    }
-     
     BlockStmtNode::BlockStmtNode(std::shared_ptr<Node> node, int line)
         : node(node) {
         this->line = line;
@@ -154,4 +145,21 @@ namespace eris {
         return NodeKind::WHILE_STMT;
     }
 
+    FuncDeclStmtNode::FuncDeclStmtNode(const std::string& name, const std::vector<std::string>& args, std::shared_ptr<Node> body, int line)
+        : name(name), args(args), body(body) {
+        this->line = line;
+    }
+
+    NodeKind FuncDeclStmtNode::kind() const {
+        return NodeKind::FUNC_DECL_STMT;
+    }
+
+    StmtListNode::StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line)
+        : stmts(stmts) {
+        this->line = line;
+    }
+
+    NodeKind StmtListNode::kind() const {
+        return NodeKind::STMT_LIST;
+    }
 } // namespace eris

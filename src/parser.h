@@ -23,6 +23,7 @@ namespace eris {
         void advance();
         std::shared_ptr<Node> stmt_list(TokenType end = TokenType::EOF_);
         std::shared_ptr<Node> stmt();
+        std::shared_ptr<Node> func_decl_stmt();
         std::shared_ptr<Node> for_stmt();
         std::shared_ptr<Node> while_stmt();
         std::shared_ptr<Node> if_stmt();

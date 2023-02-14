@@ -3,6 +3,8 @@
 
 #include <cassert>
 #include <cmath>
+#include <functional>
+#include <vector>
 
 // A copy of this file will be included in every transpiled program
 
@@ -13,14 +15,17 @@ public:
         NIL,
         NUM,
         BOOL,
-        CHAR
+        CHAR,
+        FUNC
     } tag;
 
     union {
         double n;
         bool b;
         char c;
+        std::function<ErisVal(std::vector<ErisVal>)>* f;
     };
+
 
     static ErisVal make_nil() {
         ErisVal result;
@@ -46,6 +51,13 @@ public:
         ErisVal result;
         result.tag = CHAR;
         result.c = c;
+        return result;
+    }
+
+    static ErisVal make_func(std::function<ErisVal(std::vector<ErisVal>)>& f) {
+        ErisVal result;
+        result.tag = CHAR;
+        result.f = &f;
         return result;
     }
 
