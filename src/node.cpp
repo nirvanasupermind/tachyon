@@ -64,6 +64,15 @@ namespace eris {
         return NodeKind::PAREN_EXPR;
     }
 
+    LambdaExprNode::LambdaExprNode(const std::vector<std::string>& args, std::shared_ptr<Node> body, int line)
+        : args(args), body(body) {
+        this->line = line;
+    }
+
+    NodeKind LambdaExprNode::kind() const {
+        return NodeKind::LAMBDA_EXPR;
+    }
+
     UnaryExprNode::UnaryExprNode(Token op, std::shared_ptr<Node> node, int line)
         : op(op), node(node) {
         this->line = line;

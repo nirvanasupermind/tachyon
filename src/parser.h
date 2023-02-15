@@ -45,6 +45,7 @@ namespace eris {
         std::shared_ptr<Node> additive_expr();
         std::shared_ptr<Node> multiplicative_expr();
         std::shared_ptr<Node> unary_expr();
+        std::shared_ptr<Node> lambda_expr();
         std::shared_ptr<Node> primary_expr();
     public:
         Parser(const std::vector<Token>& tokens, const std::string& filename);

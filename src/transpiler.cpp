@@ -26,6 +26,10 @@ namespace eris {
             return visit(static_cast<CharNode*>(node));
         case NodeKind::PAREN_EXPR:
             return visit(static_cast<ParenExprNode*>(node));
+        case NodeKind::LAMBDA_EXPR:
+            return visit(static_cast<LambdaExprNode*>(node));
+        case NodeKind::UNARY_EXPR:
+            return visit(static_cast<UnaryExprNode*>(node));
         case NodeKind::BINARY_EXPR:
             return visit(static_cast<BinaryExprNode*>(node));
         case NodeKind::EXPR_STMT:
@@ -44,6 +48,8 @@ namespace eris {
             return visit(static_cast<ForStmtNode*>(node));
         case NodeKind::STMT_LIST:
             return visit(static_cast<StmtListNode*>(node));
+        case NodeKind::FUNC_DECL_STMT:
+            return visit(static_cast<FuncDeclStmtNode*>(node));
         default:
             throw std::string(filename + ":" + std::to_string(node->line) + ": unknown AST node type");
         }
@@ -109,6 +115,21 @@ namespace eris {
         post_main_code << ";";
     }
 
+    void Transpiler::visit(LambdaExprNode* node) {
+        post_main_code << "(ErisVal::make_func([&](const std::vector<ErisVal>& args) {\n";
+        for(int i = 0; i < node->args.size(); i++) {
+            post_main_code << "ErisVal " << node->args.at(i) << " = args.at(" << i << ");\n";
+        }
+        if(node->body->kind() == NodeKind::BLOCK_STMT) {
+        visit(node->body.get());
+        post_main_code << "\nreturn ErisVal::make_nil();\n}))";
+        } else {
+        post_main_code << "return ";
+        visit(node->body.get());
+        post_main_code << ";\n}))";
+        }
+    }
+    
     void Transpiler::visit(VarDeclStmtNode* node) {
         post_main_code << "ErisVal ";
         post_main_code << node->name;
@@ -156,6 +177,15 @@ namespace eris {
         visit(node->update.get());
         post_main_code << ") ";
         visit(node->body.get());
+    }
+    
+    void Transpiler::visit(FuncDeclStmtNode* node) {
+        post_main_code << "ErisVal " << node->name << " = ErisVal::make_func([&](const std::vector<ErisVal>& args) {\n";
+        for(int i = 0; i < node->args.size(); i++) {
+            post_main_code << "ErisVal " << node->args.at(i) << " = args.at(" << i << ");\n";
+        }
+        visit(node->body.get());
+        post_main_code << "\nreturn ErisVal::make_nil();\n});";
     }
     
     void Transpiler::visit(StmtListNode* node) {

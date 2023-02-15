@@ -23,7 +23,7 @@ public:
         double n;
         bool b;
         char c;
-        std::function<ErisVal(std::vector<ErisVal>)>* f;
+        const std::function<ErisVal(std::vector<ErisVal>)>* f;
     };
 
 
@@ -54,9 +54,9 @@ public:
         return result;
     }
 
-    static ErisVal make_func(std::function<ErisVal(std::vector<ErisVal>)>& f) {
+    static ErisVal make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f) {
         ErisVal result;
-        result.tag = CHAR;
+        result.tag = FUNC;
         result.f = &f;
         return result;
     }

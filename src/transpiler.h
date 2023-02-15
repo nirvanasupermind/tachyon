@@ -20,6 +20,7 @@ namespace eris {
         void visit(FalseNode* node);        
         void visit(CharNode* node);
         void visit(ParenExprNode* node);
+        void visit(LambdaExprNode* node);
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
         void visit(ExprStmtNode* node);
@@ -30,6 +31,7 @@ namespace eris {
         void visit(IfElseStmtNode* node);
         void visit(WhileStmtNode* node);
         void visit(ForStmtNode* node);
+        void visit(FuncDeclStmtNode* node);
     public:
         static std::string boilerplate;
         Transpiler(const std::string& filename);

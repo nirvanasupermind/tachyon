@@ -49,6 +49,9 @@ namespace eris {
         case TokenType::DEF:
             result += "DEF";
             break;
+        case TokenType::LAMBDA:
+            result += "LAMBDA";
+            break;
         case TokenType::PLUS:
             result += "PLUS";
             break;

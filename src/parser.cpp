@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -65,7 +64,10 @@ namespace eris {
         }
         else if(current.type == TokenType::FOR) {
             return for_stmt();
-        }        
+        } 
+        else if(current.type == TokenType::DEF) {
+            return func_decl_stmt();
+        }      
         else {
             return expr_stmt();
         }
@@ -207,7 +209,7 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::equality_expr() {
-        return binary_expr([this]() { return bcomp_expr(); }, { TokenType::EE, TokenType::NE });
+        return binary_expr([this]() { return comp_expr(); }, { TokenType::EE, TokenType::NE });
     }
 
     std::shared_ptr<Node> Parser::comp_expr() {
@@ -237,8 +239,32 @@ namespace eris {
         }
     }
 
+    std::shared_ptr<Node> Parser::lambda_expr() {
+        int line = current.line;
+        eat(TokenType::LAMBDA);
+        std::vector<std::string> args;
+        eat(TokenType::LPAREN);
+        while(current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
+            args.push_back(eat(TokenType::IDENTIFIER).val);
+            if(current.type == TokenType::RPAREN) {
+                break; 
+            } else {
+                eat(TokenType::COMMA);            
+            }
+        }
+        eat(TokenType::RPAREN);
+        std::shared_ptr<Node> body;
+        if(current.type == TokenType::LCURLY) {
+            body = block_stmt();
+        } else {
+            body = expr();
+        }
+        return std::shared_ptr<LambdaExprNode>(new LambdaExprNode(args, body, line));
+    }
+
     std::shared_ptr<Node> Parser::primary_expr() {
         Token token = current;
+
         switch (token.type) {
         case TokenType::NIL: {
             advance();
@@ -269,6 +295,9 @@ namespace eris {
             std::shared_ptr<Node> expr_node = expr();
             eat(TokenType::RPAREN);
             return std::shared_ptr<ParenExprNode>(new ParenExprNode(expr_node, token.line));
+        };
+        case TokenType::LAMBDA: {
+           return lambda_expr();
         };
         default:
             raise_error();
