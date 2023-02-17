@@ -4,9 +4,43 @@
 #include <cassert>
 #include <cmath>
 #include <functional>
+#include <string>
 #include <vector>
+#include <map>
 
 // A copy of this file will be included in every transpiled program
+
+class ErisObject {
+public:
+    std::map<std::string, ErisVal> map{};
+
+    ErisObject() = default;
+
+    ErisObject(std::map<std::string, ErisVal> map)
+        : map(map) {
+    }
+
+    ErisVal get(const std::string& key) const {
+        if(!(map.count(key)) && map.count("proto")) {
+            return map.at("proto").o->get(key);
+        } else {
+            return map.at(key);
+        }
+    }
+    
+    void set(const std::string& key, const ErisVal& val) {
+        map[key] = val;
+    }
+};
+
+class ErisFunc : public ErisObject {
+public:
+    std::function<ErisVal(std::vector<ErisVal>)> f;
+    ErisFunc(const std::function<ErisVal(std::vector<ErisVal>)>& f)
+        : f(f) {
+
+    }
+};
 
 // Tagged union
 class ErisVal {
@@ -16,14 +50,15 @@ public:
         NUM,
         BOOL,
         CHAR,
-        FUNC
+        FUNC,
+        OBJECT
     } tag;
 
     union {
         double n;
         bool b;
         char c;
-        const std::function<ErisVal(std::vector<ErisVal>)>* f;
+        ErisObject* o;
     };
 
 
@@ -57,7 +92,7 @@ public:
     static ErisVal make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f) {
         ErisVal result;
         result.tag = FUNC;
-        result.f = &f;
+        result.o = new ErisFunc(f);
         return result;
     }
 

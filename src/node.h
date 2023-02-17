@@ -14,6 +14,7 @@ namespace eris {
         TRUE,
         FALSE,
         CHAR,
+        CALL_EXPR,
         PAREN_EXPR,
         LAMBDA_EXPR,
         UNARY_EXPR,
