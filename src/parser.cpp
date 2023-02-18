@@ -261,6 +261,25 @@ namespace eris {
         }
     }
 
+    std::shared_ptr<Node> Parser::object_expr() {
+        int line = current.line;
+        std::vector<std::string> keys;
+        std::vector<std::shared_ptr<Node> > vals;
+        eat(TokenType::LCURLY);
+        while(current.type != TokenType::EOF_ && current.type != TokenType::RCURLY) {
+            keys.push_back(eat(TokenType::IDENTIFIER).val);
+            eat(TokenType::COLON);
+            vals.push_back(expr());
+            if(current.type == TokenType::RCURLY) {
+                break; 
+            } else {
+                eat(TokenType::COMMA);            
+            }
+        }
+        eat(TokenType::RCURLY);
+        return std::shared_ptr<ObjectExprNode>(new ObjectExprNode(keys, vals, line));
+    }
+
     std::shared_ptr<Node> Parser::lambda_expr() {
         int line = current.line;
         eat(TokenType::LAMBDA);
@@ -320,6 +339,9 @@ namespace eris {
         };
         case TokenType::LAMBDA: {
            return lambda_expr();
+        };
+        case TokenType::LCURLY: {
+           return object_expr();
         };
         default:
             raise_error();

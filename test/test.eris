@@ -1,2 +1,1 @@
-var sqr = lambda (x) x * x;
-sqr(5);
+var x = {a: 2, b: 3};

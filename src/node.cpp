@@ -119,6 +119,15 @@ namespace eris {
         return NodeKind::VAR_DECL_STMT;
     }
 
+    ObjectExprNode::ObjectExprNode(const std::vector<std::strings>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line)
+        : keys(keys), vals(vals) {
+        this->line = line;
+    }
+
+    NodeKind ObjectExprNode::kind() const {
+        return NodeKind::OBJECT_EXPR;
+    }
+    
     BlockStmtNode::BlockStmtNode(std::shared_ptr<Node> node, int line)
         : node(node) {
         this->line = line;
