@@ -14,9 +14,9 @@ namespace eris {
         TRUE,
         FALSE,
         CHAR,
-        CALL_EXPR,
         PAREN_EXPR,
         LAMBDA_EXPR,
+        CALL_EXPR,
         UNARY_EXPR,
         BINARY_EXPR,
         EXPR_STMT,
@@ -95,6 +95,15 @@ namespace eris {
         std::vector<std::string> args;
         std::shared_ptr<Node> body;
         explicit LambdaExprNode(const std::vector<std::string>& args, std::shared_ptr<Node> body, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class CallExprNode: public Node {
+    public:
+        std::shared_ptr<Node> callee;
+        std::vector<std::shared_ptr<Node> > args;
+        explicit CallExprNode(std::shared_ptr<Node> callee, const std::vector<std::shared_ptr<Node> >& args, int line);
         NodeKind kind() const;
         std::string str() const;
     };

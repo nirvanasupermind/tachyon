@@ -44,6 +44,7 @@ namespace eris {
         LCURLY,
         RCURLY,
         COMMA,
+        COLON,
         SEMICOLON,
         EOF_
     };

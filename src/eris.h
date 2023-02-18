@@ -201,6 +201,11 @@ public:
     ErisVal operator!=(const ErisVal& other) const {
         return ErisVal::make_bool(!(operator==(other)).b);
     }
+
+    ErisVal operator()(const std::vector<ErisVal>& args) {
+        assert(tag == OBJECT);
+        return static_cast<ErisFunc*>(o)->f(args);
+    }
 };
 
 #endif // ERIS_Hs

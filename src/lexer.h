@@ -18,7 +18,7 @@ namespace eris {
         {"while", TokenType::WHILE},
         {"for", TokenType::FOR},
         {"def", TokenType::DEF},  
-        {"lambda", TokenType::LAMBDA},
+        {"lambda", TokenType::LAMBDA}
     };
 
     class Lexer {

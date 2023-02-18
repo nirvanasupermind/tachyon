@@ -73,6 +73,16 @@ namespace eris {
         return NodeKind::LAMBDA_EXPR;
     }
 
+    CallExprNode::CallExprNode(std::shared_ptr<Node> callee, const std::vector<std::shared_ptr<Node> >& args, int line)
+        : callee(callee), args(args) {
+        this->line = line;
+    }
+
+    NodeKind CallExprNode::kind() const {
+        return NodeKind::CALL_EXPR;
+    }
+
+
     UnaryExprNode::UnaryExprNode(Token op, std::shared_ptr<Node> node, int line)
         : op(op), node(node) {
         this->line = line;

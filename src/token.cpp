@@ -126,6 +126,9 @@ namespace eris {
         case TokenType::COMMA:
             result += "COMMA";
             break;
+        case TokenType::COLON:
+            result += "COLON";
+            break;
         case TokenType::SEMICOLON:
             result += "SEMICOLON";
             break;

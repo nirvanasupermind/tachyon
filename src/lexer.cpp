@@ -160,6 +160,10 @@ namespace eris {
                 tokens.push_back(Token(TokenType::COMMA, ",", line));
                 advance();
             }
+            else if (current == ':') {
+                tokens.push_back(Token(TokenType::COLON, ":", line));
+                advance();
+            }
             else if (current == ';') {
                 tokens.push_back(Token(TokenType::SEMICOLON, ";", line));
                 advance();

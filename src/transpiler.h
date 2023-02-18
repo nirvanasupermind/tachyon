@@ -19,6 +19,7 @@ namespace eris {
         void visit(TrueNode* node);
         void visit(FalseNode* node);        
         void visit(CharNode* node);
+        void visit(CallExprNode* node);
         void visit(ParenExprNode* node);
         void visit(LambdaExprNode* node);
         void visit(UnaryExprNode* node);

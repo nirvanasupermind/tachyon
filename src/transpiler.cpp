@@ -26,6 +26,8 @@ namespace eris {
             return visit(static_cast<CharNode*>(node));
         case NodeKind::PAREN_EXPR:
             return visit(static_cast<ParenExprNode*>(node));
+        case NodeKind::CALL_EXPR:
+            return visit(static_cast<CallExprNode*>(node));
         case NodeKind::LAMBDA_EXPR:
             return visit(static_cast<LambdaExprNode*>(node));
         case NodeKind::UNARY_EXPR:
@@ -81,6 +83,18 @@ namespace eris {
         post_main_code << "ErisVal::make_char('";
         post_main_code << node->val;
         post_main_code << "')";
+    }
+
+    void Transpiler::visit(CallExprNode* node) {
+        visit(node->callee.get());
+        post_main_code << "({";
+        for(int i = 0; i < node->args.size(); i++) {
+            visit(node->args.at(i).get());
+            if(i < node->args.size() - 1) {
+                post_main_code << ',';
+            }
+        }
+        post_main_code << "})";
     }
 
     void Transpiler::visit(ParenExprNode* node) {

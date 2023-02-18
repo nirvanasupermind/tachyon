@@ -235,7 +235,29 @@ namespace eris {
             return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op, unary_expr(), op.line));
         }
         else {
-            return primary_expr();
+            return call_expr();
+        }
+    }
+
+
+    std::shared_ptr<Node> Parser::call_expr() {
+        int line = current.line;
+        std::shared_ptr<Node> callee = primary_expr();
+        if(current.type == TokenType::LPAREN) {
+        std::vector<std::shared_ptr<Node> > args;
+        advance();
+        while(current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
+            args.push_back(expr());
+            if(current.type == TokenType::RPAREN) {
+                break; 
+            } else {
+                eat(TokenType::COMMA);            
+            }
+        }
+        eat(TokenType::RPAREN);
+        return std::shared_ptr<CallExprNode>(new CallExprNode(callee, args, line));
+        } else {
+            return callee;
         }
     }
 
