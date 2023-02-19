@@ -119,7 +119,7 @@ namespace eris {
         return NodeKind::VAR_DECL_STMT;
     }
 
-    ObjectExprNode::ObjectExprNode(const std::vector<std::strings>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line)
+    ObjectExprNode::ObjectExprNode(const std::vector<std::string>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line)
         : keys(keys), vals(vals) {
         this->line = line;
     }
@@ -180,6 +180,15 @@ namespace eris {
 
     NodeKind FuncDeclStmtNode::kind() const {
         return NodeKind::FUNC_DECL_STMT;
+    }
+
+    ReturnStmtNode::ReturnStmtNode(std::shared_ptr<Node> node, int line)
+        : node(node) {
+        this->line = line;
+    }
+
+    NodeKind ReturnStmtNode::kind() const {
+        return NodeKind::RETURN_STMT;
     }
 
     StmtListNode::StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line)

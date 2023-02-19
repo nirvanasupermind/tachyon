@@ -67,10 +67,22 @@ namespace eris {
         } 
         else if(current.type == TokenType::DEF) {
             return func_decl_stmt();
-        }      
+        }
+        else if(current.type == TokenType::RETURN) {
+            return return_stmt();
+        }
+
         else {
             return expr_stmt();
         }
+    }
+
+    std::shared_ptr<Node> Parser::return_stmt() {
+        int line = current.line;
+        eat(TokenType::RETURN);
+        std::shared_ptr<Node> node = expr();
+        eat(TokenType::SEMICOLON);
+        return std::shared_ptr<ReturnStmtNode>(new ReturnStmtNode(node, line));
     }
 
     std::shared_ptr<Node> Parser::func_decl_stmt() {

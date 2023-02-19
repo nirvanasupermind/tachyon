@@ -22,6 +22,7 @@ namespace eris {
         void visit(CallExprNode* node);
         void visit(ParenExprNode* node);
         void visit(LambdaExprNode* node);
+        void visit(ObjectExprNode* node);
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
         void visit(ExprStmtNode* node);
@@ -33,6 +34,7 @@ namespace eris {
         void visit(WhileStmtNode* node);
         void visit(ForStmtNode* node);
         void visit(FuncDeclStmtNode* node);
+        void visit(ReturnStmtNode* node);
     public:
         static std::string boilerplate;
         Transpiler(const std::string& filename);

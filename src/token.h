@@ -19,6 +19,7 @@ namespace eris {
         FOR,
         DEF,
         LAMBDA,
+        RETURN,
         PLUS,
         MINUS,
         MUL,

@@ -192,6 +192,22 @@ namespace eris {
             number_str = number_str + current;
             advance();
         }
+
+        if(current == 'e' || current == 'E') {
+            number_str = number_str + current;
+            advance();
+
+            if(current == '+' || current == '-') {
+                number_str = number_str + current;
+                advance();
+            }
+            
+            while (current != '\0' && isdigit(current)) {
+                number_str = number_str + current;
+                advance();
+            }
+        }
+
         return Token(TokenType::NUMBER, number_str, line);
     }
 

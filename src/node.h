@@ -28,6 +28,7 @@ namespace eris {
         WHILE_STMT,
         FOR_STMT,
         FUNC_DECL_STMT,
+        RETURN_STMT,
         STMT_LIST
     };
 
@@ -207,6 +208,14 @@ namespace eris {
         std::vector<std::string> args;
         std::shared_ptr<Node> body;
         explicit FuncDeclStmtNode(const std::string& name, const std::vector<std::string>& args, std::shared_ptr<Node> body, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class ReturnStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> node;
+        explicit ReturnStmtNode(std::shared_ptr<Node> node, int line);
         NodeKind kind() const;
         std::string str() const;
     };

@@ -16,7 +16,7 @@ public:
 
     ErisObject() = default;
 
-    ErisObject(std::map<std::string, ErisVal> map)
+    ErisObject(const std::map<std::string, ErisVal>& map)
         : map(map) {
     }
 
@@ -50,7 +50,6 @@ public:
         NUM,
         BOOL,
         CHAR,
-        FUNC,
         OBJECT
     } tag;
 
@@ -89,9 +88,16 @@ public:
         return result;
     }
 
+    static ErisVal make_object(const std::map<std::string, ErisVal>& map) {
+        ErisVal result;
+        result.tag = OBJECT;
+        result.o = new ErisObject(map);
+        return result;
+    }
+    
     static ErisVal make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f) {
         ErisVal result;
-        result.tag = FUNC;
+        result.tag = OBJECT;
         result.o = new ErisFunc(f);
         return result;
     }
