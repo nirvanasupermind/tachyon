@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -52,23 +53,23 @@ namespace eris {
         if (current.type == TokenType::VAR) {
             return var_decl_stmt();
         }
-        else if(current.type == TokenType::BLOCK) {
+        else if (current.type == TokenType::BLOCK) {
             advance();
             return block_stmt();
         }
-        else if(current.type == TokenType::IF) {
+        else if (current.type == TokenType::IF) {
             return if_stmt();
         }
-        else if(current.type == TokenType::WHILE) {
+        else if (current.type == TokenType::WHILE) {
             return while_stmt();
         }
-        else if(current.type == TokenType::FOR) {
+        else if (current.type == TokenType::FOR) {
             return for_stmt();
-        } 
-        else if(current.type == TokenType::DEF) {
+        }
+        else if (current.type == TokenType::DEF) {
             return func_decl_stmt();
         }
-        else if(current.type == TokenType::RETURN) {
+        else if (current.type == TokenType::RETURN) {
             return return_stmt();
         }
 
@@ -91,12 +92,13 @@ namespace eris {
         std::string name = eat(TokenType::IDENTIFIER).val;
         std::vector<std::string> args;
         eat(TokenType::LPAREN);
-        while(current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
+        while (current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
             args.push_back(eat(TokenType::IDENTIFIER).val);
-            if(current.type == TokenType::RPAREN) {
-                break; 
-            } else {
-                eat(TokenType::COMMA);            
+            if (current.type == TokenType::RPAREN) {
+                break;
+            }
+            else {
+                eat(TokenType::COMMA);
             }
         }
         eat(TokenType::RPAREN);
@@ -134,14 +136,14 @@ namespace eris {
         std::shared_ptr<Node> test = expr();
         eat(TokenType::RPAREN);
         std::shared_ptr<Node> body = block_stmt();
-        if(current.type == TokenType::ELSE) {
+        if (current.type == TokenType::ELSE) {
             advance();
-            std::shared_ptr<Node> alternate = block_stmt();            
+            std::shared_ptr<Node> alternate = block_stmt();
             return std::shared_ptr<IfElseStmtNode>(new IfElseStmtNode(test, body, alternate, line));
         }
         return std::shared_ptr<IfStmtNode>(new IfStmtNode(test, body, line));
     }
-    
+
     std::shared_ptr<Node> Parser::block_stmt() {
         int line = current.line;
         eat(TokenType::LCURLY);
@@ -247,30 +249,42 @@ namespace eris {
             return std::shared_ptr<UnaryExprNode>(new UnaryExprNode(op, unary_expr(), op.line));
         }
         else {
-            return call_expr();
+            return call_attr_expr();
         }
     }
 
 
-    std::shared_ptr<Node> Parser::call_expr() {
+    std::shared_ptr<Node> Parser::call_attr_expr() {
         int line = current.line;
-        std::shared_ptr<Node> callee = primary_expr();
-        if(current.type == TokenType::LPAREN) {
-        std::vector<std::shared_ptr<Node> > args;
-        advance();
-        while(current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
-            args.push_back(expr());
-            if(current.type == TokenType::RPAREN) {
-                break; 
-            } else {
-                eat(TokenType::COMMA);            
+        std::shared_ptr<Node> node = primary_expr();
+        while (current.type == TokenType::LPAREN || current.type == TokenType::PERIOD) {
+            std::vector<std::shared_ptr<Node> > args;
+            // advance();
+                // std::cout << 263 << '\n';
+                // std::cout << (int)(current.type) << '\n';
+            if (current.type == TokenType::LPAREN) {
+                advance();
+                while (current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
+                    args.push_back(expr());
+                    if (current.type == TokenType::RPAREN) {
+                        break;
+                    } else {
+                        eat(TokenType::COMMA);
+                    }
+                }
+
+                eat(TokenType::RPAREN);
+                return std::shared_ptr<CallExprNode>(new CallExprNode(node, args, line));
             }
+            else if (current.type == TokenType::PERIOD) {
+                advance();
+                std::string attr = eat(TokenType::IDENTIFIER).val;
+                node = std::shared_ptr<AttrExprNode>(new AttrExprNode(node, attr, line));
+            }
+
         }
-        eat(TokenType::RPAREN);
-        return std::shared_ptr<CallExprNode>(new CallExprNode(callee, args, line));
-        } else {
-            return callee;
-        }
+
+        return node;
     }
 
     std::shared_ptr<Node> Parser::object_expr() {
@@ -278,14 +292,15 @@ namespace eris {
         std::vector<std::string> keys;
         std::vector<std::shared_ptr<Node> > vals;
         eat(TokenType::LCURLY);
-        while(current.type != TokenType::EOF_ && current.type != TokenType::RCURLY) {
+        while (current.type != TokenType::EOF_ && current.type != TokenType::RCURLY) {
             keys.push_back(eat(TokenType::IDENTIFIER).val);
             eat(TokenType::COLON);
             vals.push_back(expr());
-            if(current.type == TokenType::RCURLY) {
-                break; 
-            } else {
-                eat(TokenType::COMMA);            
+            if (current.type == TokenType::RCURLY) {
+                break;
+            }
+            else {
+                eat(TokenType::COMMA);
             }
         }
         eat(TokenType::RCURLY);
@@ -297,19 +312,21 @@ namespace eris {
         eat(TokenType::LAMBDA);
         std::vector<std::string> args;
         eat(TokenType::LPAREN);
-        while(current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
+        while (current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
             args.push_back(eat(TokenType::IDENTIFIER).val);
-            if(current.type == TokenType::RPAREN) {
-                break; 
-            } else {
-                eat(TokenType::COMMA);            
+            if (current.type == TokenType::RPAREN) {
+                break;
+            }
+            else {
+                eat(TokenType::COMMA);
             }
         }
         eat(TokenType::RPAREN);
         std::shared_ptr<Node> body;
-        if(current.type == TokenType::LCURLY) {
+        if (current.type == TokenType::LCURLY) {
             body = block_stmt();
-        } else {
+        }
+        else {
             body = expr();
         }
         return std::shared_ptr<LambdaExprNode>(new LambdaExprNode(args, body, line));
@@ -350,10 +367,10 @@ namespace eris {
             return std::shared_ptr<ParenExprNode>(new ParenExprNode(expr_node, token.line));
         };
         case TokenType::LAMBDA: {
-           return lambda_expr();
+            return lambda_expr();
         };
         case TokenType::LCURLY: {
-           return object_expr();
+            return object_expr();
         };
         default:
             raise_error();

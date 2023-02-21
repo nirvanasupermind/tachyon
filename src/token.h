@@ -47,6 +47,7 @@ namespace eris {
         COMMA,
         COLON,
         SEMICOLON,
+        PERIOD,
         EOF_
     };
     

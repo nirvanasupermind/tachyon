@@ -8,39 +8,10 @@
 #include <vector>
 #include <map>
 
-// A copy of this file will be included in every transpiled program
+// A copy of this file will be included in every transpiled programs
 
-class ErisObject {
-public:
-    std::map<std::string, ErisVal> map{};
-
-    ErisObject() = default;
-
-    ErisObject(const std::map<std::string, ErisVal>& map)
-        : map(map) {
-    }
-
-    ErisVal get(const std::string& key) const {
-        if(!(map.count(key)) && map.count("proto")) {
-            return map.at("proto").o->get(key);
-        } else {
-            return map.at(key);
-        }
-    }
-    
-    void set(const std::string& key, const ErisVal& val) {
-        map[key] = val;
-    }
-};
-
-class ErisFunc : public ErisObject {
-public:
-    std::function<ErisVal(std::vector<ErisVal>)> f;
-    ErisFunc(const std::function<ErisVal(std::vector<ErisVal>)>& f)
-        : f(f) {
-
-    }
-};
+class ErisObject;
+class ErisFunc;
 
 // Tagged union
 class ErisVal {
@@ -88,19 +59,9 @@ public:
         return result;
     }
 
-    static ErisVal make_object(const std::map<std::string, ErisVal>& map) {
-        ErisVal result;
-        result.tag = OBJECT;
-        result.o = new ErisObject(map);
-        return result;
-    }
-    
-    static ErisVal make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f) {
-        ErisVal result;
-        result.tag = OBJECT;
-        result.o = new ErisFunc(f);
-        return result;
-    }
+    static ErisVal make_object(const std::map<std::string, ErisVal>& map);
+
+    static ErisVal make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f);
 
     ErisVal operator+() const {
         assert(tag == NUM);
@@ -208,10 +169,60 @@ public:
         return ErisVal::make_bool(!(operator==(other)).b);
     }
 
-    ErisVal operator()(const std::vector<ErisVal>& args) {
-        assert(tag == OBJECT);
-        return static_cast<ErisFunc*>(o)->f(args);
+    ErisVal operator()(const std::vector<ErisVal>& args);
+};
+
+class ErisObject {
+public:
+    std::map<std::string, ErisVal> map{};
+
+    ErisObject() = default;
+
+    ErisObject(const std::map<std::string, ErisVal>& map)
+        : map(map) {
+    }
+
+    ErisVal get(const std::string& key) const {
+        if (!(map.count(key)) && map.count("proto")) {
+            return map.at("proto").o->get(key);
+        }
+        else {
+            return map.at(key);
+        }
+    }
+
+    ErisVal set(const std::string& key, const ErisVal& val) {
+        map[key] = val;
+        return val;
     }
 };
 
-#endif // ERIS_Hs
+class ErisFunc: public ErisObject {
+public:
+    std::function<ErisVal(std::vector<ErisVal>)> f;
+    ErisFunc(const std::function<ErisVal(std::vector<ErisVal>)>& f)
+        : f(f) {
+
+    }
+};
+
+ErisVal ErisVal::make_object(const std::map<std::string, ErisVal>& map) {
+    ErisVal result;
+    result.tag = ErisVal::OBJECT;
+    result.o = new ErisObject(map);
+    return result;
+}
+
+ErisVal ErisVal::make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f) {
+    ErisVal result;
+    result.tag = ErisVal::OBJECT;
+    result.o = new ErisFunc(f);
+    return result;
+}
+
+ErisVal ErisVal::operator()(const std::vector<ErisVal>& args) {
+    assert(tag == OBJECT);
+    return static_cast<ErisFunc*>(o)->f(args);
+}
+
+#endif // ERIS_H

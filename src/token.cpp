@@ -135,6 +135,9 @@ namespace eris {
         case TokenType::SEMICOLON:
             result += "SEMICOLON";
             break;
+        case TokenType::PERIOD:
+            result += "PERIOD";
+            break;
         case TokenType::EOF_:
             result += "EOF";
             break;

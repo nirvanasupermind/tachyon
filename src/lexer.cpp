@@ -168,6 +168,10 @@ namespace eris {
                 tokens.push_back(Token(TokenType::SEMICOLON, ";", line));
                 advance();
             }
+            else if (current == '.') {
+                tokens.push_back(Token(TokenType::PERIOD, ".", line));
+                advance();
+            }
             else {
                 throw std::string(filename + ":" + std::to_string(line) + ": illegal character '" + current + "'");
             }

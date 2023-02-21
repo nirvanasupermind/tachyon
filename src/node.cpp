@@ -81,8 +81,15 @@ namespace eris {
     NodeKind CallExprNode::kind() const {
         return NodeKind::CALL_EXPR;
     }
-
-
+    
+    AttrExprNode::AttrExprNode(const std::shared_ptr<Node> object, const std::string& attr, int line)
+        : object(object), attr(attr) {
+        this->line = line;
+    }
+    
+    NodeKind AttrExprNode::kind() const {
+        return NodeKind::ATTR_EXPR;
+    }
     UnaryExprNode::UnaryExprNode(Token op, std::shared_ptr<Node> node, int line)
         : op(op), node(node) {
         this->line = line;

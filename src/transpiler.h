@@ -19,10 +19,11 @@ namespace eris {
         void visit(TrueNode* node);
         void visit(FalseNode* node);        
         void visit(CharNode* node);
-        void visit(CallExprNode* node);
         void visit(ParenExprNode* node);
         void visit(LambdaExprNode* node);
         void visit(ObjectExprNode* node);
+        void visit(CallExprNode* node);
+        void visit(AttrExprNode* node);
         void visit(UnaryExprNode* node);
         void visit(BinaryExprNode* node);
         void visit(ExprStmtNode* node);
@@ -41,6 +42,5 @@ namespace eris {
         std::string generate_code(Node* node);
     };
 } // namespace eris
-
 
 #endif // TOKEN_H
