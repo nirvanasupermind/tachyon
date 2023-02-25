@@ -10,10 +10,11 @@ namespace eris {
     enum class NodeKind {
         NIL,
         NUMBER,
-        IDENTIFIER,
         TRUE,
         FALSE,
         CHAR,
+        STRING,
+        IDENTIFIER,
         PAREN_EXPR,
         LAMBDA_EXPR,
         OBJECT_EXPR,
@@ -54,15 +55,6 @@ namespace eris {
         NodeKind kind() const;
         std::string str() const;
     };
-
-    class IdentifierNode: public Node {
-    public:
-        std::string val;
-        explicit IdentifierNode(const std::string& val, int line);
-        NodeKind kind() const;
-        std::string str() const;
-    };
-
     class TrueNode: public Node {
     public:
         explicit TrueNode(int line);
@@ -81,6 +73,22 @@ namespace eris {
     public:
         char val;
         explicit CharNode(char val, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class StringNode: public Node {
+    public:
+        std::string val;
+        explicit StringNode(const std::string& val, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class IdentifierNode: public Node {
+    public:
+        std::string val;
+        explicit IdentifierNode(const std::string& val, int line);
         NodeKind kind() const;
         std::string str() const;
     };

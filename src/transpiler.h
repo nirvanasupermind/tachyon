@@ -15,10 +15,11 @@ namespace eris {
         void visit(Node* node);
         void visit(NilNode* node);
         void visit(NumberNode* node);
-        void visit(IdentifierNode* node);
         void visit(TrueNode* node);
         void visit(FalseNode* node);        
         void visit(CharNode* node);
+        void visit(StringNode* node);
+        void visit(IdentifierNode* node);
         void visit(ParenExprNode* node);
         void visit(LambdaExprNode* node);
         void visit(ObjectExprNode* node);

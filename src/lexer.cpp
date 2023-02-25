@@ -31,11 +31,9 @@ namespace eris {
             }
             else if (isdigit(current)) {
                 tokens.push_back(generate_number());
-                // advance();
             }
             else if (current == '_' || current == '$' || isalpha(current)) {
                 tokens.push_back(generate_identifier());
-                // advance();
             }
             else if (current == '\'') {
                 advance();
@@ -45,6 +43,9 @@ namespace eris {
                     tokens.push_back(Token(TokenType::CHAR, std::string("'") + val + std::string("'"), line));
                     advance();
                 }
+            }            
+            else if (current == '"') {
+                tokens.push_back(generate_string());
             }
             else if (current == '+') {
                 tokens.push_back(Token(TokenType::PLUS, "+", line));
@@ -213,6 +214,17 @@ namespace eris {
         }
 
         return Token(TokenType::NUMBER, number_str, line);
+    }
+
+    Token Lexer::generate_string() {
+        advance();
+        std::string str;
+        while (current != '\0' && current != '"') {
+            str = str + current;
+            advance();
+        }
+        advance();
+        return Token(TokenType::STRING, str, line);
     }
 
     Token Lexer::generate_identifier() {

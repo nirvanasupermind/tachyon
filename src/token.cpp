@@ -16,12 +16,14 @@ namespace eris {
         case TokenType::CHAR:
             result += "CHAR";
             break;
+        case TokenType::STRING:
+            result += "STRING";
+            break;
         case TokenType::IDENTIFIER:
             result += "IDENTIFIER";
             break;
         case TokenType::NIL:
             result += "NIL";
-            break;
         case TokenType::TRUE:
             result += "TRUE";
             break;

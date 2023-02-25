@@ -344,10 +344,6 @@ namespace eris {
             advance();
             return std::shared_ptr<NumberNode>(new NumberNode(std::stod(token.val), token.line));
         };
-        case TokenType::IDENTIFIER: {
-            advance();
-            return std::shared_ptr<IdentifierNode>(new IdentifierNode(token.val, token.line));
-        };
         case TokenType::TRUE: {
             advance();
             return std::shared_ptr<TrueNode>(new TrueNode(token.line));
@@ -359,6 +355,14 @@ namespace eris {
         case TokenType::CHAR: {
             advance();
             return std::shared_ptr<CharNode>(new CharNode(token.val.at(1), token.line));
+        };
+        case TokenType::STRING: {
+            advance();
+            return std::shared_ptr<StringNode>(new StringNode(token.val, token.line));
+        };
+        case TokenType::IDENTIFIER: {
+            advance();
+            return std::shared_ptr<IdentifierNode>(new IdentifierNode(token.val, token.line));
         };
         case TokenType::LPAREN: {
             advance();

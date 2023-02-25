@@ -20,16 +20,6 @@ namespace eris {
     NodeKind NumberNode::kind() const {
         return NodeKind::NUMBER;
     }
-
-    IdentifierNode::IdentifierNode(const std::string& val, int line)
-        : val(val) {
-        this->line = line;
-    }
-
-    NodeKind IdentifierNode::kind() const {
-        return NodeKind::IDENTIFIER;
-    }
-
     TrueNode::TrueNode(int line) {
         this->line = line;
     }
@@ -53,6 +43,24 @@ namespace eris {
 
     NodeKind CharNode::kind() const {
         return NodeKind::CHAR;
+    }
+
+    StringNode::StringNode(const std::string& val, int line)
+        : val(val) {
+        this->line = line;
+    }
+
+    NodeKind StringNode::kind() const {
+        return NodeKind::STRING;
+    }
+
+    IdentifierNode::IdentifierNode(const std::string& val, int line)
+        : val(val) {
+        this->line = line;
+    }
+
+    NodeKind IdentifierNode::kind() const {
+        return NodeKind::IDENTIFIER;
     }
 
     ParenExprNode::ParenExprNode(std::shared_ptr<Node> node, int line)
@@ -90,6 +98,7 @@ namespace eris {
     NodeKind AttrExprNode::kind() const {
         return NodeKind::ATTR_EXPR;
     }
+    
     UnaryExprNode::UnaryExprNode(Token op, std::shared_ptr<Node> node, int line)
         : op(op), node(node) {
         this->line = line;

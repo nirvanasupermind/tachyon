@@ -31,6 +31,7 @@ namespace eris {
         int line;
         void advance();
         Token generate_number();
+        Token generate_string();
         Token generate_identifier();
     public:
         Lexer(const std::string& text, const std::string& filename);

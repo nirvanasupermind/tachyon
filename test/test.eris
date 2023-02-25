@@ -1,5 +1,1 @@
-var Point = {
-    calc: lambda(self) self.x + self.y
-};
-var p = {proto: Point, x: 2, y: 3};
-p.calc();
+System.print("Hello world!");

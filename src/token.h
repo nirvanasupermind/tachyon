@@ -7,6 +7,7 @@ namespace eris {
     enum class TokenType {
         NUMBER,
         CHAR,
+        STRING,
         IDENTIFIER,
         NIL,
         TRUE,
