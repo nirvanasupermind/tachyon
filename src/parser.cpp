@@ -253,15 +253,11 @@ namespace eris {
         }
     }
 
-
     std::shared_ptr<Node> Parser::call_attr_expr() {
         int line = current.line;
         std::shared_ptr<Node> node = primary_expr();
         while (current.type == TokenType::LPAREN || current.type == TokenType::PERIOD) {
             std::vector<std::shared_ptr<Node> > args;
-            // advance();
-                // std::cout << 263 << '\n';
-                // std::cout << (int)(current.type) << '\n';
             if (current.type == TokenType::LPAREN) {
                 advance();
                 while (current.type != TokenType::EOF_ && current.type != TokenType::RPAREN) {
@@ -287,6 +283,23 @@ namespace eris {
         return node;
     }
 
+    std::shared_ptr<Node> Parser::vec_expr() {
+        int line = current.line;
+        std::vector<std::shared_ptr<Node> > elems;
+        eat(TokenType::LSQUARE);
+        while (current.type != TokenType::EOF_ && current.type != TokenType::RSQUARE) {
+            elems.push_back(expr());
+            if (current.type == TokenType::RSQUARE) {
+                break;
+            }
+            else {
+                eat(TokenType::COMMA);
+            }
+        }
+        eat(TokenType::RSQUARE);
+        return std::shared_ptr<VecNode>(new VecNode(elems, line));
+    }
+
     std::shared_ptr<Node> Parser::object_expr() {
         int line = current.line;
         std::vector<std::string> keys;
@@ -304,7 +317,7 @@ namespace eris {
             }
         }
         eat(TokenType::RCURLY);
-        return std::shared_ptr<ObjectExprNode>(new ObjectExprNode(keys, vals, line));
+        return std::shared_ptr<ObjectNode>(new ObjectNode(keys, vals, line));
     }
 
     std::shared_ptr<Node> Parser::lambda_expr() {
@@ -375,6 +388,9 @@ namespace eris {
         };
         case TokenType::LCURLY: {
             return object_expr();
+        };
+        case TokenType::LSQUARE: {
+            return vec_expr();
         };
         default:
             raise_error();

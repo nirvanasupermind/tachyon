@@ -17,7 +17,8 @@ namespace eris {
         IDENTIFIER,
         PAREN_EXPR,
         LAMBDA_EXPR,
-        OBJECT_EXPR,
+        OBJECT,
+        VEC,
         CALL_EXPR,
         ATTR_EXPR,
         UNARY_EXPR,
@@ -110,11 +111,20 @@ namespace eris {
         std::string str() const;
     };
 
-    class ObjectExprNode: public Node {
+    class ObjectNode: public Node {
     public:
         std::vector<std::string> keys;
         std::vector<std::shared_ptr<Node> > vals;
-        explicit ObjectExprNode(const std::vector<std::string>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line);
+        explicit ObjectNode(const std::vector<std::string>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+
+    class VecNode: public Node {
+    public:
+        std::vector<std::shared_ptr<Node> > elems;
+        explicit VecNode(const std::vector<std::shared_ptr<Node> >& elems, int line);
         NodeKind kind() const;
         std::string str() const;
     };
@@ -241,7 +251,7 @@ namespace eris {
     class StmtListNode: public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;
-        explicit StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line);
+        explicit StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts, int line);
         NodeKind kind() const;
         std::string str() const;
     };

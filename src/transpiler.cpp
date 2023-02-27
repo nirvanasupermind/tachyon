@@ -28,8 +28,10 @@ namespace eris {
             return visit(static_cast<StringNode*>(node));
         case NodeKind::PAREN_EXPR:
             return visit(static_cast<ParenExprNode*>(node));
-        case NodeKind::OBJECT_EXPR:
-            return visit(static_cast<ObjectExprNode*>(node));            
+        case NodeKind::OBJECT:
+            return visit(static_cast<ObjectNode*>(node));
+        case NodeKind::VEC:
+            return visit(static_cast<VecNode*>(node));
         case NodeKind::LAMBDA_EXPR:
             return visit(static_cast<LambdaExprNode*>(node));
         case NodeKind::CALL_EXPR:
@@ -90,7 +92,7 @@ namespace eris {
     }
 
     void Transpiler::visit(StringNode* node) {
-        post_main_code << "ErisVal::make_string(\"";
+        post_main_code << "ErisVal::make_str(\"";
         post_main_code << node->val;
         post_main_code << "\")";
     }
@@ -104,7 +106,66 @@ namespace eris {
         visit(node->node.get());
         post_main_code << ')';
     }
+    void Transpiler::visit(LambdaExprNode* node) {
+        post_main_code << "ErisVal::make_func([&](const std::vector<ErisVal>& args) {\n";
+        for (int i = 0; i < node->args.size(); i++) {
+            post_main_code << "ErisVal " << node->args.at(i) << " = args.at(" << i << ");\n";
+        }
+        if (node->body->kind() == NodeKind::BLOCK_STMT) {
+            visit(node->body.get());
+            post_main_code << "\nreturn ErisVal::make_nil();\n}))";
+        }
+        else {
+            post_main_code << "return ";
+            visit(node->body.get());
+            post_main_code << ";\n})";
+        }
+    }
 
+    void Transpiler::visit(ObjectNode* node) {
+        post_main_code << "ErisVal::make_object({";
+        for (int i = 0; i < node->keys.size(); i++) {
+            post_main_code << "{\"" << node->keys.at(i) << "\",";
+            visit(node->vals.at(i).get());
+            post_main_code << '}';
+            if (i < node->keys.size() - 1) {
+                post_main_code << ',';
+            }
+        }
+        post_main_code << "})";
+    }
+
+    void Transpiler::visit(VecNode* node) {
+        post_main_code << "ErisVal::make_vec({";
+        for (int i = 0; i < node->elems.size(); i++) {
+            visit(node->elems.at(i).get());
+            if (i < node->elems.size() - 1) {
+                post_main_code << ',';
+            }
+        }
+        post_main_code << "})";
+    }
+
+    void Transpiler::visit(CallExprNode* node) {
+        visit(node->callee.get());
+        post_main_code << "({";
+        if(node->callee->kind() == NodeKind::ATTR_EXPR) {
+            std::shared_ptr<AttrExprNode> attr_expr_node = std::dynamic_pointer_cast<AttrExprNode>(node->callee);
+            visit(attr_expr_node->object.get());
+            if(node->args.size()) {
+                post_main_code << ',';
+            }
+        } 
+
+        for (int i = 0; i < node->args.size(); i++) {
+            visit(node->args.at(i).get());
+            if (i < node->args.size() - 1) {
+                post_main_code << ',';
+            }
+        }
+        post_main_code << "})";
+    }
+    
     void Transpiler::visit(UnaryExprNode* node) {
         post_main_code << '(';
         post_main_code << node->op.val;
@@ -138,55 +199,6 @@ namespace eris {
     void Transpiler::visit(ExprStmtNode* node) {
         visit(node->node.get());
         post_main_code << ";";
-    }
-
-    void Transpiler::visit(LambdaExprNode* node) {
-        post_main_code << "ErisVal::make_func([&](const std::vector<ErisVal>& args) {\n";
-        for (int i = 0; i < node->args.size(); i++) {
-            post_main_code << "ErisVal " << node->args.at(i) << " = args.at(" << i << ");\n";
-        }
-        if (node->body->kind() == NodeKind::BLOCK_STMT) {
-            visit(node->body.get());
-            post_main_code << "\nreturn ErisVal::make_nil();\n}))";
-        }
-        else {
-            post_main_code << "return ";
-            visit(node->body.get());
-            post_main_code << ";\n})";
-        }
-    }
-
-    void Transpiler::visit(ObjectExprNode* node) {
-        post_main_code << "ErisVal::make_object({";
-        for (int i = 0; i < node->keys.size(); i++) {
-            post_main_code << "{\"" << node->keys.at(i) << "\",";
-            visit(node->vals.at(i).get());
-            post_main_code << '}';
-            if (i < node->keys.size() - 1) {
-                post_main_code << ',';
-            }
-        }
-        post_main_code << "})";
-    }
-
-    void Transpiler::visit(CallExprNode* node) {
-        visit(node->callee.get());
-        post_main_code << "({";
-        if(node->callee->kind() == NodeKind::ATTR_EXPR) {
-            std::shared_ptr<AttrExprNode> attr_expr_node = std::dynamic_pointer_cast<AttrExprNode>(node->callee);
-            visit(attr_expr_node->object.get());
-            if(node->args.size()) {
-                post_main_code << ',';
-            }
-        } 
-
-        for (int i = 0; i < node->args.size(); i++) {
-            visit(node->args.at(i).get());
-            if (i < node->args.size() - 1) {
-                post_main_code << ',';
-            }
-        }
-        post_main_code << "})";
     }
 
     void Transpiler::visit(AttrExprNode* node) {

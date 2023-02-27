@@ -140,6 +140,12 @@ namespace eris {
         case TokenType::PERIOD:
             result += "PERIOD";
             break;
+        case TokenType::LSQUARE:
+            result += "LSQUARE";
+            break;
+        case TokenType::RSQUARE:
+            result += "LSQUARE";
+            break;
         case TokenType::EOF_:
             result += "EOF";
             break;

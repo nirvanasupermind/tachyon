@@ -20,6 +20,7 @@ namespace eris {
     NodeKind NumberNode::kind() const {
         return NodeKind::NUMBER;
     }
+
     TrueNode::TrueNode(int line) {
         this->line = line;
     }
@@ -135,15 +136,24 @@ namespace eris {
         return NodeKind::VAR_DECL_STMT;
     }
 
-    ObjectExprNode::ObjectExprNode(const std::vector<std::string>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line)
+    ObjectNode::ObjectNode(const std::vector<std::string>& keys, const std::vector<std::shared_ptr<Node> >& vals, int line)
         : keys(keys), vals(vals) {
         this->line = line;
     }
 
-    NodeKind ObjectExprNode::kind() const {
-        return NodeKind::OBJECT_EXPR;
+    NodeKind ObjectNode::kind() const {
+        return NodeKind::OBJECT;
     }
     
+    VecNode::VecNode(const std::vector<std::shared_ptr<Node> >& elems, int line)
+        : elems(elems) {
+        this->line = line;
+    }
+
+    NodeKind VecNode::kind() const {
+        return NodeKind::VEC;
+    }
+
     BlockStmtNode::BlockStmtNode(std::shared_ptr<Node> node, int line)
         : node(node) {
         this->line = line;
@@ -207,7 +217,7 @@ namespace eris {
         return NodeKind::RETURN_STMT;
     }
 
-    StmtListNode::StmtListNode(std::vector<std::shared_ptr<Node> > stmts, int line)
+    StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts, int line)
         : stmts(stmts) {
         this->line = line;
     }

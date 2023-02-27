@@ -46,6 +46,7 @@ namespace eris {
         std::shared_ptr<Node> multiplicative_expr();
         std::shared_ptr<Node> unary_expr();
         std::shared_ptr<Node> call_attr_expr();
+        std::shared_ptr<Node> vec_expr();
         std::shared_ptr<Node> object_expr();
         std::shared_ptr<Node> lambda_expr();
         std::shared_ptr<Node> primary_expr();

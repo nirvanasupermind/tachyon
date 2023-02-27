@@ -45,6 +45,8 @@ namespace eris {
         RPAREN,
         LCURLY,
         RCURLY,
+        LSQUARE,
+        RSQUARE,
         COMMA,
         COLON,
         SEMICOLON,
@@ -61,6 +63,5 @@ namespace eris {
         std::string str() const;  
     };
 } // namespace eris
-
 
 #endif // TOKEN_H

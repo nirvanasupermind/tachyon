@@ -157,6 +157,14 @@ namespace eris {
                 tokens.push_back(Token(TokenType::RCURLY, "}", line));
                 advance();
             }
+            else if (current == '[') {
+                tokens.push_back(Token(TokenType::LSQUARE, "[]", line));
+                advance();
+            }
+            else if (current == ']') {
+                tokens.push_back(Token(TokenType::RSQUARE, "]", line));
+                advance();
+            }
             else if (current == ',') {
                 tokens.push_back(Token(TokenType::COMMA, ",", line));
                 advance();
