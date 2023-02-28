@@ -113,7 +113,7 @@ namespace eris {
         }
         if (node->body->kind() == NodeKind::BLOCK_STMT) {
             visit(node->body.get());
-            post_main_code << "\nreturn ErisVal::make_nil();\n}))";
+            post_main_code << "\nreturn ErisVal::make_nil();\n})";
         }
         else {
             post_main_code << "return ";

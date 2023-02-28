@@ -12,6 +12,8 @@
 #include <random>
 #include <chrono>
 #include <ctime>
+#include <thread>
+#include <algorithm>
 
 // A copy of this file will be included in every transpiled programs
 
@@ -45,6 +47,7 @@ public:
     static ErisVal make_str(const std::string& s);
     static ErisVal make_vec(const std::vector<ErisVal>& v);
     static ErisVal make_func(const std::function<ErisVal(std::vector<ErisVal>)>& f);
+    static ErisVal make_thread(std::thread* t);
     ErisVal operator+() const;
     ErisVal operator-() const;
     ErisVal operator+(const ErisVal& other) const;
@@ -72,6 +75,7 @@ public:
 extern ErisVal String;
 extern ErisVal Vec;
 extern ErisVal Func;
+extern ErisVal Thread;
 
 class ErisObject {
 public:
@@ -99,6 +103,12 @@ class ErisFunc: public ErisObject {
 public:
     std::function<ErisVal(std::vector<ErisVal>)> f;
     ErisFunc(const std::function<ErisVal(std::vector<ErisVal>)>& f);
+};
+
+class ErisThread: public ErisObject {
+public:
+    std::thread* t;
+    ErisThread(std::thread* t);
 };
 
 ErisVal ErisVal::make_nil() {
@@ -139,6 +149,13 @@ ErisVal ErisVal::make_str(const std::string& s) {
     ErisVal result;
     result.tag = OBJECT;
     result.o = new ErisString(s);
+    return result;
+}
+
+ErisVal ErisVal::make_thread(std::thread* t) {
+    ErisVal result;
+    result.tag = OBJECT;
+    result.o = new ErisThread(t);
     return result;
 }
 
@@ -328,6 +345,11 @@ ErisFunc::ErisFunc(const std::function<ErisVal(std::vector<ErisVal>)>& f)
     set("proto", Func);
 }
 
+ErisThread::ErisThread(std::thread* t)
+    : t(t) {
+    set("proto", Thread);
+}
+
 std::random_device rd;
 std::mt19937 mt(rd());
 std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -379,8 +401,7 @@ ErisVal Math = ErisVal::make_object({
         return ErisVal::make_num(std::atan(args.at(1).n));
     })},
     {"atan2", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(1).tag == ErisVal::NUM);
-        assert(args.at(2).tag == ErisVal::NUM);
+        assert(args.at(1).tag == ErisVal::NUM && args.at(2).tag == ErisVal::NUM);
         return ErisVal::make_num(std::atan2(args.at(1).n, args.at(2).n));
     })},
     {"exp", ErisVal::make_func([](const std::vector<ErisVal>& args) {
@@ -396,8 +417,7 @@ ErisVal Math = ErisVal::make_object({
         return ErisVal::make_num(std::sqrt(args.at(1).n));
     })},
     {"pow", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(1).tag == ErisVal::NUM);
-        assert(args.at(2).tag == ErisVal::NUM);
+        assert(args.at(1).tag == ErisVal::NUM && args.at(2).tag == ErisVal::NUM);
         return ErisVal::make_num(std::pow(args.at(1).n, args.at(2).n));
     })},
     {"ceil", ErisVal::make_func([](const std::vector<ErisVal>& args) {
@@ -424,8 +444,7 @@ ErisVal String = ErisVal::make_object({
         return ErisVal::make_num(str.length());
     })},
     {"at", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(0).tag == ErisVal::OBJECT);
-        assert(args.at(1).tag == ErisVal::NUM);
+        assert(args.at(0).tag == ErisVal::OBJECT && args.at(1).tag == ErisVal::NUM);
         std::string str = static_cast<ErisString*>(args.at(0).o)->s;
         return ErisVal::make_char(str.at(args.at(1).n));
     })},
@@ -440,22 +459,24 @@ ErisVal String = ErisVal::make_object({
         return ErisVal::make_char(str.back());
     })},
     {"find", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(0).tag == ErisVal::OBJECT);
-        assert(args.at(1).tag == ErisVal::CHAR || args.at(1).tag == ErisVal::OBJECT);
+        assert(args.at(0).tag == ErisVal::OBJECT && args.at(1).tag == ErisVal::OBJECT);
         std::string str = static_cast<ErisString*>(args.at(0).o)->s;
         std::string str2 = static_cast<ErisString*>(args.at(1).o)->s;
         return ErisVal::make_num(str.find(str2));
     })},
+    {"contains", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+        assert(args.at(0).tag == ErisVal::OBJECT && args.at(1).tag == ErisVal::OBJECT);
+        std::string str = static_cast<ErisString*>(args.at(0).o)->s;
+        std::string str2 = static_cast<ErisString*>(args.at(1).o)->s;
+        return ErisVal::make_bool(str.find(str2) != std::string::npos);
+    })},
     {"substr", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(0).tag == ErisVal::OBJECT);
-        assert(args.at(1).tag == ErisVal::NUM);
-        assert(args.at(2).tag == ErisVal::NUM);
+        assert(args.at(0).tag == ErisVal::OBJECT && args.at(1).tag == ErisVal::NUM && args.at(2).tag == ErisVal::NUM);
         std::string str = static_cast<ErisString*>(args.at(0).o)->s;
         return ErisVal::make_str(str.substr(args.at(1).n, args.at(2).n));
     })},
     {"concat", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(0).tag == ErisVal::OBJECT);
-        assert(args.at(1).tag == ErisVal::OBJECT);
+        assert(args.at(0).tag == ErisVal::OBJECT && args.at(1).tag == ErisVal::OBJECT);
         std::string str = static_cast<ErisString*>(args.at(0).o)->s;
         std::string str2 = static_cast<ErisString*>(args.at(1).o)->s;
         return ErisVal::make_str(str + str2);
@@ -516,14 +537,28 @@ ErisVal Vec = ErisVal::make_object({
     return ErisVal::make_nil();
     })},
     {"subvec", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-    assert(args.at(0).tag == ErisVal::OBJECT);
-    assert(args.at(1).tag == ErisVal::NUM);
-    assert(args.at(2).tag == ErisVal::NUM);
+    assert(args.at(0).tag == ErisVal::OBJECT && args.at(1).tag == ErisVal::NUM && args.at(2).tag == ErisVal::NUM);
     std::vector<ErisVal> vec = static_cast<ErisVec*>(args.at(0).o)->v;
     return ErisVal::make_vec({vec.begin() + args.at(1).n, vec.begin() + args.at(1).n + args.at(2).n});
     })}
     });
 
 ErisVal Func = ErisVal::make_object({});
+
+ErisVal Thread = ErisVal::make_object({
+    {"create", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+    assert(args.at(1).tag == ErisVal::OBJECT);
+
+    return ErisVal::make_thread(new std::thread([args] () {
+        return static_cast<ErisFunc*>(args.at(1).o)->f({});
+    }));
+    })},
+    {"join", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+    assert(args.at(0).tag == ErisVal::OBJECT);
+    std::thread* thr = static_cast<ErisThread*>(args.at(0).o)->t;
+    thr->join();
+    return ErisVal::make_nil();
+    })}
+    });
 
 #endif // ERIS_Hw   

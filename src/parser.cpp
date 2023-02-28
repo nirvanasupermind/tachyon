@@ -126,7 +126,7 @@ namespace eris {
         std::shared_ptr<Node> test = expr();
         eat(TokenType::RPAREN);
         std::shared_ptr<Node> body = block_stmt();
-        return std::shared_ptr<IfStmtNode>(new IfStmtNode(test, body, line));
+        return std::shared_ptr<WhileStmtNode>(new WhileStmtNode(test, body, line));
     }
 
     std::shared_ptr<Node> Parser::if_stmt() {

@@ -1,2 +1,16 @@
-var v = [1, 2, 3];
-System.print(v.at(1));
+var t1 = System.time();
+def fac(x) {
+    if(x == 0) {
+        return 1;
+    } else {
+        return x * fac(x - 1);
+    }
+}
+var i = 0;
+while(i < 10000) {
+    fac(100);
+    i = i + 1;
+}
+var t2 = System.time();
+System.print(t2 - t1);
+System.print(i);

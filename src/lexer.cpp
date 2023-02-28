@@ -237,7 +237,7 @@ namespace eris {
 
     Token Lexer::generate_identifier() {
         std::string identifier_str;
-        while (current != '\0' && (current == '_' || current == '$' || isalpha(current))) {
+        while (current != '\0' && (current == '_' || current == '$' || isalnum(current))) {
             identifier_str = identifier_str + current;
             advance();
         }
