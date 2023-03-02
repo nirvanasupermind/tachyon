@@ -216,6 +216,15 @@ namespace eris {
     NodeKind ReturnStmtNode::kind() const {
         return NodeKind::RETURN_STMT;
     }
+    
+    CImportStmtNode::CImportStmtNode(std::shared_ptr<Node> node, int line)
+        : node(node) {
+        this->line = line;
+    }
+
+    NodeKind CImportStmtNode::kind() const {
+        return NodeKind::CIMPORT_STMT;
+    }
 
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts, int line)
         : stmts(stmts) {

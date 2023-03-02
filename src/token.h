@@ -21,6 +21,8 @@ namespace eris {
         DEF,
         LAMBDA,
         RETURN,
+        IMPORT,
+        CIMPORT,
         PLUS,
         MINUS,
         MUL,

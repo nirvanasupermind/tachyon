@@ -4,8 +4,11 @@
 #include <vector>
 #include <set>
 #include <functional>
+#include <sstream>
+#include <fstream>
 
 #include "token.h"
+#include "lexer.h"
 #include "node.h"
 #include "parser.h"
 
@@ -72,9 +75,37 @@ namespace eris {
         else if (current.type == TokenType::RETURN) {
             return return_stmt();
         }
-
+        else if (current.type == TokenType::IMPORT) {
+            return import_stmt();
+        }
         else {
             return expr_stmt();
+        }
+    }
+
+    std::shared_ptr<Node> Parser::import_stmt() {
+        int line = current.line;
+        eat(TokenType::IMPORT);
+        std::shared_ptr<Node> node = expr();
+        eat(TokenType::SEMICOLON);
+        if (node->kind() == NodeKind::STRING) {
+            std::string in_filename = static_cast<StringNode*>(node.get())->val;
+            std::ifstream in_file;
+            in_file.open(in_filename);
+
+            std::stringstream strStream;
+            strStream << in_file.rdbuf();
+
+            std::string text = strStream.str();
+            Lexer lexer(text, in_filename);
+            std::vector<Token> tokens = lexer.generate_tokens();
+            Parser parser(tokens, in_filename);
+            std::shared_ptr<eris::Node> tree = parser.parse();
+
+            return tree;
+        }
+        else {
+            raise_error();
         }
     }
 
@@ -264,7 +295,8 @@ namespace eris {
                     args.push_back(expr());
                     if (current.type == TokenType::RPAREN) {
                         break;
-                    } else {
+                    }
+                    else {
                         eat(TokenType::COMMA);
                     }
                 }

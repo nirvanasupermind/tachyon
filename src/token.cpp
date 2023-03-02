@@ -57,6 +57,12 @@ namespace eris {
         case TokenType::RETURN:
             result += "RETURN";
             break;
+        case TokenType::IMPORT:
+            result += "IMPORT";
+            break;
+        case TokenType::CIMPORT:
+            result += "IMPORT";
+            break;
         case TokenType::PLUS:
             result += "PLUS";
             break;

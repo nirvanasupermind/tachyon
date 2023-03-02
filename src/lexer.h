@@ -20,6 +20,8 @@ namespace eris {
         {"def", TokenType::DEF},  
         {"lambda", TokenType::LAMBDA},
         {"return", TokenType::RETURN},
+        {"import", TokenType::IMPORT},
+        {"cimport", TokenType::CIMPORT}
     };
 
     class Lexer {

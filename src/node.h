@@ -32,6 +32,7 @@ namespace eris {
         FOR_STMT,
         FUNC_DECL_STMT,
         RETURN_STMT,
+        CIMPORT_STMT,
         STMT_LIST
     };
 
@@ -119,7 +120,6 @@ namespace eris {
         NodeKind kind() const;
         std::string str() const;
     };
-
 
     class VecNode: public Node {
     public:
@@ -244,6 +244,14 @@ namespace eris {
     public:
         std::shared_ptr<Node> node;
         explicit ReturnStmtNode(std::shared_ptr<Node> node, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
+    class CImportStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> node;
+        explicit CImportStmtNode(std::shared_ptr<Node> node, int line);
         NodeKind kind() const;
         std::string str() const;
     };
