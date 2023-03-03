@@ -14,6 +14,7 @@
 #include <ctime>
 #include <thread>
 #include <algorithm>
+#include <fstream>
 
 // A copy of this file will be included in every transpiled programs
 
@@ -561,4 +562,26 @@ ErisVal Thread = ErisVal::make_object({
     })}
     });
 
-#endif // ERIS_Hw   
+ErisVal FileSystem = ErisVal::make_object({
+    {"read", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+    assert(args.at(1).tag == ErisVal::OBJECT);
+    std::string path = static_cast<ErisString*>(args.at(1).o)->s;
+    std::ifstream in_file;
+    in_file.open(path);
+    std::stringstream strStream;
+    strStream << in_file.rdbuf();
+    std::string text = strStream.str();
+    return ErisVal::make_str(text);
+    })},
+    {"write", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+    assert(args.at(1).tag == ErisVal::OBJECT && args.at(2).tag == ErisVal::OBJECT);
+    std::string path = static_cast<ErisString*>(args.at(1).o)->s;
+    std::string str = static_cast<ErisString*>(args.at(2).o)->s;
+    std::ofstream out_file;
+    out_file.open(path);
+    out_file << str;
+    return ErisVal::make_nil();
+    })}
+    });
+
+#endif // ERIS_H

@@ -1,2 +1,2 @@
-import "test/test2.eris";
-System.print(x - 1);
+FileSystem.write("test/test.txt", "Hello world!");
+System.print(FileSystem.read("test/test.txt"));
