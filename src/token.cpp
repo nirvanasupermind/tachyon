@@ -63,6 +63,12 @@ namespace eris {
         case TokenType::CIMPORT:
             result += "IMPORT";
             break;
+        case TokenType::TRY:
+            result += "TRY";
+            break;
+        case TokenType::CATCH:
+            result += "CATCH";
+            break;
         case TokenType::PLUS:
             result += "PLUS";
             break;
@@ -94,13 +100,11 @@ namespace eris {
             result += "BITXOR";
             break;
         case TokenType::AND:
-            result += "BITAND";
+            result += "AND";
             break;
         case TokenType::OR:
-            result += "BITOR";
+            result += "OR";
             break;
-        case TokenType::XOR:
-            result += "BITXOR";
         case TokenType::EQ:
             result += "EQ";
             break;

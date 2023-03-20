@@ -60,8 +60,16 @@ namespace eris {
                 advance();
             }
             else if (current == '/') {
-                tokens.push_back(Token(TokenType::DIV, "/", line));
+                int ln = line;
                 advance();
+                if (current == '/') {
+                    advance();
+                    while(current != '\n' && current != '\0') {
+                        advance();
+                    }
+                } else {
+                    tokens.push_back(Token(TokenType::EQ, "=", ln));
+                }
             }
             else if (current == '%') {
                 tokens.push_back(Token(TokenType::MOD, "%", line));
@@ -132,14 +140,8 @@ namespace eris {
                 }
             }
             else if (current == '^') {
-                int ln = line;
-                advance();
-                if (current == '^') {
-                    tokens.push_back(Token(TokenType::XOR, "^^", ln));
-                    advance();
-                } else {
-                    tokens.push_back(Token(TokenType::BITXOR, "^", ln));
-                }
+                tokens.push_back(Token(TokenType::BITXOR, "^", line));
+                advance();    
             }
             else if (current == '(') {
                 tokens.push_back(Token(TokenType::LPAREN, "(", line));

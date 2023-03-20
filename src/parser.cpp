@@ -81,9 +81,25 @@ namespace eris {
         else if (current.type == TokenType::CIMPORT) {
             return cimport_stmt();
         }
+        else if (current.type == TokenType::TRY) {
+            return try_catch_stmt();
+        }
         else {
             return expr_stmt();
         }
+    }
+
+
+    std::shared_ptr<Node> Parser::try_catch_stmt() {
+        int line = current.line;
+        eat(TokenType::TRY);
+        std::shared_ptr<Node> try_body = block_stmt();
+        eat(TokenType::CATCH);
+        eat(TokenType::LPAREN);
+        std::string ex = eat(TokenType::IDENTIFIER).val;
+        eat(TokenType::RPAREN);
+        std::shared_ptr<Node> catch_body = block_stmt();
+        return std::shared_ptr<TryCatchStmtNode>(new TryCatchStmtNode(try_body, ex, catch_body, line));    
     }
 
     std::shared_ptr<Node> Parser::cimport_stmt() {
@@ -247,12 +263,9 @@ namespace eris {
     }
 
     std::shared_ptr<Node> Parser::or_expr() {
-        return binary_expr([this]() { return xor_expr(); }, { TokenType::OR });
+        return binary_expr([this]() { return and_expr(); }, { TokenType::OR });
     }
 
-    std::shared_ptr<Node> Parser::xor_expr() {
-        return binary_expr([this]() { return and_expr(); }, { TokenType::XOR });
-    }
 
     std::shared_ptr<Node> Parser::and_expr() {
         return binary_expr([this]() { return bitor_expr(); }, { TokenType::AND });

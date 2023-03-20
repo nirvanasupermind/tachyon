@@ -21,7 +21,9 @@ namespace eris {
         {"lambda", TokenType::LAMBDA},
         {"return", TokenType::RETURN},
         {"import", TokenType::IMPORT},
-        {"cimport", TokenType::CIMPORT}
+        {"cimport", TokenType::CIMPORT},
+        {"try", TokenType::TRY},
+        {"catch", TokenType::CATCH},
     };
 
     class Lexer {

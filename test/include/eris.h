@@ -373,7 +373,11 @@ ErisVal System = ErisVal::make_object({
     })},
     {"time", ErisVal::make_func([](const std::vector<ErisVal>& args) {
         return ErisVal::make_num(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-    })}
+    })},
+    {"assert", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+        assert(args.at(1).tag == ErisVal::BOOL & args.at(1).b);
+        return ErisVal::make_num(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+    })},
     });
 
 ErisVal Math = ErisVal::make_object({
@@ -552,7 +556,7 @@ ErisVal Thread = ErisVal::make_object({
     {"create", ErisVal::make_func([](const std::vector<ErisVal>& args) {
     assert(args.at(1).tag == ErisVal::OBJECT);
 
-    return ErisVal::make_thread(new std::thread([args] () {
+    return ErisVal::make_thread(new std::thread([args]() {
         return static_cast<ErisFunc*>(args.at(1).o)->f({});
     }));
     })},
@@ -586,18 +590,12 @@ ErisVal FileSystem = ErisVal::make_object({
     })}
     });
 
-
-// ErisVal Exception = ErisVal::make_object({
-//     {"read", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-//     assert(args.at(1).tag == ErisVal::OBJECT);
-//     std::string path = static_cast<ErisString*>(args.at(1).o)->s;
-//     std::ifstream in_file;
-//     in_file.open(path);
-//     std::stringstream strStream;
-//     strStream << in_file.rdbuf();
-//     std::string text = strStream.str();
-//     return ErisVal::make_str(text);
-//     })}
-//     });
+ErisVal Exception = ErisVal::make_object({
+    {"throw", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+    std::string msg = static_cast<ErisString*>(args.at(0).o->get("msg").o)->s;
+    throw std::runtime_error(msg);
+    return ErisVal::make_nil();
+    })}
+    });
 
 #endif // ERIS_H

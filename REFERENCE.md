@@ -31,6 +31,8 @@
 ## 5.7 Function Declaration Statements
 ## 5.8 Import Statements
 ## 5.9 C++ Import Statements
+## 6.0 Try-Catch Statements
+
 # 6 The Standard Library
 ## 6.1 The System Object
 ## 6.2 The Math Object

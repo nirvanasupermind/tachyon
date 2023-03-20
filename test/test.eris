@@ -1,2 +1,1 @@
-cimport "./sqr.cpp";
-System.print(sqr(6));
+System.print(2 ^ 4); // prints 2 xor 4

@@ -64,6 +64,8 @@ namespace eris {
             return visit(static_cast<ReturnStmtNode*>(node));
         case NodeKind::CIMPORT_STMT:
             return visit(static_cast<CImportStmtNode*>(node));
+        case NodeKind::TRY_CATCH_STMT:
+            return visit(static_cast<TryCatchStmtNode*>(node));
         default:
             throw std::string(filename + ":" + std::to_string(node->line) + ": unknown AST node type");
         }
@@ -274,6 +276,13 @@ namespace eris {
 
     void Transpiler::visit(CImportStmtNode* node) {
         included_headers.insert("\"" + node->path + "\"");
+    }
+
+    void Transpiler::visit(TryCatchStmtNode* node) {
+        post_main_code << "try ";
+        visit(node->try_body.get());
+        post_main_code << "catch(const std::runtime_error&" << node->ex << ") ";
+        visit(node->catch_body.get());
     }
 
     void Transpiler::visit(StmtListNode* node) {

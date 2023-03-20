@@ -22,6 +22,7 @@ namespace eris {
         void advance();
         std::shared_ptr<Node> stmt_list(TokenType end = TokenType::EOF_);
         std::shared_ptr<Node> stmt();
+        std::shared_ptr<Node> try_catch_stmt();
         std::shared_ptr<Node> cimport_stmt();
         std::shared_ptr<Node> import_stmt();
         std::shared_ptr<Node> return_stmt();
@@ -35,7 +36,6 @@ namespace eris {
         std::shared_ptr<Node> expr();
         std::shared_ptr<Node> assignment_expr();
         std::shared_ptr<Node> binary_expr(const std::function<std::shared_ptr<Node>()>& operand, const std::set<TokenType>& op_types);
-        std::shared_ptr<Node> xor_expr();
         std::shared_ptr<Node> or_expr();
         std::shared_ptr<Node> and_expr();
         std::shared_ptr<Node> bitor_expr();

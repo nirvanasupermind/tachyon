@@ -226,6 +226,15 @@ namespace eris {
         return NodeKind::CIMPORT_STMT;
     }
 
+    TryCatchStmtNode::TryCatchStmtNode(std::shared_ptr<Node> try_body, const std::string& ex, std::shared_ptr<Node> catch_body, int line)
+        : try_body(try_body), ex(ex), catch_body(catch_body) {
+        this->line = line;
+    }
+
+    NodeKind TryCatchStmtNode::kind() const {
+        return NodeKind::TRY_CATCH_STMT;
+    }
+
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts, int line)
         : stmts(stmts) {
         this->line = line;

@@ -33,6 +33,7 @@ namespace eris {
         FUNC_DECL_STMT,
         RETURN_STMT,
         CIMPORT_STMT,
+        TRY_CATCH_STMT,
         STMT_LIST
     };
 
@@ -255,6 +256,17 @@ namespace eris {
         NodeKind kind() const;
         std::string str() const;
     };
+
+    class TryCatchStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> try_body;
+        std::string ex;
+        std::shared_ptr<Node> catch_body;
+        explicit TryCatchStmtNode(std::shared_ptr<Node> try_body, const std::string& ex, std::shared_ptr<Node> catch_body, int line);
+        NodeKind kind() const;
+        std::string str() const;
+    };
+
 
     class StmtListNode: public Node {
     public:
