@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "token.h"
 #include "lexer.h"
 #include "node.h"
@@ -20,6 +22,20 @@ void transpile(const std::string& in_filename, const std::string& out_filename, 
     out_file.open(out_filename);
     out_file << transpiler.generate_code(tree.get());
     out_file.close();
+    std::size_t idx = in_filename.find_last_of("/\\");
+
+    std::string sPath = idx == std::string::npos ? "." : in_filename.substr(0, idx) + "/include";
+    mode_t nMode = 0733; // UNIX style permissions
+    int nError = 0;
+    #if defined(_WIN32)
+    nError = _mkdir(sPath.c_str()); // can be used on Windows
+    #else 
+    nError = mkdir(sPath.c_str(),nMode); // can be used on non-Windows
+    #endif
+
+    std::ifstream src("src/eris.h", std::ios::binary);
+    std::ofstream dst(idx == std::string::npos ? "." : in_filename.substr(0, idx) + "/include/eris.h", std::ios::binary);
+    dst << src.rdbuf();
 }
 
 int main(int argc, char** argv) {

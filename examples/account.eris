@@ -1,0 +1,20 @@
+var Account = {
+    deposit: lambda(self, amount) {
+        self.balance = self.balance + amount;
+    },
+    withdraw: lambda(self, amount) {
+        self.balance = self.balance - amount;
+    }
+};
+
+var SavingsAccount = {
+    proto: Account,
+    compound: lambda(self) {
+        self.balance = self.balance * (1 + self.interest);
+    }
+};
+
+var savingsAccount = {proto: SavingsAccount, balance: 0, interest: 0.05};
+account.deposit(20);
+account.compound();
+System.print(savingsAccount.balance);

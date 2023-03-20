@@ -7,7 +7,7 @@
 
 namespace eris {
     Transpiler::Transpiler(const std::string& filename)
-        : filename(filename), included_headers({ "\"../src/eris.h\"" }) {
+        : filename(filename), included_headers({ "\"./include/eris.h\"" }) {
     }
 
     void Transpiler::visit(Node* node) {
@@ -62,6 +62,8 @@ namespace eris {
             return visit(static_cast<FuncDeclStmtNode*>(node));
         case NodeKind::RETURN_STMT:
             return visit(static_cast<ReturnStmtNode*>(node));
+        case NodeKind::CIMPORT_STMT:
+            return visit(static_cast<CImportStmtNode*>(node));
         default:
             throw std::string(filename + ":" + std::to_string(node->line) + ": unknown AST node type");
         }
@@ -268,6 +270,10 @@ namespace eris {
         post_main_code << "return ";
         visit(node->node.get());
         post_main_code << ';';
+    }
+
+    void Transpiler::visit(CImportStmtNode* node) {
+        included_headers.insert("\"" + node->path + "\"");
     }
 
     void Transpiler::visit(StmtListNode* node) {

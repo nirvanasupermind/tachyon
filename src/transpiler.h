@@ -38,6 +38,7 @@ namespace eris {
         void visit(ForStmtNode* node);
         void visit(FuncDeclStmtNode* node);
         void visit(ReturnStmtNode* node);
+        void visit(CImportStmtNode* node);
     public:
         static std::string boilerplate;
         Transpiler(const std::string& filename);

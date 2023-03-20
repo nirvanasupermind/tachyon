@@ -78,8 +78,25 @@ namespace eris {
         else if (current.type == TokenType::IMPORT) {
             return import_stmt();
         }
+        else if (current.type == TokenType::CIMPORT) {
+            return cimport_stmt();
+        }
         else {
             return expr_stmt();
+        }
+    }
+
+    std::shared_ptr<Node> Parser::cimport_stmt() {
+        int line = current.line;
+        eat(TokenType::CIMPORT);
+        std::shared_ptr<Node> node = expr();
+        eat(TokenType::SEMICOLON);
+        if (node->kind() == NodeKind::STRING) {
+            std::string path = static_cast<StringNode*>(node.get())->val;
+            return std::shared_ptr<Node>(new CImportStmtNode(path, line));
+        }
+        else {
+            raise_error();
         }
     }
 

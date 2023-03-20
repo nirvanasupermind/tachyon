@@ -250,8 +250,8 @@ namespace eris {
 
     class CImportStmtNode: public Node {
     public:
-        std::shared_ptr<Node> node;
-        explicit CImportStmtNode(std::shared_ptr<Node> node, int line);
+        std::string path;
+        explicit CImportStmtNode(const std::string& path, int line);
         NodeKind kind() const;
         std::string str() const;
     };

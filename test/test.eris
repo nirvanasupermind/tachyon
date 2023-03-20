@@ -1,2 +1,2 @@
-FileSystem.write("test/test.txt", "Hello world!");
-System.print(FileSystem.read("test/test.txt"));
+cimport "./sqr.cpp";
+System.print(sqr(6));

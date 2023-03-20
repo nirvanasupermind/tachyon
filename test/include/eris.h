@@ -587,17 +587,17 @@ ErisVal FileSystem = ErisVal::make_object({
     });
 
 
-ErisVal Exception = ErisVal::make_object({
-    {"read", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-    assert(args.at(1).tag == ErisVal::OBJECT);
-    std::string path = static_cast<ErisString*>(args.at(1).o)->s;
-    std::ifstream in_file;
-    in_file.open(path);
-    std::stringstream strStream;
-    strStream << in_file.rdbuf();
-    std::string text = strStream.str();
-    return ErisVal::make_str(text);
-    })}
-    });
+// ErisVal Exception = ErisVal::make_object({
+//     {"read", ErisVal::make_func([](const std::vector<ErisVal>& args) {
+//     assert(args.at(1).tag == ErisVal::OBJECT);
+//     std::string path = static_cast<ErisString*>(args.at(1).o)->s;
+//     std::ifstream in_file;
+//     in_file.open(path);
+//     std::stringstream strStream;
+//     strStream << in_file.rdbuf();
+//     std::string text = strStream.str();
+//     return ErisVal::make_str(text);
+//     })}
+//     });
 
 #endif // ERIS_H

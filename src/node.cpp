@@ -217,8 +217,8 @@ namespace eris {
         return NodeKind::RETURN_STMT;
     }
     
-    CImportStmtNode::CImportStmtNode(std::shared_ptr<Node> node, int line)
-        : node(node) {
+    CImportStmtNode::CImportStmtNode(const std::string& path, int line)
+        : path(path) {
         this->line = line;
     }
 

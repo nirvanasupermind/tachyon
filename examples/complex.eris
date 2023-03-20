@@ -1,0 +1,12 @@
+var Complex = {
+    add: lambda (self, other) {
+        return Complex(self.re + other.re, self.im + other.im);
+    },
+    abs: lambda (self) {
+        return Math.sqrt(self.re * self.re + self.im * self.im);
+    }
+};
+
+var a = {proto: Complex, re: 0, im: 1};
+var b = {proto: Complex, re: 2, im: -1};
+System.print(a.add(b).abs());
