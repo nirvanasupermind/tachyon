@@ -1,12 +1,22 @@
 # 1 Introduction
+Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing.
+
 # 2 Grammar
 ## 2.1 Lexical Grammar
 ## 2.2 Syntactic Grammar
 # 3 Values and Types
 ## 3.1 Nil
+The nil type represents the absence of a useful value, and has one single value, which can be created using the literal `nil`.
+
 ## 3.2 Numbers
+The number type represents a double-precision (64-bit) floating-point number. Numbers can be created using a numeric literal, which can be either a decimal number such as `64.5` or a scientific notation number such as `6.45e1`.
+
 ## 3.3 Booleans
+The boolean type has two values, created using the literals `false` and `true`, which represent the two truth values of logic. 
+
 ## 3.4 Characters
+The character type represents a 1-byte text character. 
+
 ## 3.5 Objects
 ## 3.5.1 Strings 
 ## 3.5.2 Vectors

@@ -1,1 +1,1 @@
-System.print(2 ^ 4); // prints 2 xor 4
+System.print(System.time());
