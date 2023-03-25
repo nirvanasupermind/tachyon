@@ -1,7 +1,7 @@
 # 1 Introduction
 Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing.
 
-# 2 Grammar
+# 2 Formal Grammar
 ## 2.1 Lexical Grammar
 ## 2.2 Syntactic Grammar
 # 3 Values and Types
@@ -9,15 +9,17 @@ Eris is a lightweight dynamic programming language that supports full multithrea
 The nil type represents the absence of a useful value, and has one single value, which can be created using the literal `nil`.
 
 ## 3.2 Numbers
-The number type represents a double-precision (64-bit) floating-point number. Numbers can be created using a numeric literal, which can be either a decimal number such as `64.5` or a scientific notation number such as `6.45e1`.
+The number type represents a double-precision (64-bit) floating-point number. Numbers can be created using a numeric literal, which can be either a decimal number such as `64.5` or a scientific notation number such as `6.45e+1`.
 
 ## 3.3 Booleans
 The boolean type has two values, created using the literals `false` and `true`, which represent the two truth values of logic. 
 
 ## 3.4 Characters
-The character type represents a 1-byte text character. 
+The character type represents a single character in text. Note that characters in Eris correspond to bytes rather than Unicode characters, in order to be compatible with C++. Literal characters are delimited by single quotess such a. `Z`'.
 
 ## 3.5 Objects
+The object type represents a map of keys to values that can be inherited from using a prototype-based object model. The key-value pairs contained inside an object are known as properties. Objects can inherit properties directly from other objects through their `proto` property. Objects can be created using JSON-like literals where keys and values are separated by a colon such as `{a; 2, b: 3}`. There is no root of the object hierarchy in Eris and some objects can have no prototype.
+
 ## 3.5.1 Strings 
 ## 3.5.2 Vectors
 ## 3.5.3 Functions
