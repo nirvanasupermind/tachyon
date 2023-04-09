@@ -221,7 +221,7 @@ ErisVal ErisVal::operator>>(const ErisVal& other) const {
 
 ErisVal ErisVal::operator&(const ErisVal& other) const {
     assert(tag == NUM && other.tag == NUM);
-    return ErisVal::make_num((int)n & (int)other.n);
+    return ErisVal::make_num((int)n && (int)other.n);
 }
 
 ErisVal ErisVal::operator|(const ErisVal& other) const {
@@ -375,7 +375,7 @@ ErisVal System = ErisVal::make_object({
         return ErisVal::make_num(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
     })},
     {"assert", ErisVal::make_func([](const std::vector<ErisVal>& args) {
-        assert(args.at(1).tag == ErisVal::BOOL & args.at(1).b);
+        assert(args.at(1).tag == ErisVal::BOOL && args.at(1).b);
         return ErisVal::make_num(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
     })},
     });

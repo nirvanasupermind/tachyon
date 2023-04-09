@@ -1,1 +1,23 @@
-System.print(System.time());
+var t1 = System.time();
+def sqrtBisect(x) {
+    var lo = 1;
+    var hi = x;
+    var i = 0;
+    while(i < 50) {
+        var avg = (lo + hi)/2;
+        if(avg * avg < x) {
+            lo = avg;
+        } else {
+            hi = avg;
+        }
+        i = i + 1;
+    }
+    return lo;
+}
+var i = 0;
+while(i < 1000000) {
+    sqrtBisect(2);
+    i = i + 1;
+}
+var t2 = System.time();
+System.print(t2 - t1);

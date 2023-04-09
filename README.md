@@ -2,7 +2,7 @@
 
 **Version 2.0.0-dev**
 
-Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing.
+Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing, and can interact with C++ code.
 
 
 # Example

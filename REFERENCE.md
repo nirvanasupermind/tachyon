@@ -1,49 +1,340 @@
+# Eris 2.0 Reference Manual
 # 1 Introduction
-Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing.
+Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing, and can interact with C++ code.
+# 2 Lexical Structure
+This section specifies the lexical structure of Eris. Extended Backus–Naur form (EBNF) is also provided for the described grammar.
 
-# 2 Formal Grammar
-## 2.1 Lexical Grammar
+## 2.1 Whitespace
+```
+whitespace = " " | "\n" | "\t" | "\v" | "\f" | "\r";
+```
+
+Whitespace characters include characters that represent horizontal or vertical space, and are ignored by the Eris transpiler.
+
+## 2.2 Comments
+```
+comment = "//", {? any character except for newline ?};
+```
+
+A comment is text ignored by the Eris transpiler. They are normally used to add explanations to code. A comment is `//` followed by any sequence of characters. Comments are terminated by newlines.
+ 
+```
+// This is a comment
+```
+
+## 2.3 Literals
+```
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+number = digit, {digit}, [".", digit, {digit}], [("e" | "E"), ["+" | "-"], {digit}];
+char = "'", ? any character except for single quote ?, "'"; 
+string = '"', {? any character except for double quote ?}, '"'; 
+```
+
+Eris accepts decimal and scientific numeric literals, character literals and string literals. Character literals are wrapped in single quotes whereas string literals are wrapped in double qoutes. String literals can span multiple lines. Escape sequences in character and string literals are currently not supported in Eris, but will be added in a future version.
+
+```
+var a = 123;
+var b = 64.5;
+var c = 1e+5;
+var d = 'a';
+var e = "String literal";
+var f = "Multiline
+string literal":
+```
+
+## 2.4 Identifiers
+```
+identifier = (letter | "_"), {letter | digit | "_"};
+```
+
+An identifier is an unlimited-length sequence of letters, digits, and underscores which does not start with a digit. Identifiers are case-sensitive.
+## 2.5 Keywords
+The following keywords are reserved by the language and cannot be used as identifiers:
+```
+nil true false var block if else while for def lambda return import cimport try catch
+```
+## 2.6 Operators
+The following tokens are the Eris operators:
+```
++ - * / % == != < > <= >=  && || ! & | ^ << >> ~
+```
+## 2.7 Other Tokens
+Other tokens used are:
+```
+' " ( ) { } [ ] , : ; . 
+```
+<!-- 
+# 2 Grammar
+
+## 2.1 Lexical Grammar 
+```
+letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       | "x" | "y" | "z" ;
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+whitespace = " " | "\n" | "\t" | "\v" | "\f" | "\r";
+comment = "//", {? any character except for newline ?};
+skip = whitespace | comment;
+number = digit, {digit}, [".", digit, {digit}], [("e" | "E"), ["+" | "-"], {digit}];
+char = "'", ? any character except for single quote ?, "'"; 
+string = '"', {? any character except for double quote ?}, '"'; 
+identifier = (letter | "_"), {letter | digit | "_"};
+```
+
 ## 2.2 Syntactic Grammar
-# 3 Values and Types
-## 3.1 Nil
-The nil type represents the absence of a useful value, and has one single value, which can be created using the literal `nil`.
+```
+paren expr = "(", expr, ")";
+properties = "" | identifier, ":", expr, key value pairs;
+object = "{", properties, "}";
+expr list = "" | expr, ",", expr list;
+vec = "[", expr list, "]";
+arg names = "" | (identifier, ",", arg names);
+lambda = "lamba", "(",  arg names, ")", block stmt;
+primary expr = number | char | string | identifier | paren expr | object | vec | lambda;
+call prop expr = primary expr, {("(", expr list, ")") | (".", identifier)},
+unary expr = {"+" | "-" | "!" | "~"}, call prop expr;
+multiplicative expr = unary expr | (unary expr, ("*" | "/" | "%"), multiplicative expr);
+additive expr = multiplicative expr | (multiplicative expr, ("+" | "-"), additive expr);
+shift expr = additive expr | (additive expr, ("<<" | ">>"), shift expr);
+comp expr = shift expr | (shift expr, ("<" | ">" | "<=" | ">="), comp expr);
+equality expr = comp expr | (comp expr, ("==" | "!="), equality expr);
+bitand expr = equality expr | (equality expr, "&", bitand expr);
+bitxor expr = bitand expr | (bitand expr, "^", bitxor expr);
+bitor expr = bitxor expr | (bitxor expr, "|", bitor expr);
+and expr = bitor expr | (and expr, "&&", bitor expr);
+or expr = and expr | (and expr, "||", or expr);
+assignment expr = or expr, "=", assignment expr);
+expr = assignment expr;
+expr stmt = expr, ";";
+var decl stmt = "var", identifier, "=", expr, ";";
+block stmt = "{", {stmt}, "}";
+if stmt = "if", "(", expr, ")", block stmt, ["else", block stmt];
+while stmt = "while", "(", expr, ")", block stmt;
+for stmt = "for", "(", var decl stmt, expr, ";", expr, ")", block stmt;
+func decl stmt = "def", identifier, "(", arg names, ")", block stmt;
+return stmt = "return", expr, ";";
+import stmt = "import", string, ";";
+cimport stmt = "cimport", string, ";";
+try catch stmt = "try", block stmt, "catch", "(", identifier, ")", block stmt;
+stmt = expr stmt | var decl stmt | block stmt | if stmt | while stmt | for stmt | func decl stmt 
+       | return stmt | import stmt | cimport stmt | try catch stmt;
+``` -->
 
+# 3 Values and Types
+Eris is a dynamically-typed language. This means that variables themselves do not have a type, although they are to a value that does have a type. All values in Eris are first-class values, and can be stored in data structures, variables, and passed and returned from functions.
+
+## 3.1 Nil
+The nil type represents the absence of a useful value, and has one single value, `nil`.
+
+```
+var a = nil;
+```
 ## 3.2 Numbers
-The number type represents a double-precision (64-bit) floating-point number. Numbers can be created using a numeric literal, which can be either a decimal number such as `64.5` or a scientific notation number such as `6.45e+1`.
+The number type represents a double-precision (64-bit) floating-point number. Both decimal and scientific notation literals can be used for numbers.
+```
+var a = 123;
+var b = 64.5;
+var c = 1e+5;
+```
 
 ## 3.3 Booleans
 The boolean type has two values, created using the literals `false` and `true`, which represent the two truth values of logic. 
 
+```
+var a = true;
+```
+
 ## 3.4 Characters
-The character type represents a single character in text. Note that characters in Eris correspond to bytes rather than Unicode characters, in order to be compatible with C++. Literal characters are delimited by single quotess such a. `Z`'.
+The character type represents a single character in text. A character is not a Unicode character but a single byte.
+
+```
+var a = 'H';
+```
 
 ## 3.5 Objects
-The object type represents a map of keys to values that can be inherited from using a prototype-based object model. The key-value pairs contained inside an object are known as properties. Objects can inherit properties directly from other objects through their `proto` property. Objects can be created using JSON-like literals where keys and values are separated by a colon such as `{a; 2, b: 3}`. There is no root of the object hierarchy in Eris and some objects can have no prototype.
+Objects are associative containers implemented as key-value pairs (called a member). Objects can be modified after creation. Objects can inherit members from other objects via their prototype, which is set using the `proto` member. Strings, vectors, and functions are all objects that are derived from the built-in `String`, `Vec` and `Func` objects respectively.
 
-## 3.5.1 Strings 
-## 3.5.2 Vectors
-## 3.5.3 Functions
+```
+var Vec2 = {
+    mag: lambda(self) {
+        return Math.sqrt(self.x * self.x + self.y * self.y);
+    }
+};
+
+var vec2 = {x: 3, y: 4, proto: Vec2};
+System.print(vec2.mag()); // 5
+```
+
 # 4 Expressions
-## 4.1 Lambda Expressions
-## 4.2 Function Calls
-## 4.3 Unary Operators
-## 4.4 Arithmetic Operators
-## 4.5 Bitwise Operators
-## 4.6 Comparison Operators
-## 4.7 Equality Operators
-## 4.8 Logical Operators
-## 4.9 Assignment Operators
+```
+expr = assignment expr;
+```
+
+This section describes expressions in Eris.  Extended Backus–Naur form (EBNF) is also provided for the described grammar.
+
+## 4.1 Primary Expressions
+```
+primary expr = number | char | string | vec expr | object expr | lambda expr | paren expr;
+```
+Primary expressions include the simplest expressions: [literals](#23-literals), vector expressions, object expressions, lambda expressions, and parenthesized expressions.
+
+## 4.1.1 Vector Expressions
+```
+expr list = "" | expr, ",", expr list;
+vec expr = "[", expr list, "]";
+```
+
+Vector expressions can be used used to create [vector](#64-the-vec-object) objects. A vector expression is a list of zero or more comma-seperated expressions enclosed in square brackets.
+
+```
+var primes = [2, 3, 5, 7, 11];
+```
+
+## 4.1.2 Object Expressions
+```
+expr list = "" | expr, ",", expr list;
+vec expr = "[", expr list, "]";
+```
+
+Object expressions can be used used to create [objects](#35-objects). An object expression is a list of zero or more comma-seperated key-value pairs enclosed in curly brackets.
+
+
+```
+var object = {a: 2, b: 5};
+```
+
+## 4.1.3 Lambda Expressions
+```
+arg names = "" | identifier, ",", arg names;
+lambda expr = "lamba", "(",  arg names, ")", (expr | block stmt);
+```
+Lambda expressions can be used used to create anonymous [functions](#55-the-func-object). Lambda expressions have similar syntax to [function declaration statements](#48-function-declaration-statements), with the only major difference being the body of a lambda expression can either be an expression or a block statement.
+
+```
+var sqr = lambda(x) x * x;
+var add = lambda(a, b) {
+    return a + b;
+}
+```
+
+## 4.1.4 Parenthesized Expressions
+```
+paren expr = "(", expr, ")";
+```
+A parenthesized expression is an expression whose value is that of the contained expression.
+
+## 4.2 Call Member Expressions
+```
+expr list = "" | "expr", ",", expr list;
+call member expr = primary expr, {("(", expr list, ")") | (".", identifier)};
+```
+
+Call member expressions include function calls, object member accesses, and all combinations of them, in addition to primary expressions. 
+```
+System.print("Hello world!");
+```
+## 4.3 Operators
+### 4.3.1 Unary Operators
+```
+unary expr = {"+" | "-" | "!" | "~"}, call prop expr;
+```
+
+The unary operators include `+` (unary plus), `-` (unary minus), `!` (logical NOT), and `~` (bitwise NOT). `+`, `-`, and `~` must take a number as their argument whereas `!` must take a boolean as their argument.
+
+### 4.3.2 Multiplicative Operators
+```
+multiplicative expr = unary expr | (unary expr, ("*" | "/" | "%"), multiplicative expr);
+```
+
+The multiplicative operators are `*` (multiply), `/` (divide), and `%` (modulo or remainder). They are syntatically left-assosciative, must have numbers are arguments, and output numbers. The result of the modulo operator has the same sign as the first argument.
+
+### 4.3.3 Additive Operators
+```
+additive expr = multiplicative expr | (multiplicative expr, ("+" | "-"), additive expr);
+```
+
+The additive operators are `+` (add) and `-` (subtract). They are syntatically left-assosciative, must have numbers as arguments, and output numbers.
+
+## 4.3.4 Shift Operators
+```
+shift expr = additive expr | (additive expr, ("<<" | ">>"), shift expr);
+```
+
+The shift operators are `<<` (right shift) and `>>` (left shift). They are bitwise operators which convert a number to an signed 64-bit integer then shift the bits of the number to the left or right. They are syntatically left-assosciative, must have numbers as arguments, and output numbers. 
+
+## 4.3.5 Comparison Operators
+```
+comp expr = shift expr | (shift expr, ("<" | ">" | "<=" | ">="), comp expr);
+```
+
+The comparison operators are `<` (less than), `>` (greater than), `<=` (less than or equal), and `>=` (greater than or equal). They are syntatically left-assosciative, must have numbers as arguments, and output booleans. 
+
+## 4.3.6 Equality Operators
+```
+equality expr = comp expr | (comp expr, ("==" | "!="), equality expr);
+```
+
+The equality operators are `==` (equal) and `!=` (not equal). They are syntatically left-assosciative, can take any value as arguments, and output booleans. Objects are considered equal if they are the same reference.
+
+## 4.3.7 Bitwise AND Operator
+```
+bitand expr = equality expr | (equality expr, "&", bitand expr);
+```
+The bitwise AND (`&`) operator converts both arguments to signed 64-bit integers then takes the logical AND of each of their bits. It is syntatically left-assosciative, must have numbers as arguments, and outputs a number.
+
+## 4.3.8 Bitwise OR Operator
+```
+bitand expr = equality expr | (equality expr, "&", bitand expr);
+```
+The bitwise OR (`|`) operator converts both arguments to signed 64-bit integers then takes the logical OR of each of their bits. It is syntatically left-assosciative, must have numbers as arguments, and outputs a number.
+
+## 4.3.9 Bitwise XOR Operator
+```
+bitxor expr = bitand expr | (bitand expr, "^", bitxor expr);
+```
+The bitwise XOR (`^`) operator converts both arguments to signed 64-bit integers then takes the logical XOR of each of their bits. It is syntatically left-assosciative, must have numbers as arguments, and outputs a number.
+
+## 4.3.10 Bitwise OR Operator
+```
+bitor expr = bitxor expr | (bitxor expr, "|", bitor expr);
+```
+The bitwise OR (`|`) operator converts both arguments to signed 64-bit integers then takes the logical OR of each of their bits. It is syntatically left-assosciative, must have numbers as arguments, and outputs a number.
+
+## 4.3.11 Loigcal AND Operator
+```
+and expr = bitor expr | (and expr, "&&", bitor expr);
+```
+The logical AND (`&&`) operator takes the logical AND of two booleans. It is syntatically left-assosciative, must have booleans as arguments, and outputs a boolean.
+
+## 4.3.12 Loigcal OR Operator
+```
+and expr = bitor expr | (and expr, "&&", bitor expr);
+```
+The logical OR (`||`) operator takes the logical OR of two booleans. It is syntatically left-assosciative, must have booleans as arguments, and outputs a boolean. There is no logical XOR operator as it would be identical to `!=` for boolean arguments. 
+
+## 4.3.13 Loigcal OR Operator
+```
+or expr = and expr | (and expr, "||", or expr);
+```
+The logical OR (`||`) operator takes the logical OR of two booleans. It is syntatically left-assosciative, must have booleans as arguments, and outputs a boolean.
+
 # 5 Statements
-## 5.1 Variable Declaration Statements
-## 5.2 Block Statements
-## 5.3 If Statements
-## 5.4 If-Else Statements
-## 5.5 While Statements
-## 5.6 For Statements
-## 5.7 Function Declaration Statements
-## 5.8 Import Statements
-## 5.9 C++ Import Statements
-## 6.0 Try-Catch Statements
+## 5.1 Expression Statements
+## 5.2 Variable Declaration Statements
+## 5.3 Block Statements
+## 5.4 If Statements
+## 5.5 If-Else Statements
+## 5.6 While Statements
+## 5.7 For Statements
+## 5.8 Function Declaration Statements
+## 5.9 Import Statements
+## 5.10 C++ Import Statements
+## 5.11 Try-Catch Statements
 
 # 6 The Standard Library
 ## 6.1 The System Object
@@ -52,8 +343,12 @@ The object type represents a map of keys to values that can be inherited from us
 ## 6.4 The Vec Object
 ## 6.5 The Func Object
 ## 6.6 The Thread Object
+## 6.7 The FileSystem Object
+## 6.8 The Exception Object
+
 # 7 The C++ API
 ## 7.1 The ErisVal Class
+
 ## 7.2 The ErisObject Class
 ## 7.3 The ErisString Class
 ## 7.4 The ErisVector Class
