@@ -15,6 +15,7 @@
 #include <thread>
 #include <algorithm>
 #include <fstream>
+#include <cstdint>
 
 // A copy of this file will be included in every transpiled programs
 
@@ -211,27 +212,27 @@ ErisVal ErisVal::operator%(const ErisVal& other) const {
 
 ErisVal ErisVal::operator<<(const ErisVal& other) const {
     assert(tag == NUM && other.tag == NUM);
-    return ErisVal::make_num((int)n << (int)other.n);
+    return ErisVal::make_num((int64_t)n << (int64_t)other.n);
 }
 
 ErisVal ErisVal::operator>>(const ErisVal& other) const {
     assert(tag == NUM && other.tag == NUM);
-    return ErisVal::make_num((int)n >> (int)other.n);
+    return ErisVal::make_num((int64_t)n >> (int64_t)other.n);
 }
 
 ErisVal ErisVal::operator&(const ErisVal& other) const {
     assert(tag == NUM && other.tag == NUM);
-    return ErisVal::make_num((int)n && (int)other.n);
+    return ErisVal::make_num((int64_t)n && (int64_t)other.n);
 }
 
 ErisVal ErisVal::operator|(const ErisVal& other) const {
     assert(tag == NUM && other.tag == NUM);
-    return ErisVal::make_num((int)n | (int)other.n);
+    return ErisVal::make_num((int64_t)n | (int64_t)other.n);
 }
 
 ErisVal ErisVal::operator^(const ErisVal& other) const {
     assert(tag == NUM && other.tag == NUM);
-    return ErisVal::make_num((int)n ^ (int)other.n);
+    return ErisVal::make_num((int64_t)n ^ (int64_t)other.n);
 }
 
 ErisVal ErisVal::operator&&(const ErisVal& other) const {

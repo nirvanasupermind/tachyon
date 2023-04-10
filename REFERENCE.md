@@ -126,15 +126,17 @@ stmt = expr stmt | var decl stmt | block stmt | if stmt | while stmt | for stmt 
 ``` -->
 
 # 3 Values and Types
+
+## 3.1 Types
 Eris is a dynamically-typed language. This means that variables themselves do not have a type, although they are to a value that does have a type. All values in Eris are first-class values, and can be stored in data structures, variables, and passed and returned from functions.
 
-## 3.1 Nil
+### 3.1.1 Nil
 The nil type represents the absence of a useful value, and has one single value, `nil`.
 
 ```
 var a = nil;
 ```
-## 3.2 Numbers
+### 3.1.2 Numbers
 The number type represents a double-precision (64-bit) floating-point number. Both decimal and scientific notation literals can be used for numbers.
 ```
 var a = 123;
@@ -142,21 +144,21 @@ var b = 64.5;
 var c = 1e+5;
 ```
 
-## 3.3 Booleans
+### 3.1.3 Booleans
 The boolean type has two values, created using the literals `false` and `true`, which represent the two truth values of logic. 
 
 ```
 var a = true;
 ```
 
-## 3.4 Characters
+### 3.1.4 Characters
 The character type represents a single character in text. A character is not a Unicode character but a single byte.
 
 ```
 var a = 'H';
 ```
 
-## 3.5 Objects
+### 3.1.5 Objects
 Objects are associative containers implemented as key-value pairs (called a member). Objects can be modified after creation. Objects can inherit members from other objects via their prototype, which is set using the `proto` member. Strings, vectors, and functions are all objects that are derived from the built-in `String`, `Vec` and `Func` objects respectively.
 
 ```
@@ -170,12 +172,15 @@ var vec2 = {x: 3, y: 4, proto: Vec2};
 System.print(vec2.mag()); // 5
 ```
 
+## 3.2 Variables and Scopes
+Variables are named bindings to values. Variable declaration statements and function declaration statements can be used to declare variables. The scope of a variable is the part of a program where the variable can be accessed. Scopes use a hierarchical structure with the global scope at the root. A variable can be accesed if it is in the current scope or any of its parent scopes. Block statements create a new child scope of their enclosing scope.
+
 # 4 Expressions
 ```
 expr = assignment expr;
 ```
 
-This section describes expressions in Eris.  Extended Backus–Naur form (EBNF) is also provided for the described grammar.
+This section describes expressions in Eris. Extended Backus–Naur form (EBNF) is also provided for the described syntax.
 
 ## 4.1 Primary Expressions
 ```
@@ -324,17 +329,131 @@ or expr = and expr | (and expr, "||", or expr);
 The logical OR (`||`) operator takes the logical OR of two booleans. It is syntatically left-assosciative, must have booleans as arguments, and outputs a boolean.
 
 # 5 Statements
+```
+stmt = expr stmt | var decl stmt | block stmt | if stmt | while stmt | for stmt | func decl stmt; 
+```
+
+This section describes statements in Eris. Extended Backus–Naur form (EBNF) is also provided for the described syntax.
+
 ## 5.1 Expression Statements
+```
+expr stmt = expr, ";";
+```
+Expressions may be used as statements by following them with semicolons. The value of the expression is discarded.
+
 ## 5.2 Variable Declaration Statements
-## 5.3 Block Statements
-## 5.4 If Statements
-## 5.5 If-Else Statements
-## 5.6 While Statements
-## 5.7 For Statements
-## 5.8 Function Declaration Statements
-## 5.9 Import Statements
-## 5.10 C++ Import Statements
-## 5.11 Try-Catch Statements
+```
+var decl stmt = "var", identifier, "=", expr, ";";
+```
+
+A variable declaration statement declares a variable name.
+
+```
+var a = 5;
+```
+
+## 5.3 Variable Declaration Statements
+```
+var decl stmt = "var", identifier, "=", expr, ";";
+```
+
+A variable declaration statement declares a variable name.
+
+```
+var a = 5;
+```
+
+## 5.4 Block Statements
+```
+block stmt = "{", {stmt}, "}";
+```
+
+A block is a sequence of statements within braces. Block statements create a new child scope of their enclosing scope.
+
+```
+{
+    var x = 2;
+}
+// x cannot be accessed from outside
+```
+
+## 5.5 If Statements
+```
+if stmt = "if", "(", expr, ")", block stmt, ["else", block stmt];
+```
+
+The if statement executes a statement if the condition is `true`. If the condition is `false`, another statement in the optional else clause will be executed. The condition of an if-else statement must be a boolean.
+
+```
+if(a < 5) {
+    a = 0;
+} else {
+    a = 1;
+}
+```
+
+## 5.7 While Statements
+```
+while stmt = "while", "(", expr, ")", block stmt;
+```
+
+The while statement executes a statement while the condition is true.
+
+```
+while(y < 10) {
+    x = x + 1;
+}
+```
+
+## 5.8 For Statements
+```
+for stmt = "for", "(", var decl stmt, expr, ";", expr, ")", block stmt;
+```
+
+The for statement executes some initialization code, then executes an expression, a statement, and some update code repeatedly until the value of the expression is false.
+
+```
+for (var i = 0; i < 10; i = i + 1) {
+    System.print(i);
+}
+```
+
+## 5.9 Function Declaration Statements
+```
+func decl stmt = "def", identifier, "(", arg names, ")", block stmt;
+```
+
+A function declaration statements declares a named function.
+
+```
+def sqr(x) {
+    return x * x;
+}
+```
+
+## 5.10 Import Statements
+```
+import stmt = "import", string, ";";
+```
+
+An import statement is used to include another Eris file.
+
+```
+import "file.eris";
+```
+
+## 5.11 C++ Import Statements
+```
+cpp import stmt = "cppimport", string, ";";
+```
+A C++ import statement is used to include the contents of another C++ file inside the C++ code emitted by the transpiler. C++ import statements can be used to allow interop with C++.
+
+```
+cppimport "file.cpp";
+```
+
+
+## 5.12 Try-Catch Statements
 
 # 6 The Standard Library
 ## 6.1 The System Object

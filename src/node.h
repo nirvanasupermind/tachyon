@@ -267,7 +267,6 @@ namespace eris {
         std::string str() const;
     };
 
-
     class StmtListNode: public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;
