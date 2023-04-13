@@ -1,0 +1,6 @@
+try { 
+    ([1, 2, 3]).at(95);
+} catch(e) {
+    System.print("The error message was");
+    System.print(e.msg);
+}

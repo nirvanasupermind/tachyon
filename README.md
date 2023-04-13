@@ -1,31 +1,18 @@
-# Eris 
-**Version 1.0.0**
+![Eris](logo.png)
 
-C++ interpreter for the Eris programming language with a header-only implementation.
+**Version 2.0.0-dev**
 
-Eris is a general-purpose, lightweight, dynamic programming language with class-based object-oriented programming support.
+Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing, and can interact with C++ code.
 
-Compile `src/main.cpp` to get an executable that can run Eris programs on the command-line like `eris filename.eris` (make sure to compile on C++11).
 
+# Example
 ```
-class Point {
-    def constructor(self, x, y) {
-        self.x = x;
-        self.y = y;
+var Vec2 = {
+    mag: lambda(self) {
+        return Math.sqrt(self.x * self.x + self.y * self.y);
     }
+};
 
-    def calc(self) {
-        return Math::pow(self.x, 2.0) + Math::pow(self.y, 2.0);
-    }
-}
-
-let p = Point(5, 6);
-print(p.calc()); // 61.0
+var vec2 = {x: 3, y: 4, proto: Vec2};
+System.print(vec2.mag()); // 5
 ```
-
-## Status
-Currently, the interpreter is mostly working, but the implementation is old and unstable, and thus may contain bugs, and documentation is sparse.
-A refactoring of the interpreter, the addition of hash maps, and many stability and performance updates, are slated for Eris 2.0.
-
-## Example programs
-See the [#examples](examples) directory for example programs.

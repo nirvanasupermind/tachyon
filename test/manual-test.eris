@@ -1,1 +1,0 @@
-print(Math::pow(2, 31));
