@@ -514,8 +514,9 @@ Returns the ceiling function of `a`.
 
 
 ## 6.3 The String Object
-The `String` object represents ordered sequences of [characters](#3.1.4-characters). All string literals are implemented as objects whose prototype is `String`.
+The `String` object represents ordered sequences of [characters](#3.1.4-characters). All string literals are implemented as objects whose prototype is `String`. The characters inside a string are assigned a zero-based index number, with the first character being indexed 0, the second being indexed 1, the third being indexed 2, and so on.
 
+### Members
 #### `String.length(self)`
 R#eturns the length of `self`.
 #### `String.at(self, idx)`
@@ -537,11 +538,22 @@ Splits the string into a vector of substrings using a specified seperator.
 #### `String.from(self, val)`
 Returns a string representation of the specified value. Objects aside from strings themselves are represented by the string "&lt;object&gt;".
 ## 6.4 The Vec Object
-The `Vec` object represents ordered sequences of any value. A single vector can contain values of different types. All vector expressions are implemented as objects whose prototype is `Vec`.
+The `Vec` object represents ordered sequences of any value. A single vector can contain values of different types. All vector expressions are implemented as objects whose prototype is `Vec`. The elements inside a vector are assigned a zero-based index number, with the first element being indexed 0, the second being indexed 1, the third being indexed 2, and so on.
 
+### Members
+#### `Vec.length(self)`
+Returns the length of `self`.
+#### `Vec.at(self, idx)`
+Returns the element indexed `idx` in `self`.
+#### `Vec.first(self)`
+Returns the first element in `self`.
+#### `Vec.last(self)`
+Returns the last element in `self`.
 
-## 6.4 The Vec Object
+## 6.5 The Fu
 ## 6.5 The Func Object
+
+
 ## 6.6 The Thread Object
 ## 6.7 The FileSystem Object
 ## 6.8 The Exception Object
