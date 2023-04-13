@@ -591,7 +591,7 @@ ErisVal FileSystem = ErisVal::make_object({
     })}
     });
 
-ErisVal Exception = ErisVal::make_object({
+ ErisVal   = ErisVal::make_object({
     {"throw", ErisVal::make_func([](const std::vector<ErisVal>& args) {
     std::string msg = static_cast<ErisString*>(args.at(0).o->get("msg").o)->s;
     throw std::runtime_error(msg);

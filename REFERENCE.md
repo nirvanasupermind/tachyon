@@ -239,7 +239,7 @@ expr list = "" | "expr", ",", expr list;
 call member expr = primary expr, {("(", expr list, ")") | (".", identifier)};
 ```
 
-Call member expressions include function calls, object member accesses, and all combinations of them, in addition to primary expressions. 
+Call member expressions include function calls, object member accesses, and all combinations of them, in addition to primary expressions.
 ```
 System.print("Hello world!");
 ```
@@ -454,11 +454,92 @@ cppimport "file.cpp";
 
 
 ## 5.12 Try-Catch Statements
+The try-catch statement is used for runtime exception handling. If a runtime exception is thrown during the execution of the `try` clause, the `catch` clause will be used as a fallback.
+
+```
+try {
+    [1, 2, 3].at(3);
+} catch(e) {
+    System.print("Error message: ".concat(e.msg));
+}
+```
 
 # 6 The Standard Library
 ## 6.1 The System Object
+The `System` object exposes operating system facilities like I/O, date time manipulation etc.
+
+### Members
+#### `System.print(self, a)`
+Prints a value to the console followed by a newline.
+#### `System.input(self)`
+Returns the user input as a string.
+#### `System.exit(self)`
+Terminates the program.
+#### `System.time(self)`
+Returns the current Unix epoch in milliseconds.
+
+
 ## 6.2 The Math Object
+The `Math` object contains commonly-used mathematical constants and routines.
+
+### Members
+#### `Math.PI`
+The closest float64 approximation of the mathematical constant pi.
+#### `Math.E`
+The closest float64 approximation of the mathematical constant e.
+#### `Math.sin(self, a)`
+Returns the sine of `a`.
+#### `Math.cos(self, a)`
+Returns the cosine of `a`.
+#### `Math.tan(self, a)`
+Returns the tangent of `a`.
+#### `Math.asin(self, a)`
+Returns the inverse sine of `a`.
+#### `Math.acos(self, a)`
+Returns the inverse cosine of `a`.
+#### `Math.atan(self, a)`
+Returns the inverse tangent of `a`.
+#### `Math.atan2(self, a, b)`
+Returns the inverse tangent of `a`/`b`.
+#### `Math.exp(self, a)`
+Returns the exponential of `a`.
+#### `Math.log(self, a)`
+Returns the natural logarithm of `a`.
+#### `Math.sqrt(self, a)`
+Returns the square root of `a`.
+#### `Math.pow(self, a)`
+Returns `a` raised to the power of `b`.
+#### `Math.ceil(self, a)`
+Returns the ceiling function of `a`.
+
+
 ## 6.3 The String Object
+The `String` object represents ordered sequences of [characters](#3.1.4-characters). All string literals are implemented as objects whose prototype is `String`.
+
+#### `String.length(self)`
+R#eturns the length of `self`.
+#### `String.at(self, idx)`
+Returns the character indexed `idx` in `self`.
+#### `String.first(self)`
+Returns the first character in `self`.
+#### `String.last(self)`
+Returns the last character in `self`.
+#### `String.find(self, str)`
+Returns the index of the first instance of `str` in `self`.
+#### `String.contains(self, str)`
+Determines whether `self` contains `str`.
+#### `String.substr(self, pos, len)`
+Returns the substring of `self` starting at index `pos` and having a length of `len`.
+#### `String.concat(self, str)`
+Returns the concatenation of `self` and `str`.
+#### `String.split(self, sep)`
+Splits the string into a vector of substrings using a specified seperator.
+#### `String.from(self, val)`
+Returns a string representation of the specified value. Objects aside from strings themselves are represented by the string "&lt;object&gt;".
+## 6.4 The Vec Object
+The `Vec` object represents ordered sequences of any value. A single vector can contain values of different types. All vector expressions are implemented as objects whose prototype is `Vec`.
+
+
 ## 6.4 The Vec Object
 ## 6.5 The Func Object
 ## 6.6 The Thread Object

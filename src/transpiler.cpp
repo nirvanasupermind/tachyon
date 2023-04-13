@@ -104,7 +104,7 @@ namespace eris {
     void Transpiler::visit(IdentifierNode* node) {
         post_main_code << node->val;
     }
-    
+
     void Transpiler::visit(ParenExprNode* node) {
         post_main_code << '(';
         visit(node->node.get());
@@ -153,13 +153,13 @@ namespace eris {
     void Transpiler::visit(CallExprNode* node) {
         visit(node->callee.get());
         post_main_code << "({";
-        if(node->callee->kind() == NodeKind::ATTR_EXPR) {
+        if (node->callee->kind() == NodeKind::ATTR_EXPR) {
             std::shared_ptr<AttrExprNode> attr_expr_node = std::dynamic_pointer_cast<AttrExprNode>(node->callee);
             visit(attr_expr_node->object.get());
-            if(node->args.size()) {
+            if (node->args.size()) {
                 post_main_code << ',';
             }
-        } 
+        }
 
         for (int i = 0; i < node->args.size(); i++) {
             visit(node->args.at(i).get());
@@ -169,7 +169,7 @@ namespace eris {
         }
         post_main_code << "})";
     }
-    
+
     void Transpiler::visit(UnaryExprNode* node) {
         post_main_code << '(';
         post_main_code << node->op.val;
@@ -178,13 +178,14 @@ namespace eris {
     }
 
     void Transpiler::visit(BinaryExprNode* node) {
-        if(node->node_a->kind() == NodeKind::ATTR_EXPR && node->op.val == "=") {
+        if (node->node_a->kind() == NodeKind::ATTR_EXPR && node->op.val == "=") {
             std::shared_ptr<AttrExprNode> attr_expr_node = std::dynamic_pointer_cast<AttrExprNode>(node->node_a);
             visit(attr_expr_node->object.get());
             post_main_code << ".o->set(\"" << attr_expr_node->attr << "\",";
             visit(node->node_b.get());
             post_main_code << ')';
-        } else {
+        }
+        else {
             post_main_code << '(';
             visit(node->node_a.get());
             post_main_code << ' ';
@@ -281,8 +282,10 @@ namespace eris {
     void Transpiler::visit(TryCatchStmtNode* node) {
         post_main_code << "try ";
         visit(node->try_body.get());
-        post_main_code << "catch(const std::runtime_error&" << node->ex << ") ";
+        post_main_code << "catch(const std::exception& _e) {\nErisVal " << node->ex
+            << " = ErisVal::make_object({{\"msg\",ErisVal::make_str(_e.what())},{\"proto\",Exception}});\n";
         visit(node->catch_body.get());
+        post_main_code << "\n}";
     }
 
     void Transpiler::visit(StmtListNode* node) {
