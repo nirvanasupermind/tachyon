@@ -514,7 +514,7 @@ Returns the ceiling function of `a`.
 
 
 ## 6.3 The String Object
-The `String` object represents ordered sequences of [characters](#3.1.4-characters). All string literals are implemented as objects whose prototype is `String`. The characters inside a string are assigned a zero-based index number, with the first character being indexed 0, the second being indexed 1, the third being indexed 2, and so on.
+The `String` object represents ordered sequences of [characters](#3.1.4-characters). All strings  are implemented as objects whose prototype is `String`. The characters inside a string are assigned a zero-based index number, with the first character being indexed 0, the second being indexed 1, the third being indexed 2, and so on.
 
 ### Members
 #### `String.length(self)`
@@ -537,8 +537,9 @@ Returns the concatenation of `self` and `str`.
 Splits the string into a vector of substrings using a specified seperator.
 #### `String.from(self, val)`
 Returns a string representation of the specified value. Objects aside from strings themselves are represented by the string "&lt;object&gt;".
+
 ## 6.4 The Vec Object
-The `Vec` object represents ordered sequences of any value. A single vector can contain values of different types. All vector expressions are implemented as objects whose prototype is `Vec`. The elements inside a vector are assigned a zero-based index number, with the first element being indexed 0, the second being indexed 1, the third being indexed 2, and so on.
+The `Vec` object represents ordered sequences of any value. A single vector can contain values of different types. All vectors are implemented as objects whose prototype is `Vec`. The elements inside a vector are assigned a zero-based index number, with the first element being indexed 0, the second being indexed 1, the third being indexed 2, and so on.
 
 ### Members
 #### `Vec.length(self)`
@@ -550,9 +551,8 @@ Returns the first element in `self`.
 #### `Vec.last(self)`
 Returns the last element in `self`.
 
-## 6.5 The Fu
 ## 6.5 The Func Object
-
+The `Func` object represents a function, a block of code which only runs when it is called. Data known as arguments can be passed to a function. All functions are implemented as objects whose prototype is `Func`.
 
 ## 6.6 The Thread Object
 ## 6.7 The FileSystem Object
