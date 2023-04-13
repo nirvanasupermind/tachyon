@@ -12,7 +12,7 @@
 #include "node.h"
 #include "parser.h"
 
-namespace eris {
+namespace tachyon {
     Parser::Parser(const std::vector<Token>& tokens, const std::string& filename)
         : tokens(tokens), pos(0), current(Token(TokenType::EOF_, "", 1)), filename(filename) {
         advance();
@@ -133,7 +133,7 @@ namespace eris {
             Lexer lexer(text, in_filename);
             std::vector<Token> tokens = lexer.generate_tokens();
             Parser parser(tokens, in_filename);
-            std::shared_ptr<eris::Node> tree = parser.parse();
+            std::shared_ptr<tachyon::Node> tree = parser.parse();
 
             return tree;
         }
@@ -459,4 +459,4 @@ namespace eris {
         }
     }
 
-} // namespace eris
+} // namespace tachyon

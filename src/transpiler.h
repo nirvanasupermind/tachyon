@@ -6,7 +6,7 @@
 #include <set>
 #include "node.h"
 
-namespace eris {
+namespace tachyon {
     class Transpiler {
     private:
         std::string filename{};
@@ -45,6 +45,6 @@ namespace eris {
         Transpiler(const std::string& filename);
         std::string generate_code(Node* node);
     };
-} // namespace eris
+} // namespace tachyon
 
 #endif // TOKEN_H

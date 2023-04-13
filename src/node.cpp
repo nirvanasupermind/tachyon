@@ -3,7 +3,7 @@
 #include "token.h"
 #include "node.h"
 
-namespace eris {
+namespace tachyon {
     NilNode::NilNode(int line) {
         this->line = line;
     }
@@ -243,4 +243,4 @@ namespace eris {
     NodeKind StmtListNode::kind() const {
         return NodeKind::STMT_LIST;
     }
-} // namespace eris
+} // namespace tachyon

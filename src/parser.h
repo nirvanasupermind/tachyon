@@ -10,7 +10,7 @@
 #include "token.h"
 #include "node.h"
 
-namespace eris {    
+namespace tachyon {    
     class Parser {
     private:
         std::vector<Token> tokens{};
@@ -57,7 +57,7 @@ namespace eris {
         std::shared_ptr<Node> parse();
     };
 
-} // namespace eris
+} // namespace tachyon
 
 
 #endif // PARSER_H

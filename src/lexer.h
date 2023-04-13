@@ -6,7 +6,7 @@
 #include <map>
 #include "token.h"
 
-namespace eris {
+namespace tachyon {
     const std::map<std::string, TokenType> KEYWORDS{
         {"nil", TokenType::NIL},
         {"true", TokenType::TRUE},
@@ -41,7 +41,7 @@ namespace eris {
         Lexer(const std::string& text, const std::string& filename);
         std::vector<Token> generate_tokens();
     };
-} // namespace eris
+} // namespace tachyon
 
 
 #endif // LEXER_H

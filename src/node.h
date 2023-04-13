@@ -6,7 +6,7 @@
 #include <vector>
 #include "token.h"
 
-namespace eris {
+namespace tachyon {
     enum class NodeKind {
         NIL,
         NUMBER,
@@ -274,6 +274,6 @@ namespace eris {
         NodeKind kind() const;
         std::string str() const;
     };
-} // namespace eris
+} // namespace tachyon
 
 #endif // NODE_H

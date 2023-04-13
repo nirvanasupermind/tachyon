@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace eris {
+namespace tachyon {
     enum class TokenType {
         NUMBER,
         CHAR,
@@ -65,6 +65,6 @@ namespace eris {
         Token(TokenType type, const std::string& val, int line);
         std::string str() const;  
     };
-} // namespace eris
+} // namespace tachyon
 
 #endif // TOKEN_H

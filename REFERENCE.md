@@ -1,22 +1,22 @@
-# Eris 2.0 Reference Manual
+# Tachyon 2.0 Reference Manual
 # 1 Introduction
-Eris is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Eris is transpiled to C++11 using tagged unions to handle dynamic typing, and can interact with C++ code.
+Tachyon is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Tachyon is transpiled to C++11 using tagged unions to handle dynamic typing, and can interact with C++ code.
 # 2 Lexical Structure
-This section specifies the lexical structure of Eris. Extended Backus–Naur form (EBNF) is also provided for the described grammar.
+This section specifies the lexical structure of Tachyon. Extended Backus–Naur form (EBNF) is also provided for the described grammar.
 
 ## 2.1 Whitespace
 ```
 whitespace = " " | "\n" | "\t" | "\v" | "\f" | "\r";
 ```
 
-Whitespace characters include characters that represent horizontal or vertical space, and are ignored by the Eris transpiler.
+Whitespace characters include characters that represent horizontal or vertical space, and are ignored by the Tachyon transpiler.
 
 ## 2.2 Comments
 ```
 comment = "//", {? any character except for newline ?};
 ```
 
-A comment is text ignored by the Eris transpiler. They are normally used to add explanations to code. A comment is `//` followed by any sequence of characters. Comments are terminated by newlines.
+A comment is text ignored by the Tachyon transpiler. They are normally used to add explanations to code. A comment is `//` followed by any sequence of characters. Comments are terminated by newlines.
  
 ```
 // This is a comment
@@ -30,7 +30,7 @@ char = "'", ? any character except for single quote ?, "'";
 string = '"', {? any character except for double quote ?}, '"'; 
 ```
 
-Eris accepts decimal and scientific numeric literals, character literals and string literals. Character literals are wrapped in single quotes whereas string literals are wrapped in double qoutes. String literals can span multiple lines. Escape sequences in character and string literals are currently not supported in Eris, but will be added in a future version.
+Tachyon accepts decimal and scientific numeric literals, character literals and string literals. Character literals are wrapped in single quotes whereas string literals are wrapped in double qoutes. String literals can span multiple lines. Escape sequences in character and string literals are currently not supported in Tachyon, but will be added in a future version.
 
 ```
 var a = 123;
@@ -54,7 +54,7 @@ The following keywords are reserved by the language and cannot be used as identi
 nil true false var block if else while for def lambda return import cimport try catch
 ```
 ## 2.6 Operators
-The following tokens are the Eris operators:
+The following tokens are the Tachyon operators:
 ```
 + - * / % == != < > <= >=  && || ! & | ^ << >> ~
 ```
@@ -128,7 +128,7 @@ stmt = expr stmt | var decl stmt | block stmt | if stmt | while stmt | for stmt 
 # 3 Values and Types
 
 ## 3.1 Types
-Eris is a dynamically-typed language. This means that variables themselves do not have a type, although they are to a value that does have a type. All values in Eris are first-class values, and can be stored in data structures, variables, and passed and returned from functions.
+Tachyon is a dynamically-typed language. This means that variables themselves do not have a type, although they are to a value that does have a type. All values in Tachyon are first-class values, and can be stored in data structures, variables, and passed and returned from functions.
 
 ### 3.1.1 Nil
 The nil type represents the absence of a useful value, and has one single value, `nil`.
@@ -180,7 +180,7 @@ Variables are named bindings to values. Variable declaration statements and func
 expr = assignment expr;
 ```
 
-This section describes expressions in Eris. Extended Backus–Naur form (EBNF) is also provided for the described syntax.
+This section describes expressions in Tachyon. Extended Backus–Naur form (EBNF) is also provided for the described syntax.
 
 ## 4.1 Primary Expressions
 ```
@@ -333,7 +333,7 @@ The logical OR (`||`) operator takes the logical OR of two booleans. It is synta
 stmt = expr stmt | var decl stmt | block stmt | if stmt | while stmt | for stmt | func decl stmt; 
 ```
 
-This section describes statements in Eris. Extended Backus–Naur form (EBNF) is also provided for the described syntax.
+This section describes statements in Tachyon. Extended Backus–Naur form (EBNF) is also provided for the described syntax.
 
 ## 5.1 Expression Statements
 ```
@@ -436,10 +436,10 @@ def sqr(x) {
 import stmt = "import", string, ";";
 ```
 
-An import statement is used to include another Eris file.
+An import statement is used to include another Tachyon file.
 
 ```
-import "file.eris";
+import "file.tachyon";
 ```
 
 ## 5.11 C++ Import Statements
@@ -559,10 +559,10 @@ Returns the last element in `self`.
 ## 6.8 The Exception Object
 
 # 7 The C++ API
-## 7.1 The ErisVal Class
+## 7.1 The TachyonVal Class
 
-## 7.2 The ErisObject Class
-## 7.3 The ErisString Class
-## 7.4 The ErisVector Class
-## 7.5 The ErisFunc Class
-## 7.6 Using the Eris Standard Library
+## 7.2 The TachyonObject Class
+## 7.3 The TachyonString Class
+## 7.4 The TachyonVector Class
+## 7.5 The TachyonFunc Class
+## 7.6 Using the Tachyon Standard Library

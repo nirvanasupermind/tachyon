@@ -2,7 +2,7 @@
 #include <string>
 #include "token.h"
 
-namespace eris {
+namespace tachyon {
     Token::Token(TokenType type, const std::string& val, int line)
         : type(type), val(val), line(line) {
     }
@@ -165,4 +165,4 @@ namespace eris {
         return result;
     }
 
-} // namespace eris
+} // namespace tachyon

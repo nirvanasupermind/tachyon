@@ -5,9 +5,9 @@
 #include "node.h"
 #include "transpiler.h"
 
-namespace eris {
+namespace tachyon {
     Transpiler::Transpiler(const std::string& filename)
-        : filename(filename), included_headers({ "\"./include/eris.h\"" }) {
+        : filename(filename), included_headers({ "\"./include/tachyon.h\"" }) {
     }
 
     void Transpiler::visit(Node* node) {
@@ -72,31 +72,31 @@ namespace eris {
     }
 
     void Transpiler::visit(NilNode* node) {
-        post_main_code << "ErisVal::make_nil()";
+        post_main_code << "TachyonVal::make_nil()";
     }
 
     void Transpiler::visit(NumberNode* node) {
-        post_main_code << "ErisVal::make_num(";
+        post_main_code << "TachyonVal::make_num(";
         post_main_code << node->val;
         post_main_code << ')';
     }
 
     void Transpiler::visit(TrueNode* node) {
-        post_main_code << "ErisVal::make_bool(true)";
+        post_main_code << "TachyonVal::make_bool(true)";
     }
 
     void Transpiler::visit(FalseNode* node) {
-        post_main_code << "ErisVal::make_bool(false)";
+        post_main_code << "TachyonVal::make_bool(false)";
     }
 
     void Transpiler::visit(CharNode* node) {
-        post_main_code << "ErisVal::make_char('";
+        post_main_code << "TachyonVal::make_char('";
         post_main_code << node->val;
         post_main_code << "')";
     }
 
     void Transpiler::visit(StringNode* node) {
-        post_main_code << "ErisVal::make_str(\"";
+        post_main_code << "TachyonVal::make_str(\"";
         post_main_code << node->val;
         post_main_code << "\")";
     }
@@ -111,13 +111,13 @@ namespace eris {
         post_main_code << ')';
     }
     void Transpiler::visit(LambdaExprNode* node) {
-        post_main_code << "ErisVal::make_func([&](const std::vector<ErisVal>& args) {\n";
+        post_main_code << "TachyonVal::make_func([&](const std::vector<TachyonVal>& args) {\n";
         for (int i = 0; i < node->args.size(); i++) {
-            post_main_code << "ErisVal " << node->args.at(i) << " = args.at(" << i << ");\n";
+            post_main_code << "TachyonVal " << node->args.at(i) << " = args.at(" << i << ");\n";
         }
         if (node->body->kind() == NodeKind::BLOCK_STMT) {
             visit(node->body.get());
-            post_main_code << "\nreturn ErisVal::make_nil();\n})";
+            post_main_code << "\nreturn TachyonVal::make_nil();\n})";
         }
         else {
             post_main_code << "return ";
@@ -127,7 +127,7 @@ namespace eris {
     }
 
     void Transpiler::visit(ObjectNode* node) {
-        post_main_code << "ErisVal::make_object({";
+        post_main_code << "TachyonVal::make_object({";
         for (int i = 0; i < node->keys.size(); i++) {
             post_main_code << "{\"" << node->keys.at(i) << "\",";
             visit(node->vals.at(i).get());
@@ -140,7 +140,7 @@ namespace eris {
     }
 
     void Transpiler::visit(VecNode* node) {
-        post_main_code << "ErisVal::make_vec({";
+        post_main_code << "TachyonVal::make_vec({";
         for (int i = 0; i < node->elems.size(); i++) {
             visit(node->elems.at(i).get());
             if (i < node->elems.size() - 1) {
@@ -212,7 +212,7 @@ namespace eris {
     }
 
     void Transpiler::visit(VarDeclStmtNode* node) {
-        post_main_code << "ErisVal ";
+        post_main_code << "TachyonVal ";
         post_main_code << node->name;
         post_main_code << " = ";
         visit(node->val.get());
@@ -261,12 +261,12 @@ namespace eris {
     }
 
     void Transpiler::visit(FuncDeclStmtNode* node) {
-        post_main_code << "ErisVal " << node->name << " = ErisVal::make_func([&](const std::vector<ErisVal>& args) {\n";
+        post_main_code << "TachyonVal " << node->name << " = TachyonVal::make_func([&](const std::vector<TachyonVal>& args) {\n";
         for (int i = 0; i < node->args.size(); i++) {
-            post_main_code << "ErisVal " << node->args.at(i) << " = args.at(" << i << ");\n";
+            post_main_code << "TachyonVal " << node->args.at(i) << " = args.at(" << i << ");\n";
         }
         visit(node->body.get());
-        post_main_code << "\nreturn ErisVal::make_nil();\n});";
+        post_main_code << "\nreturn TachyonVal::make_nil();\n});";
     }
 
     void Transpiler::visit(ReturnStmtNode* node) {
@@ -282,8 +282,8 @@ namespace eris {
     void Transpiler::visit(TryCatchStmtNode* node) {
         post_main_code << "try ";
         visit(node->try_body.get());
-        post_main_code << "catch(const std::exception& _e) {\nErisVal " << node->ex
-            << " = ErisVal::make_object({{\"msg\",ErisVal::make_str(_e.what())},{\"proto\",Exception}});\n";
+        post_main_code << "catch(const std::exception& _e) {\nTachyonVal " << node->ex
+            << " = TachyonVal::make_object({{\"msg\",TachyonVal::make_str(_e.what())},{\"proto\",Exception}});\n";
         visit(node->catch_body.get());
         post_main_code << "\n}";
     }
@@ -298,7 +298,7 @@ namespace eris {
 
     std::string Transpiler::generate_code(Node* node) {
         visit(node);
-        std::string code = "// Generated by Eris\n";
+        std::string code = "// Generated by Tachyon\n";
         for (const std::string& header : included_headers) {
             code += "#include " + header + "\n";
 
@@ -308,4 +308,4 @@ namespace eris {
         code += "    return 0;\n}";
         return code;
     }
-}; // namespace eris
+}; // namespace tachyon

@@ -4,7 +4,7 @@
 #include "token.h"
 #include "lexer.h"
 
-namespace eris {
+namespace tachyon {
     Lexer::Lexer(const std::string& text, const std::string& filename)
         : text(text), current('\0'), pos(0), line(1), filename(filename) {
         advance();
@@ -248,4 +248,4 @@ namespace eris {
         }
         return Token(TokenType::IDENTIFIER, identifier_str, line);
     }
-} // namespace eris
+} // namespace tachyon
