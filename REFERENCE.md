@@ -63,67 +63,6 @@ Other tokens used are:
 ```
 ' " ( ) { } [ ] , : ; . 
 ```
-<!-- 
-# 2 Grammar
-
-## 2.1 Lexical Grammar 
-```
-letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
-       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
-       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
-       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
-       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
-       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
-       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
-       | "x" | "y" | "z" ;
-digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
-whitespace = " " | "\n" | "\t" | "\v" | "\f" | "\r";
-comment = "//", {? any character except for newline ?};
-skip = whitespace | comment;
-number = digit, {digit}, [".", digit, {digit}], [("e" | "E"), ["+" | "-"], {digit}];
-char = "'", ? any character except for single quote ?, "'"; 
-string = '"', {? any character except for double quote ?}, '"'; 
-identifier = (letter | "_"), {letter | digit | "_"};
-```
-
-## 2.2 Syntactic Grammar
-```
-paren expr = "(", expr, ")";
-properties = "" | identifier, ":", expr, key value pairs;
-object = "{", properties, "}";
-expr list = "" | expr, ",", expr list;
-vec = "[", expr list, "]";
-arg names = "" | (identifier, ",", arg names);
-lambda = "lamba", "(",  arg names, ")", block stmt;
-primary expr = number | char | string | identifier | paren expr | object | vec | lambda;
-call prop expr = primary expr, {("(", expr list, ")") | (".", identifier)},
-unary expr = {"+" | "-" | "!" | "~"}, call prop expr;
-multiplicative expr = unary expr | (unary expr, ("*" | "/" | "%"), multiplicative expr);
-additive expr = multiplicative expr | (multiplicative expr, ("+" | "-"), additive expr);
-shift expr = additive expr | (additive expr, ("<<" | ">>"), shift expr);
-comp expr = shift expr | (shift expr, ("<" | ">" | "<=" | ">="), comp expr);
-equality expr = comp expr | (comp expr, ("==" | "!="), equality expr);
-bitand expr = equality expr | (equality expr, "&", bitand expr);
-bitxor expr = bitand expr | (bitand expr, "^", bitxor expr);
-bitor expr = bitxor expr | (bitxor expr, "|", bitor expr);
-and expr = bitor expr | (and expr, "&&", bitor expr);
-or expr = and expr | (and expr, "||", or expr);
-assignment expr = or expr, "=", assignment expr);
-expr = assignment expr;
-expr stmt = expr, ";";
-var decl stmt = "var", identifier, "=", expr, ";";
-block stmt = "{", {stmt}, "}";
-if stmt = "if", "(", expr, ")", block stmt, ["else", block stmt];
-while stmt = "while", "(", expr, ")", block stmt;
-for stmt = "for", "(", var decl stmt, expr, ";", expr, ")", block stmt;
-func decl stmt = "def", identifier, "(", arg names, ")", block stmt;
-return stmt = "return", expr, ";";
-import stmt = "import", string, ";";
-cimport stmt = "cimport", string, ";";
-try catch stmt = "try", block stmt, "catch", "(", identifier, ")", block stmt;
-stmt = expr stmt | var decl stmt | block stmt | if stmt | while stmt | for stmt | func decl stmt 
-       | return stmt | import stmt | cimport stmt | try catch stmt;
-``` -->
 
 # 3 Values and Types
 
@@ -239,7 +178,7 @@ expr list = "" | "expr", ",", expr list;
 call member expr = primary expr, {("(", expr list, ")") | (".", identifier)};
 ```
 
-Call member expressions include function calls, object member accesses, and all combinations of them, in addition to primary expressions.
+Call member expressions include function calls, object member accesses, and all combinations of them, in addition to primary expressions. When a function which is a member of an object is called, the first argument will automatically be set to the object, with the expliticly-specified arguments coming after it.
 ```
 System.print("Hello world!");
 ```
@@ -550,18 +489,46 @@ Returns the element indexed `idx` in `self`.
 Returns the first element in `self`.
 #### `Vec.last(self)`
 Returns the last element in `self`.
+#### `Vec.add(self, el)`
+Adds the element `el` to the vector.
+#### `Vec.remove(self, idx)`
+Removes the element at index `idx` from the vector.
+####  `Vec.subvec(self, pos, len)`
+Returns the subector of `self` starting at index `pos` and having a length of `len`.
 
 ## 6.5 The Func Object
-The `Func` object represents a function, a block of code which only runs when it is called. Data known as arguments can be passed to a function. All functions are implemented as objects whose prototype is `Func`.
+The `Func` object represents a block of code which only runs when it is called. Data known as arguments can be passed to a function. The first argument of a function which is a member of an object, named `self` by convention, will be impliticly set to the object, with expliticitly-stated argumets being placed after it.
 
 ## 6.6 The Thread Object
+The `Thread`  object represents a block of code that can be executed concurrently with other such blocks in multithreading environments.
+### `Thread.create(self, run)`
+Returns a thread that will run the function `run` when starting.
+### `Thread.start(self)`
+Causes the thread `self` to start execution.
+
 ## 6.7 The FileSystem Object
+The `FileSystem` object contains functions for file I/O.
+### Members
+#### `FileSystem.read(self, path)`
+R#eturns the content of `path`.
+#### `FileSystem.write(self, path, str)`
+Writes `str` to path.
 ## 6.8 The Exception Object
+The `Exception` object represents runtime exceptions.
+### Members
+#### `msg`
+Contains the message of the exception.
+#### `Exception.throw(self)`
+Throws `self`.
 
 # 7 The C++ API
 ## 7.1 The TachyonVal Class
+The `TachyonVal` class is a tagged union type that can represent all Tachyon values. 
+### 7
 
 ## 7.2 The TachyonObject Class
+
+
 ## 7.3 The TachyonString Class
 ## 7.4 The TachyonVector Class
 ## 7.5 The TachyonFunc Class
