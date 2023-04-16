@@ -1,4 +1,4 @@
-# Tachyon 2.0 Reference Manual
+# Tachyon 1.0 Reference Manual
 # 1 Introduction
 Tachyon is a lightweight dynamic programming language that supports full multithreading and prototype-based object-oriented programming. Tachyon is transpiled to C++11 using tagged unions to handle dynamic typing, and can interact with C++ code.
 # 2 Lexical Structure
@@ -546,8 +546,6 @@ Returns a Tachyon boolean with the value of `b`.
 
 ## 7.2 The TachyonObject Class
 The `TachyonObject` class represents an object in Tachyon. It is wrapper around an `std::map`.
-
-### 7
 
 
 ## 7.3 The TachyonString Class
