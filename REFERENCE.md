@@ -249,19 +249,19 @@ bitor expr = bitxor expr | (bitxor expr, "|", bitor expr);
 ```
 The bitwise OR (`|`) operator converts both arguments to signed 64-bit integers then takes the logical OR of each of their bits. It is syntatically left-assosciative, must have numbers as arguments, and outputs a number.
 
-## 4.3.11 Loigcal AND Operator
+## 4.3.11 Logical AND Operator
 ```
 and expr = bitor expr | (and expr, "&&", bitor expr);
 ```
 The logical AND (`&&`) operator takes the logical AND of two booleans. It is syntatically left-assosciative, must have booleans as arguments, and outputs a boolean.
 
-## 4.3.12 Loigcal OR Operator
+## 4.3.12 Logical OR Operator
 ```
 and expr = bitor expr | (and expr, "&&", bitor expr);
 ```
 The logical OR (`||`) operator takes the logical OR of two booleans. It is syntatically left-assosciative, must have booleans as arguments, and outputs a boolean. There is no logical XOR operator as it would be identical to `!=` for boolean arguments. 
 
-## 4.3.13 Loigcal OR Operator
+## 4.3.13 Logical OR Operator
 ```
 or expr = and expr | (and expr, "||", or expr);
 ```
