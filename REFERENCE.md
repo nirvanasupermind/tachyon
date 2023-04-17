@@ -546,9 +546,12 @@ Returns a Tachyon boolean with the value of `b`.
 
 ## 7.2 The TachyonObject Class
 The `TachyonObject` class represents an object in Tachyon. It is wrapper around an `std::map`.
-
-
+### Methods
+#### `static TachyonVal make_object()
 ## 7.3 The TachyonString Class
+The `TachyonString` class represents a string in Tachyon.
 ## 7.4 The TachyonVector Class
+The `TachyonVector` class represents a string in Tachyon.
 ## 7.5 The TachyonFunc Class
+The `TachyonFunc` class represents a string in Tachyon.
 ## 7.6 Using the Tachyon Standard Library
