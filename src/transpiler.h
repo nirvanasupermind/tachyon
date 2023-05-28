@@ -9,6 +9,7 @@
 namespace tachyon {
     class Transpiler {
     private:
+        static const std::string boilerplate;
         std::string filename{};
         std::ostringstream post_main_code{};
         std::set<std::string> included_headers{};
@@ -16,7 +17,7 @@ namespace tachyon {
         void visit(NilNode* node);
         void visit(NumberNode* node);
         void visit(TrueNode* node);
-        void visit(FalseNode* node);        
+        void visit(FalseNode* node);
         void visit(CharNode* node);
         void visit(StringNode* node);
         void visit(IdentifierNode* node);
@@ -32,7 +33,7 @@ namespace tachyon {
         void visit(VarDeclStmtNode* node);
         void visit(BlockStmtNode* node);
         void visit(StmtListNode* node);
-        void visit(IfStmtNode* node);        
+        void visit(IfStmtNode* node);
         void visit(IfElseStmtNode* node);
         void visit(WhileStmtNode* node);
         void visit(ForStmtNode* node);
@@ -41,10 +42,9 @@ namespace tachyon {
         void visit(CImportStmtNode* node);
         void visit(TryCatchStmtNode* node);
     public:
-        static std::string boilerplate;
         Transpiler(const std::string& filename);
         std::string generate_code(Node* node);
     };
 } // namespace tachyon
 
-#endif // TOKEN_H
+#endif // TRANSPILER_H

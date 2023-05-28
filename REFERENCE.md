@@ -520,38 +520,3 @@ The `Exception` object represents runtime exceptions.
 Contains the message of the exception.
 #### `Exception.throw(self)`
 Throws `self`.
-
-# 7 The C++ API
-## 7.1 The TachyonVal Class
-The `TachyonVal` class is a tagged union type that can represent all Tachyon values. It consists of an untagged union and a tag field. It can
-#### Properties
-#### `tag`
-The tag of the value. Can be `NIL`, `NUM`, `BOOL`, `CHAR`, or `OBJECT`.
-#### `double n`
-Part of the untagged union, represents the C++ value of a Tachyon number. 
-#### `bool b`
-Part of the untagged union, represents the C++ value of a Tachyon boolean. 
-#### `TachyonObject* o`
-Part of the untagged union, represents the C++ value of a Tachyon object. 
-#### Methods
-#### `static TachyonVal make_nil();`
-Returns `nil`.
-#### `static TachyonVal make_num(double n)`
-Returns a Tachyon number with the value of `n`.
-#### `static TachyonVal make_bool(bool b)`
-Returns a Tachyon boolean with the value of `b`.
-#### `static TachyonVal make_object(bool b)`
-Returns a Tachyon boolean with the value of `b`.
-
-
-## 7.2 The TachyonObject Class
-The `TachyonObject` class represents an object in Tachyon. It is wrapper around an `std::map`.
-### Methods
-#### `static TachyonVal make_object()
-## 7.3 The TachyonString Class
-The `TachyonString` class represents a string in Tachyon.
-## 7.4 The TachyonVector Class
-The `TachyonVector` class represents a string in Tachyon.
-## 7.5 The TachyonFunc Class
-The `TachyonFunc` class represents a string in Tachyon.
-## 7.6 Using the Tachyon Standard Library
