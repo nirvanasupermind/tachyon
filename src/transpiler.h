@@ -11,6 +11,7 @@ namespace tachyon {
     private:
         static const std::string boilerplate;
         std::string filename{};
+        std::string imported_code{};
         std::ostringstream post_main_code{};
         std::set<std::string> included_headers{};
         void visit(Node* node);
@@ -39,8 +40,8 @@ namespace tachyon {
         void visit(ForStmtNode* node);
         void visit(FuncDeclStmtNode* node);
         void visit(ReturnStmtNode* node);
-        void visit(CImportStmtNode* node);
         void visit(TryCatchStmtNode* node);
+        void visit(CImportStmtNode* node);
     public:
         Transpiler(const std::string& filename);
         std::string generate_code(Node* node);

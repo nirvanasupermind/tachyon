@@ -125,7 +125,7 @@ namespace tachyon {
             std::string in_filename = static_cast<StringNode*>(node.get())->val;
             std::ifstream in_file;
             in_file.open(in_filename);
-
+            
             std::stringstream strStream;
             strStream << in_file.rdbuf();
 

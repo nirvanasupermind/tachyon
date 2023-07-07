@@ -365,7 +365,8 @@ TachyonVal System = TachyonVal::make_object({
     })},
     {"assert", TachyonVal::make_func([](const std::vector<TachyonVal>& args) {
         assert(args.at(1).tag == TachyonVal::BOOL && args.at(1).b);
-        return TachyonVal::make_num(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+        return TachyonVal::make_nil();
+
     })},
     });
 
@@ -873,9 +874,6 @@ TachyonVal Exception = TachyonVal::make_object({
         post_main_code << ';';
     }
 
-    void Transpiler::visit(CImportStmtNode* node) {
-        included_headers.insert("\"" + node->path + "\"");
-    }
 
     void Transpiler::visit(TryCatchStmtNode* node) {
         post_main_code << "try ";
@@ -884,6 +882,11 @@ TachyonVal Exception = TachyonVal::make_object({
             << " = TachyonVal::make_object({{\"msg\",TachyonVal::make_str(_e.what())},{\"proto\",Exception}});\n";
         visit(node->catch_body.get());
         post_main_code << "\n}";
+    }
+    
+
+    void Transpiler::visit(CImportStmtNode* node) {
+        included_headers.insert("\"" + node->path + "\"");
     }
 
     void Transpiler::visit(StmtListNode* node) {
