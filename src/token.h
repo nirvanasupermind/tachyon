@@ -5,66 +5,32 @@
 
 namespace tachyon {
     enum class TokenType {
-        NUMBER,
-        CHAR,
-        STRING,
-        IDENTIFIER,
-        NIL,
-        TRUE,
-        FALSE,
-        VAR,
-        BLOCK,
-        IF,
-        ELSE,
-        WHILE,
-        FOR,
-        DEF,
-        LAMBDA,
-        RETURN,
-        IMPORT,
-        CIMPORT,
-        TRY,
-        CATCH,
+        INT,
+        FLOAT,
         PLUS,
         MINUS,
         MUL,
         DIV,
         MOD,
-        SL,
-        SR,
-        BITAND,
-        BITOR,
-        BITXOR,
+        NOT,
         AND,
         OR,
-        EQ,
-        EE,
-        NE,
-        LT,
-        LE,
-        GT,
-        GE,
+        XOR,
+        LSH,
+        RSH,
         LPAREN,
-        RPAREN,
-        LCURLY,
-        RCURLY,
-        LSQUARE,
-        RSQUARE,
-        COMMA,
-        COLON,
-        SEMICOLON,
-        PERIOD,
-        EOF_
+        RPAREN
     };
-    
+
     class Token {
     public:
         TokenType type;
-        std::string val{};
+        std::string val;
         int line;
-        Token(TokenType type, const std::string& val, int line);
-        std::string str() const;  
-    };
-} // namespace tachyon
 
-#endif // TOKEN_H
+        Token(TokenType type, const std::string& val, int line);
+        std::string to_string() const;
+    };
+};
+
+#endif
