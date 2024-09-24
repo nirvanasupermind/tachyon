@@ -11,24 +11,17 @@ namespace tachyon {
         MINUS,
         MUL,
         DIV,
-        MOD,
-        NOT,
-        AND,
-        OR,
-        XOR,
-        LSH,
-        RSH,
         LPAREN,
         RPAREN
     };
 
     class Token {
     public:
+        // int line;
+        int ln;
         TokenType type;
         std::string val;
-        int line;
-
-        Token(TokenType type, const std::string& val, int line);
+        Token(int ln, TokenType type, const std::string& val);
         std::string to_string() const;
     };
 };

@@ -2,10 +2,10 @@
 #include "token.h"
 
 namespace tachyon {
-    Token::Token(TokenType type, const std::string& val, int line) {
+    Token::Token(int ln, TokenType type, const std::string& val) {
+        this->ln = ln;
         this->type = type;
         this->val = val;
-        this->line = line;
     }
 
     std::string Token::to_string() const {
@@ -29,32 +29,32 @@ namespace tachyon {
         case TokenType::DIV:
             result += "DIV:";
             break;
-        case TokenType::NOT:
-            result += "NOT:";
-            break;
-        case TokenType::AND:
-            result += "AND:";
-            break;
-        case TokenType::OR:
-            result += "OR:";
-            break;
-        case TokenType::XOR:
-            result += "XOR:";
-            break;
-        case TokenType::LSH:
-            result += "LSH:";
-            break;
-        case TokenType::RSH:
-            result += "RSH:";
-            break;
+        // case TokenType::NOT:
+        //     result += "NOT:";
+        //     break;
+        // case TokenType::AND:
+        //     result += "AND:";
+        //     break;
+        // case TokenType::OR:
+        //     result += "OR:";
+        //     break;
+        // case TokenType::XOR:
+        //     result += "XOR:";
+        //     break;
+        // case TokenType::LSH:
+        //     result += "LSH:";
+        //     break;
+        // case TokenType::RSH:
+        //     result += "RSH:";
+        //     break;
         case TokenType::LPAREN:
             result += "LPAREN:";
             break;
         case TokenType::RPAREN:
             result += "RPAREN:";
-            break;
+            break;    
         }
-        result += val + ":" + std::to_string(line);
+        result += val;
         return result;
     }
 };
