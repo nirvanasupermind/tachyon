@@ -2,6 +2,12 @@
 #include "token.h"
 
 namespace tachyon {
+    Token::Token() {
+        this->ln = 0;
+        this->type = TokenType::NUMBER;
+        this->val = "";
+    }
+
     Token::Token(int ln, TokenType type, const std::string& val) {
         this->ln = ln;
         this->type = type;
@@ -11,11 +17,8 @@ namespace tachyon {
     std::string Token::to_string() const {
         std::string result = "";
         switch (type) {
-        case TokenType::INT:
-            result += "INT:";
-            break;
-        case TokenType::FLOAT:
-            result += "FLOT:";
+        case TokenType::NUMBER:
+            result += "NUMBER:";
             break;
         case TokenType::PLUS:
             result += "PLUS:";

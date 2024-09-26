@@ -5,8 +5,7 @@
 
 namespace tachyon {
     enum class TokenType {
-        INT,
-        FLOAT,
+        NUMBER,
         PLUS,
         MINUS,
         MUL,
@@ -21,6 +20,7 @@ namespace tachyon {
         int ln;
         TokenType type;
         std::string val;
+        Token();
         Token(int ln, TokenType type, const std::string& val);
         std::string to_string() const;
     };

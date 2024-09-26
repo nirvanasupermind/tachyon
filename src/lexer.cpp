@@ -66,10 +66,6 @@ namespace tachyon {
             advance();
         }
 
-        if(dot_count == 0) {
-            return Token(ln, TokenType::INT, num_str);
-        } else {
-            return Token(ln, TokenType::FLOAT, num_str);
-        }
+        return Token(ln, TokenType::NUMBER, num_str);
     }
 };
