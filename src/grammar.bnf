@@ -2,3 +2,4 @@
 <term> ::= <factor> | <term> (<MUL> | <DIV>) <factor>
 <factor> ::= <NUMBER>
 <OPT-WHITESPACE> ::= "" | (" " | "\n") <OPT-WHITESPACE>
+<OPT-WHITESPACE> ::= "" | (" " | "\n") <OPT-WHITESPACE>

@@ -4,7 +4,7 @@
 namespace tachyon {
     Token::Token() {
         this->ln = 0;
-        this->type = TokenType::NUMBER;
+        this->type = TokenType::EOF_;
         this->val = "";
     }
 
@@ -56,6 +56,9 @@ namespace tachyon {
         case TokenType::RPAREN:
             result += "RPAREN:";
             break;    
+        case TokenType::EOF_:
+            result += "EOF:";
+            break;
         }
         result += val;
         return result;

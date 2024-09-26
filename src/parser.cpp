@@ -1,9 +1,11 @@
 #include <string>
 #include <vector>
+#include <iostream>
 #include "parser.h"
 
 namespace tachyon {
-    Parser::Parser(const std::vector<Token>& tokens) {
+    Parser::Parser(const std::string& fn, const std::vector<Token>& tokens) {
+        this->fn = fn;
         this->tokens = tokens;
         this->tok_idx = -1;
         advance();
@@ -16,12 +18,26 @@ namespace tachyon {
         }
     }
 
+    void Parser::raise_error() {
+        throw std::runtime_error(fn + ":" + std::to_string(current_tok.ln) + ": unexpected '" + (current_tok.val) + "'");
+    }
+
+    std::shared_ptr<Node> Parser::parse() {
+        std::shared_ptr<Node> res = expr();
+        if(current_tok.type != TokenType::EOF_) {
+            raise_error();
+        }
+        return res;
+    }
+
     std::shared_ptr<Node> Parser::factor() {
         Token tok = current_tok;
         if (tok.type == TokenType::NUMBER) {
             advance();
             return std::make_shared<NumberNode>(NumberNode(tok));
-        } else if(tok.type)
+        } else {
+            raise_error();
+        }
     }
 
     std::shared_ptr<Node> Parser::term() {
@@ -37,10 +53,11 @@ namespace tachyon {
 
         while (std::find(ops.begin(), ops.end(), current_tok.type) != ops.end()) {
             Token op_tok = current_tok;
+            advance();
             std::shared_ptr<Node> right = func();
             left = std::make_shared<BinOpNode>(BinOpNode(left, op_tok, right));
         }
-
+        
         return left;
     }
 };

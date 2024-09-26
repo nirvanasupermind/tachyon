@@ -11,7 +11,8 @@ namespace tachyon {
         MUL,
         DIV,
         LPAREN,
-        RPAREN
+        RPAREN,
+        EOF_
     };
 
     class Token {
