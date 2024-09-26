@@ -21,7 +21,7 @@ namespace tachyon {
         if (tok.type == TokenType::NUMBER) {
             advance();
             return std::make_shared<NumberNode>(NumberNode(tok));
-        }
+        } else if(tok.type)
     }
 
     std::shared_ptr<Node> Parser::term() {
