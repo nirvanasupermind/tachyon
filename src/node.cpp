@@ -16,6 +16,19 @@ namespace tachyon {
         return tok.to_string();
     }
 
+    UnaryOpNode::UnaryOpNode(const Token& op_tok, const std::shared_ptr<Node>& right_node) {
+        this->op_tok = op_tok;
+        this->right_node = right_node;
+    }
+
+    NodeType UnaryOpNode::get_type() const {
+        return NodeType::UNARY_OP;
+    }
+
+    std::string UnaryOpNode::to_string() const {
+        return "(" + this->op_tok.to_string() + ", " + this->right_node->to_string() + ")";
+    }
+
     BinOpNode::BinOpNode(const std::shared_ptr<Node>& left_node, const Token& op_tok, const std::shared_ptr<Node>& right_node) {
         this->left_node = left_node;
         this->op_tok = op_tok;
@@ -29,10 +42,5 @@ namespace tachyon {
     std::string BinOpNode::to_string() const {
         return "(" + this->left_node->to_string() + ", " + this->op_tok.to_string() + ", " + this->right_node->to_string() + ")";
     }
-
-    
-
-
-
 };
 

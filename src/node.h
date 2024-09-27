@@ -8,6 +8,7 @@
 namespace tachyon {
     enum class NodeType {
         NUMBER,
+        UNARY_OP,
         BIN_OP
     };
 
@@ -21,6 +22,15 @@ namespace tachyon {
     public:
         Token tok;
         NumberNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class UnaryOpNode: public Node {
+    public:
+        Token op_tok;
+        std::shared_ptr<Node> right_node;
+        UnaryOpNode(const Token& op_tok, const std::shared_ptr<Node>& right_node);
         NodeType get_type() const;
         std::string to_string() const;
     };

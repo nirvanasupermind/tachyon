@@ -37,10 +37,70 @@ namespace tachyon {
             } else if(current_char == '*') {
                 tokens.push_back(Token(ln, TokenType::MUL, "*"));
                 advance();
-            }  else if(current_char == '/') {
+            } else if(current_char == '/') {
                 tokens.push_back(Token(ln, TokenType::DIV, "/"));
                 advance();
-            }  else if(current_char == '(') {
+            } else if(current_char == '~') {
+                tokens.push_back(Token(ln, TokenType::NOT, "~"));
+                advance();
+            }  else if(current_char == '&') {
+                tokens.push_back(Token(ln, TokenType::AND, "&"));
+                advance();
+            } else if(current_char == '|') {
+                tokens.push_back(Token(ln, TokenType::OR, "&"));
+                advance();
+            } else if(current_char == '^') {
+                tokens.push_back(Token(ln, TokenType::XOR, "&"));
+                advance(); 
+            } else if(current_char == '&') {
+                tokens.push_back(Token(ln, TokenType::AND, "&"));
+                advance();
+            } else if(current_char == '|') {
+                tokens.push_back(Token(ln, TokenType::OR, "|"));
+                advance();
+            } else if(current_char == '^') {
+                tokens.push_back(Token(ln, TokenType::AND, "^"));
+                advance();
+            } else if(current_char == '=') {
+                int old_ln = ln;
+                advance();
+                if(current_char == '=') {
+                    tokens.push_back(Token(ln, TokenType::EE, "=="));
+                    advance();                    
+                } else {
+                    tokens.push_back(Token(old_ln, TokenType::EQ, "="));
+                }
+            } else if(current_char == '!') {
+                advance();
+                if(current_char == '=') {
+                    tokens.push_back(Token(ln, TokenType::NE, "!="));
+                    advance();                    
+                }
+            } else if(current_char == '<') {
+                int old_ln = ln;
+                advance();
+                if(current_char == '<') {
+                    tokens.push_back(Token(ln, TokenType::LSH, "<<"));
+                    advance();
+                } else if(current_char == '=') {
+                    tokens.push_back(Token(ln, TokenType::LE, "<="));                    
+                    advance();
+                } else {
+                    tokens.push_back(Token(old_ln, TokenType::LT, "<"));
+                }
+            } else if(current_char == '>') {
+                int old_ln = ln;
+                advance();
+                if(current_char == '>') {
+                    tokens.push_back(Token(ln, TokenType::RSH, ">>"));
+                    advance();
+                } else if(current_char == '=') {
+                    tokens.push_back(Token(ln, TokenType::GE, ">="));
+                    advance();                    
+                } else {
+                    tokens.push_back(Token(old_ln, TokenType::GT, ">"));
+                }
+            } else if(current_char == '(') {
                 tokens.push_back(Token(ln, TokenType::LPAREN, "("));
                 advance();
             }  else if(current_char == ')') {

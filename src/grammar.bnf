@@ -1,5 +1,6 @@
-<expr> ::= <term> | <expr> (<ADD> | <SUB>) <term>
-<term> ::= <factor> | <term> (<MUL> | <DIV>) <factor>
+<expr> ::= <term> | <expr> <ADD> <factor> | expr <SUB> factor
+<term> ::= <factor> | <term> <MUL> <factor> | term <DIV> factor
 <factor> ::= <NUMBER>
-<OPT-WHITESPACE> ::= "" | (" " | "\n") <OPT-WHITESPACE>
+<NUMBER> ::= <NUMBER>
+
 <OPT-WHITESPACE> ::= "" | (" " | "\n") <OPT-WHITESPACE>
