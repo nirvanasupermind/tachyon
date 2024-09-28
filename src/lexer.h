@@ -8,15 +8,16 @@
 namespace tachyon {
     class Lexer {
     public:
-        std::string fn;
+        std::string filename;
         std::string text;
-        int ln;
+        int line;
         int pos;
         char current_char;
-        Lexer(const std::string& fn, const std::string& text);
+        Lexer(const std::string& filename, const std::string& text);
         void advance();
         std::vector<Token> make_tokens();
         Token make_number();
+        Token make_identifier();
     };
 };
 

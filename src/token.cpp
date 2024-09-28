@@ -3,13 +3,13 @@
 
 namespace tachyon {
     Token::Token() {
-        this->ln = 0;
+        this->line = 0;
         this->type = TokenType::EOF_;
-        this->val = "";
+        this->val = "<eof>";
     }
 
-    Token::Token(int ln, TokenType type, const std::string& val) {
-        this->ln = ln;
+    Token::Token(int line, TokenType type, const std::string& val) {
+        this->line = line;
         this->type = type;
         this->val = val;
     }
@@ -19,6 +19,12 @@ namespace tachyon {
         switch (type) {
         case TokenType::NUMBER:
             result += "NUMBER:";
+            break;
+        case TokenType::IDENTIFIER:
+            result += "IDENTIFIER:";
+            break;
+        case TokenType::KEYWORD:
+            result += "KEYWORD:";
             break;
         case TokenType::PLUS:
             result += "PLUS:";
@@ -31,6 +37,9 @@ namespace tachyon {
             break;
         case TokenType::DIV:
             result += "DIV:";
+            break;
+        case TokenType::MOD:
+            result += "MOD:";
             break;
         case TokenType::NOT:
             result += "NOT:";
@@ -50,9 +59,6 @@ namespace tachyon {
         case TokenType::RSH:
             result += "RSH:";
             break;
-        case TokenType::EQ:
-            result += "EQ:";
-            break;
         case TokenType::EE:
             result += "EE:";
             break;
@@ -69,14 +75,50 @@ namespace tachyon {
             result += "LE:";
             break;
         case TokenType::GE:
-            result += "RSH:";
+            result += "GE:";
+            break;
+        case TokenType::EQ:
+            result += "EQ:";
+            break;
+        case TokenType::PLUS_EQ:
+            result += "PLUS_EQ:";
+            break;
+        case TokenType::MINUS_EQ:
+            result += "MINUS_EQ:";
+            break;
+        case TokenType::MUL_EQ:
+            result += "MUL_EQ:";
+            break;
+        case TokenType::DIV_EQ:
+            result += "DIV_EQ:";
+            break;
+        case TokenType::MOD_EQ:
+            result += "MOD_EQ:";
+            break;
+        case TokenType::AND_EQ:
+            result += "AND_EQ:";
+            break;
+        case TokenType::OR_EQ:
+            result += "OR_EQ:";
+            break;
+        case TokenType::XOR_EQ:
+            result += "XOR_EQ:";
+            break;
+        case TokenType::LSH_EQ:
+            result += "LSH_EQ:";
+            break;
+        case TokenType::RSH_EQ:
+            result += "RSH_EQ:";
             break;
         case TokenType::LPAREN:
             result += "LPAREN:";
             break;
         case TokenType::RPAREN:
             result += "RPAREN:";
-            break;    
+            break;   
+        case TokenType::SEMICOLON:
+            result += "SEMICOLON:";
+            break;   
         case TokenType::EOF_:
             result += "EOF:";
             break;

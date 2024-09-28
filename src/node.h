@@ -3,13 +3,18 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "token.h"
 
 namespace tachyon {
     enum class NodeType {
         NUMBER,
+        IDENTIFIER,
         UNARY_OP,
-        BIN_OP
+        BIN_OP,
+        VAR_DEF,
+        EXPR_STMT,
+        STMT_LIST
     };
 
     class Node {
@@ -22,6 +27,14 @@ namespace tachyon {
     public:
         Token tok;
         NumberNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+  
+    class IdentifierNode: public Node {
+    public:
+        Token tok;
+        IdentifierNode(const Token& tok);
         NodeType get_type() const;
         std::string to_string() const;
     };
@@ -41,6 +54,40 @@ namespace tachyon {
         Token op_tok;
         std::shared_ptr<Node> right_node;
         BinOpNode(const std::shared_ptr<Node>& left_node, const Token& op_tok, const std::shared_ptr<Node>& right_node);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class VarDefNode: public Node {
+    public:
+        Token name_tok;
+        std::shared_ptr<Node> val;
+        VarDefNode(const Token& name_tok, const std::shared_ptr<Node>& val);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    // class VarAssignNode: public Node {
+    // public:
+    //     Token name_tok;
+    //     std::shared_ptr<Node> val;
+    //     VarAssignNode(const Token& name_tok, const std::shared_ptr<Node>& val);
+    //     NodeType get_type() const;
+    //     std::string to_string() const;
+    // };
+
+    class ExprStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> expr_node;
+        ExprStmtNode(const std::shared_ptr<Node>& expr_node);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class StmtListNode: public Node {
+    public:
+        std::vector<std::shared_ptr<Node> > stmts;
+        StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts);
         NodeType get_type() const;
         std::string to_string() const;
     };

@@ -9,11 +9,11 @@
 namespace tachyon {
     class Parser {
     public:
-        std::string fn;
+        std::string filename;
         std::vector<Token> tokens;
         int tok_idx;
         Token current_tok;
-        Parser(const std::string& fn, const std::vector<Token>& tokens);
+        Parser(const std::string& filename, const std::vector<Token>& tokens);
         void advance();
         void raise_error();
         std::shared_ptr<Node> parse();
@@ -26,7 +26,12 @@ namespace tachyon {
         std::shared_ptr<Node> and_expr();
         std::shared_ptr<Node> xor_expr();
         std::shared_ptr<Node> or_expr();
+        std::shared_ptr<Node> assign_expr();
         std::shared_ptr<Node> expr();
+        std::shared_ptr<Node> expr_stmt();
+        std::shared_ptr<Node> var_def_stmt();
+        std::shared_ptr<Node> stmt();
+        std::shared_ptr<Node> stmt_list(TokenType end);
         std::shared_ptr<Node> bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops);
     };
 };

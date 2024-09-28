@@ -3,4 +3,4 @@
 <factor> ::= <NUMBER>
 <NUMBER> ::= <NUMBER>
 
-<OPT-WHITESPACE> ::= "" | (" " | "\n") <OPT-WHITESPACE>
+<OPT-WHITESPACE> ::= "" | (" " | "\n" | "\t") <OPT-WHITESPACE>
