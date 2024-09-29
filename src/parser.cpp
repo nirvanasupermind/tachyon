@@ -124,9 +124,22 @@ namespace tachyon {
         advance();
         return std::make_shared<VarDefNode>(VarDefNode(name_tok, val));
     }
+
     
+    std::shared_ptr<Node> Parser::block_stmt() {
+        if(current_tok.type != TokenType::LCURLY) {
+            raise_error();
+        }
+        advance();
+        std::shared_ptr<Node> stmt_list_node = stmt_list(TokenType::RCURLY);
+        advance();
+        return std::make_shared<BlockStmtNode>(BlockStmtNode(stmt_list_node));
+    }
+
     std::shared_ptr<Node> Parser::stmt() {
-        if (current_tok.type == TokenType::KEYWORD && current_tok.val == "var") {
+        if (current_tok.type == TokenType::LCURLY) {
+            return block_stmt();
+        } else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "var") {
             return var_def_stmt();
         } else {
             return expr_stmt();

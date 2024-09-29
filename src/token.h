@@ -38,6 +38,8 @@ namespace tachyon {
         RSH_EQ,
         LPAREN,
         RPAREN,
+        LCURLY,
+        RCURLY,
         SEMICOLON,
         EOF_
     };

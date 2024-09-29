@@ -30,6 +30,7 @@ namespace tachyon {
         std::shared_ptr<Node> expr();
         std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> var_def_stmt();
+        std::shared_ptr<Node> block_stmt();
         std::shared_ptr<Node> stmt();
         std::shared_ptr<Node> stmt_list(TokenType end);
         std::shared_ptr<Node> bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops);

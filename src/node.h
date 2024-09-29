@@ -14,6 +14,7 @@ namespace tachyon {
         BIN_OP,
         VAR_DEF,
         EXPR_STMT,
+        BLOCK_STMT,
         STMT_LIST
     };
 
@@ -91,6 +92,15 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
+
+    class BlockStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> stmt_list_node;
+        BlockStmtNode(const std::shared_ptr<Node>& stmt_list_node);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
 };
 
 #endif

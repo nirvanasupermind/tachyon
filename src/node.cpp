@@ -94,6 +94,18 @@ namespace tachyon {
         return "(ExprStmtNode " + expr_node->to_string() + ")";
     }
 
+    BlockStmtNode::BlockStmtNode(const std::shared_ptr<Node>& stmt_list_node) {
+        this->stmt_list_node = stmt_list_node;
+    }
+
+    NodeType BlockStmtNode::get_type() const {
+        return NodeType::BLOCK_STMT;
+    }
+
+    std::string BlockStmtNode::to_string() const {
+        return "(BlockStmtNode " + stmt_list_node->to_string() + ")";
+    }
+
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts) {
         this->stmts = stmts;
     }

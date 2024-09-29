@@ -115,7 +115,13 @@ namespace tachyon {
             break;
         case TokenType::RPAREN:
             result += "RPAREN:";
-            break;   
+            break;
+        case TokenType::LCURLY:
+            result += "LCURLY:";
+            break;
+        case TokenType::RCURLY:
+            result += "RCURLY:";
+            break;
         case TokenType::SEMICOLON:
             result += "SEMICOLON:";
             break;   

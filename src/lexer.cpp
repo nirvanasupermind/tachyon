@@ -162,6 +162,12 @@ namespace tachyon {
             } else if(current_char == ')') {
                 tokens.push_back(Token(line, TokenType::RPAREN, ")"));
                 advance();
+            } else if(current_char == '{') {
+                tokens.push_back(Token(line, TokenType::LCURLY, "{"));
+                advance();
+            } else if(current_char == '}') {
+                tokens.push_back(Token(line, TokenType::RCURLY, "}"));
+                advance();
             } else if(current_char == ';') {
                 tokens.push_back(Token(line, TokenType::SEMICOLON, ";"));
                 advance();
