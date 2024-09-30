@@ -146,6 +146,16 @@ namespace tachyon {
         std::string to_string() const;
     };
 
+    class FuncDefStmtNode: public Node {
+    public:
+        Token name_tok;
+        std::vector<Token> arg_names;
+        std::shared_ptr<Node> body;
+        FuncDefStmtNode(const Token& name_tok, const std::vector<Token>& arg_names, const std::shared_ptr<Node>& body);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
     class StmtListNode: public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;

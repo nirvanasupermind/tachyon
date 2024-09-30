@@ -128,6 +128,9 @@ namespace tachyon {
         case TokenType::RCURLY:
             result += "RCURLY:";
             break;
+        case TokenType::COMMA:
+            result += "COMMA:";
+            break;  
         case TokenType::SEMICOLON:
             result += "SEMICOLON:";
             break;   

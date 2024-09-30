@@ -42,6 +42,7 @@ namespace tachyon {
         RPAREN,
         LCURLY,
         RCURLY,
+        COMMA,
         SEMICOLON,
         EOF_
     };

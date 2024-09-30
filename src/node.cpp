@@ -133,18 +133,6 @@ namespace tachyon {
         return "(IfElseStmtNode " + cond->to_string() + " " + if_body->to_string() + " " + else_body->to_string()  + ")";
     }
 
-    ReturnStmtNode::ReturnStmtNode(const std::shared_ptr<Node>& expr_node) {
-        this->expr_node = expr_node;
-    }
-
-    NodeType ReturnStmtNode::get_type() const {
-        return NodeType::RETURN_STMT;
-    }
-
-    std::string ReturnStmtNode::to_string() const {
-        return "(ReturnStmtNode " + expr_node->to_string() + ")";
-    }
-
     WhileStmtNode::WhileStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& body) {
         this->cond = cond;
         this->body = body;
@@ -167,6 +155,38 @@ namespace tachyon {
 
     NodeType ForStmtNode::get_type() const {
         return NodeType::FOR_STMT;
+    }
+
+
+    ReturnStmtNode::ReturnStmtNode(const std::shared_ptr<Node>& expr_node) {
+        this->expr_node = expr_node;
+    }
+
+    NodeType ReturnStmtNode::get_type() const {
+        return NodeType::RETURN_STMT;
+    }
+
+    std::string ReturnStmtNode::to_string() const {
+        return "(ReturnStmtNode " + expr_node->to_string() + ")";
+    }
+    
+    FuncDefStmtNode::FuncDefStmtNode(const Token& name_tok, const std::vector<Token>& arg_names, const std::shared_ptr<Node>& body) {
+        this->name_tok = name_tok;
+        this->arg_names = arg_names;
+        this->body = body;
+    }
+
+    NodeType FuncDefStmtNode::get_type() const {
+        return NodeType::FUNC_DEF_STMT;
+    }
+
+    std::string FuncDefStmtNode::to_string() const {
+        std::string result = "(FuncDefStmtNode " + name_tok.to_string();
+            for(int i = 0; i < arg_names.size(); i++) {
+            result += arg_names.at(i).to_string() + " ";
+        }
+        result += body->to_string();
+        return result;
     }
 
     std::string ForStmtNode::to_string() const {

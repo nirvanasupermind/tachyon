@@ -10,4 +10,4 @@ class Point {
 }
 
 var myPoint = Point(3, 5);
-printObject(myPoint.sum());
+System.printObject(myPoint.sum());

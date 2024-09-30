@@ -174,6 +174,9 @@ namespace tachyon {
             } else if(current_char == '}') {
                 tokens.push_back(Token(line, TokenType::RCURLY, "}"));
                 advance();
+            } else if(current_char == ',') {
+                tokens.push_back(Token(line, TokenType::COMMA, ","));
+                advance();
             } else if(current_char == ';') {
                 tokens.push_back(Token(line, TokenType::SEMICOLON, ";"));
                 advance();
@@ -209,7 +212,7 @@ namespace tachyon {
         }
 
         if(identifier_str == "var" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while" || identifier_str == "for"
-       || identifier_str == "def" || identifier_str == "return") {
+       || identifier_str == "return" || identifier_str == "function") {
             return Token(line, TokenType::KEYWORD, identifier_str);
         } else {
             return Token(line, TokenType::IDENTIFIER, identifier_str);

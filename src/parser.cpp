@@ -31,7 +31,8 @@ namespace tachyon {
         if (tok.type == TokenType::PLUS || tok.type == TokenType::MINUS || tok.type == TokenType::NOT) {
             advance();
             return std::make_shared<UnaryOpNode>(UnaryOpNode(tok, expr()));
-        } else if (tok.type == TokenType::LPAREN) {
+        }
+        else if (tok.type == TokenType::LPAREN) {
             advance();
             std::shared_ptr<Node> my_expr = expr();
             if (tok.type != TokenType::RPAREN) {
@@ -39,18 +40,16 @@ namespace tachyon {
             }
             advance();
             return my_expr;
-        } else if (tok.type == TokenType::NUMBER) {
+        }
+        else if (tok.type == TokenType::NUMBER) {
             advance();
-            std::shared_ptr<Node> number_node = std::make_shared<NumberNode>(NumberNode(tok));
-            if(current_tok.type == TokenType::INC || current_tok.type == TokenType::DEC) {
-                return std::make_shared<UnaryOpNode>(UnaryOpNode(current_tok, number_node));
-            } else {
-                return number_node;
-            }
-        } else if (tok.type == TokenType::IDENTIFIER) {
+            return std::make_shared<NumberNode>(NumberNode(tok));
+        }
+        else if (tok.type == TokenType::IDENTIFIER) {
             advance();
             return std::make_shared<IdentifierNode>(IdentifierNode(tok));
-        } else {
+        }
+        else {
             raise_error();
         }
     }
@@ -130,7 +129,7 @@ namespace tachyon {
     }
 
     std::shared_ptr<Node> Parser::block_stmt() {
-        if(current_tok.type != TokenType::LCURLY) {
+        if (current_tok.type != TokenType::LCURLY) {
             raise_error();
         }
         advance();
@@ -158,11 +157,12 @@ namespace tachyon {
             advance();
             std::shared_ptr<Node> else_body = block_stmt();
             return std::make_shared<IfElseStmtNode>(IfElseStmtNode(cond, body, else_body));
-        } else {
+        }
+        else {
             return std::make_shared<IfStmtNode>(IfStmtNode(cond, body));
         }
     }
-    
+
     std::shared_ptr<Node> Parser::while_stmt() {
         if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "while")) {
             raise_error();
@@ -180,7 +180,7 @@ namespace tachyon {
         std::shared_ptr<Node> body = block_stmt();
         return std::make_shared<WhileStmtNode>(WhileStmtNode(cond, body));
     }
-    
+
     std::shared_ptr<Node> Parser::for_stmt() {
         if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "for")) {
             raise_error();
@@ -201,52 +201,92 @@ namespace tachyon {
         return std::make_shared<ForStmtNode>(ForStmtNode(init, cond, update, body));
     }
 
-
     std::shared_ptr<Node> Parser::return_stmt() {
-        if (!(current_tok.type == TokenType::IDENTIFIER && current_tok.val == "return")) {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "return")) {
             raise_error();
         }
-
         advance();
-        
+
         std::shared_ptr<Node> res = expr();
         if (current_tok.type != TokenType::SEMICOLON) {
             raise_error();
         }
         advance();
-        return std::make_shared<ExprStmtNode>(ExprStmtNode(res));
+        return std::make_shared<ReturnStmtNode>(ReturnStmtNode(res));
     }
+
+    std::shared_ptr<Node> Parser::func_def_stmt() {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "function")) {
+            raise_error();
+        }
+
+        advance();
+        Token name_tok;
+        if (current_tok.type == TokenType::IDENTIFIER) {
+            name_tok = current_tok;
+            advance();
+        }
+        if (current_tok.type != TokenType::LPAREN) {
+            raise_error();
+        }
+        advance();
+        std::vector<Token> arg_names;
+        while (true) {
+            if (current_tok.type != TokenType::IDENTIFIER) {
+                raise_error();
+            }
+            arg_names.push_back(current_tok);
+            advance();
+            if (current_tok.type == TokenType::RPAREN) {
+                advance();
+                break;
+            }else if (current_tok.type == TokenType::COMMA) {
+                advance();
+            } else {
+                raise_error();
+            }
+        }
+        std::shared_ptr<Node> body = block_stmt();
+        return std::make_shared<FuncDefStmtNode>(FuncDefStmtNode(name_tok, arg_names, body));
+    }
+
 
     std::shared_ptr<Node> Parser::stmt() {
         if (current_tok.type == TokenType::LCURLY) {
             return block_stmt();
-        } else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "var") {
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "var") {
             return var_def_stmt();
-        } else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "if") {
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "if") {
             return if_stmt();
-        } else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "while") {
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "while") {
             return while_stmt();
-        } else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "for") {
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "for") {
             return for_stmt();
-        } else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "return") {
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "return") {
             return return_stmt();
-        } /* else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "def") {
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "function") {
             return func_def_stmt();
-        } */ else {
+        }
+        else {
             return expr_stmt();
         }
     }
 
-
     std::shared_ptr<Node> Parser::stmt_list(TokenType end) {
-       std::vector<std::shared_ptr<Node> > stmts;
-       while(current_tok.type != end) {
+        std::vector<std::shared_ptr<Node> > stmts;
+        while (current_tok.type != end) {
             stmts.push_back(stmt());
-       }
-       if(current_tok.type != end) {
+        }
+        if (current_tok.type != end) {
             raise_error();
-       }
-       return std::make_shared<StmtListNode>(StmtListNode(stmts));
+        }
+        return std::make_shared<StmtListNode>(StmtListNode(stmts));
     }
 
     std::shared_ptr<Node> Parser::bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops) {
