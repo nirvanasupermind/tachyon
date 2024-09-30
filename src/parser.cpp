@@ -34,12 +34,12 @@ namespace tachyon {
         }
         else if (tok.type == TokenType::LPAREN) {
             advance();
-            std::shared_ptr<Node> my_expr = expr();
+            std::shared_ptr<Node> inner_expr = expr();
             if (tok.type != TokenType::RPAREN) {
                 raise_error();
             }
             advance();
-            return my_expr;
+            return inner_expr;
         }
         else if (tok.type == TokenType::NUMBER) {
             advance();
@@ -54,8 +54,39 @@ namespace tachyon {
         }
     }
 
+    std::shared_ptr<Node> Parser::postfix_expr() {
+        std::shared_ptr<Node> result = factor();
+
+        while (true) {
+            if(current_tok.type == TokenType::LPAREN) {
+                std::vector<std::shared_ptr<Node> > args;
+                while(true) {
+                    args.push_back(expr());
+                    if (current_tok.type == TokenType::RPAREN) {
+                        advance();
+                        break;
+                    }
+                    else if (current_tok.type == TokenType::COMMA) {
+                        advance();
+                    }
+                    else {
+                        raise_error();
+                    }
+                }
+                result = std::make_shared<CallExprNode>(CallExprNode(result, args));
+            } else if(current_tok.type == TokenType::INC || current_tok.type == TokenType::DEC) {
+                result = std::make_shared<UnaryOpNode>(UnaryOpNode(current_tok, result));
+                advance();
+            } else {
+                advance();
+                break;
+            }
+        }
+        return result;
+    }
+
     std::shared_ptr<Node> Parser::multiplicative_expr() {
-        return bin_op([this]() {return this->factor(); }, { TokenType::MUL, TokenType::DIV, TokenType::MOD });
+        return bin_op([this]() {return this->postfix_expr(); }, { TokenType::MUL, TokenType::DIV, TokenType::MOD });
     }
 
     std::shared_ptr<Node> Parser::additive_expr() {
@@ -94,7 +125,8 @@ namespace tachyon {
     }
 
     std::shared_ptr<Node> Parser::expr() {
-        return assign_expr();
+        std::shared_ptr<Node> res = assign_expr();
+        return res;
     }
 
     std::shared_ptr<Node> Parser::expr_stmt() {
@@ -240,9 +272,11 @@ namespace tachyon {
             if (current_tok.type == TokenType::RPAREN) {
                 advance();
                 break;
-            }else if (current_tok.type == TokenType::COMMA) {
+            }
+            else if (current_tok.type == TokenType::COMMA) {
                 advance();
-            } else {
+            }
+            else {
                 raise_error();
             }
         }
@@ -298,7 +332,7 @@ namespace tachyon {
             std::shared_ptr<Node> right = func();
             left = std::make_shared<BinOpNode>(BinOpNode(left, op_tok, right));
         }
-
+        
         return left;
     }
 };

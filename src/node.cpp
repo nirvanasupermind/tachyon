@@ -28,6 +28,26 @@ namespace tachyon {
         return "(IdentifierNode " + tok.to_string() + ")";
     }
 
+
+    CallExprNode::CallExprNode(const std::shared_ptr<Node>& callee, const std::vector<std::shared_ptr<Node> >& args) {
+        this->callee = callee;
+        this->args = args;
+    }
+
+    NodeType CallExprNode::get_type() const {
+        return NodeType::CALL_EXPR;
+    }
+
+    std::string CallExprNode::to_string() const {
+        std::string result = "(CallExprNode ";
+        for(int i = 0; i < args.size(); i++) {
+            result += args.at(i)->to_string() + " ";
+        }
+        result = result.substr(0, result.size() - 1);
+        result += ")";
+        return result;
+    }
+
     UnaryOpNode::UnaryOpNode(const Token& op_tok, const std::shared_ptr<Node>& right_node) {
         this->op_tok = op_tok;
         this->right_node = right_node;

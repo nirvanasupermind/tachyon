@@ -17,170 +17,209 @@ namespace tachyon {
     void Lexer::advance() {
         pos++;
         current_char = pos < text.size() ? text.at(pos) : '\0';
-        if(current_char == '\n') {
-            line++;    
+        if (current_char == '\n') {
+            line++;
         }
     }
 
     std::vector<Token> Lexer::make_tokens() {
         std::vector<Token> tokens;
 
-        while(current_char != '\0') {
-            if(current_char == ' ' || current_char == '\n' || current_char == '\t') {
+        while (current_char != '\0') {
+            if (current_char == ' ' || current_char == '\n' || current_char == '\t') {
                 advance();
-            }  else if(isdigit(current_char)) {
+            }
+            else if (isdigit(current_char)) {
                 tokens.push_back(make_number());
-            } else if(isalpha(current_char) || current_char == '_') {
+            }
+            else if (isalpha(current_char) || current_char == '_') {
                 tokens.push_back(make_identifier());
-            } else if(current_char == '+') {
+            }
+            else if (current_char == '+') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::PLUS_EQ, "+="));
-                    advance();                    
-                } else if(current_char == '+') {
+                    advance();
+                }
+                else if (current_char == '+') {
                     tokens.push_back(Token(line, TokenType::INC, "++"));
-                    advance();  
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::PLUS, "+"));
                 }
-            } else if(current_char == '-') {
+            }
+            else if (current_char == '-') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::MINUS_EQ, "-="));
-                    advance();                    
-                }else if(current_char == '-') {
+                    advance();
+                }
+                else if (current_char == '-') {
                     tokens.push_back(Token(line, TokenType::DEC, "--"));
-                    advance();  
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::MINUS, "-"));
                 }
-            } else if(current_char == '*') {
+            }
+            else if (current_char == '*') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::MUL_EQ, "*="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::MUL, "*"));
                 }
-            } else if(current_char == '/') {
+            }
+            else if (current_char == '/') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::DIV_EQ, "/="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::DIV, "/"));
                 }
-            } else if(current_char == '%') {
+            }
+            else if (current_char == '%') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::MOD_EQ, "%="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::MOD, "%"));
                 }
-            } else if(current_char == '~') {
+            }
+            else if (current_char == '~') {
                 tokens.push_back(Token(line, TokenType::NOT, "~"));
                 advance();
-            } else if(current_char == '&') {
+            }
+            else if (current_char == '&') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::AND_EQ, "&="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::AND, "&"));
                 }
-            } else if(current_char == '|') {
+            }
+            else if (current_char == '|') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::OR_EQ, "|="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::OR, "|"));
                 }
-            } else if(current_char == '^') {
+            }
+            else if (current_char == '^') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::XOR_EQ, "^="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::XOR, "^"));
                 }
-            } else if(current_char == '=') {
+            }
+            else if (current_char == '=') {
                 int old_line = line;
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::EE, "=="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::EQ, "="));
                 }
-            } else if(current_char == '!') {
+            }
+            else if (current_char == '!') {
                 advance();
-                if(current_char == '=') {
+                if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::NE, "!="));
-                    advance();                    
+                    advance();
                 }
-            } else if(current_char == '<') {
+            }
+            else if (current_char == '<') {
                 int old_line = line;
                 advance();
-                if(current_char == '<') {
+                if (current_char == '<') {
                     advance();
-                    if(current_char == '=') {
+                    if (current_char == '=') {
                         tokens.push_back(Token(line, TokenType::LSH_EQ, "<<="));
-                        advance();                    
-                    } else {
+                        advance();
+                    }
+                    else {
                         tokens.push_back(Token(old_line, TokenType::LSH, "<<"));
                     }
-                } else if(current_char == '=') {
-                    tokens.push_back(Token(line, TokenType::LE, "<="));                    
+                }
+                else if (current_char == '=') {
+                    tokens.push_back(Token(line, TokenType::LE, "<="));
                     advance();
-                } else {
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::LT, "<"));
                 }
-            } else if(current_char == '>') {
+            }
+            else if (current_char == '>') {
                 int old_line = line;
                 advance();
-                if(current_char == '>') {
+                if (current_char == '>') {
                     advance();
-                    if(current_char == '=') {
+                    if (current_char == '=') {
                         tokens.push_back(Token(line, TokenType::RSH_EQ, ">>="));
-                        advance();                    
-                    } else {
+                        advance();
+                    }
+                    else {
                         tokens.push_back(Token(old_line, TokenType::RSH, ">>"));
                     }
-                } else if(current_char == '=') {
+                }
+                else if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::GE, ">="));
-                    advance();                    
-                } else {
+                    advance();
+                }
+                else {
                     tokens.push_back(Token(old_line, TokenType::GT, ">"));
                 }
-            } else if(current_char == '(') {
+            }
+            else if (current_char == '(') {
                 tokens.push_back(Token(line, TokenType::LPAREN, "("));
                 advance();
-            } else if(current_char == ')') {
+            }
+            else if (current_char == ')') {
                 tokens.push_back(Token(line, TokenType::RPAREN, ")"));
                 advance();
-            } else if(current_char == '{') {
+            }
+            else if (current_char == '{') {
                 tokens.push_back(Token(line, TokenType::LCURLY, "{"));
                 advance();
-            } else if(current_char == '}') {
+            }
+            else if (current_char == '}') {
                 tokens.push_back(Token(line, TokenType::RCURLY, "}"));
                 advance();
-            } else if(current_char == ',') {
+            }
+            else if (current_char == ',') {
                 tokens.push_back(Token(line, TokenType::COMMA, ","));
                 advance();
-            } else if(current_char == ';') {
+            }
+            else if (current_char == ';') {
                 tokens.push_back(Token(line, TokenType::SEMICOLON, ";"));
                 advance();
-            } else {
+            }
+            else {
                 throw std::runtime_error(filename + ":" + std::to_string(line) + ": " + "illegal character: '" + current_char + "'");
             }
         }
@@ -191,11 +230,12 @@ namespace tachyon {
     Token Lexer::make_number() {
         std::string num_str = "";
         int dot_count = 0;
-        while(current_char != '\0' && (isdigit(current_char) || current_char == '.')) {
-            if(current_char == '.') {
-                dot_count += 1; 
+        while (current_char != '\0' && (isdigit(current_char) || current_char == '.')) {
+            if (current_char == '.') {
+                dot_count += 1;
                 num_str += '.';
-            } else {
+            }
+            else {
                 num_str += current_char;
             }
             advance();
@@ -206,15 +246,16 @@ namespace tachyon {
 
     Token Lexer::make_identifier() {
         std::string identifier_str = "";
-        while(current_char != '\0' && (isalnum(current_char) || current_char == '_')) {
+        while (current_char != '\0' && (isalnum(current_char) || current_char == '_')) {
             identifier_str += current_char;
             advance();
         }
 
-        if(identifier_str == "var" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while" || identifier_str == "for"
-       || identifier_str == "return" || identifier_str == "function") {
+        if (identifier_str == "var" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
+            || identifier_str == "for" || identifier_str == "return" || identifier_str == "function") {
             return Token(line, TokenType::KEYWORD, identifier_str);
-        } else {
+        }
+        else {
             return Token(line, TokenType::IDENTIFIER, identifier_str);
         }
     }

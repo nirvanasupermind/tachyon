@@ -17,6 +17,7 @@ namespace tachyon {
         void advance();
         std::vector<Token> make_tokens();
         Token make_number();
+        Token make_string();
         Token make_identifier();
     };
 };

@@ -10,6 +10,7 @@ namespace tachyon {
     enum class NodeType {
         NUMBER,
         IDENTIFIER,
+        CALL_EXPR,
         UNARY_OP,
         BIN_OP,
         VAR_DEF,
@@ -42,6 +43,15 @@ namespace tachyon {
     public:
         Token tok;
         IdentifierNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class CallExprNode: public Node {
+    public:
+        std::shared_ptr<Node> callee;
+        std::vector<std::shared_ptr<Node> > args;
+        CallExprNode(const std::shared_ptr<Node>& callee, const std::vector<std::shared_ptr<Node> >& args);
         NodeType get_type() const;
         std::string to_string() const;
     };

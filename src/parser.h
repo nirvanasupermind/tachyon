@@ -18,6 +18,7 @@ namespace tachyon {
         void raise_error();
         std::shared_ptr<Node> parse();
         std::shared_ptr<Node> factor();
+        std::shared_ptr<Node> postfix_expr();
         std::shared_ptr<Node> multiplicative_expr();
         std::shared_ptr<Node> additive_expr();
         std::shared_ptr<Node> shift_expr();
