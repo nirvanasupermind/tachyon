@@ -15,6 +15,12 @@ namespace tachyon {
         VAR_DEF,
         EXPR_STMT,
         BLOCK_STMT,
+        IF_STMT,
+        IF_ELSE_STMT,
+        WHILE_STMT,
+        FOR_STMT,
+        RETURN_STMT,
+        FUNC_DEF_STMT,
         STMT_LIST
     };
 
@@ -85,14 +91,6 @@ namespace tachyon {
         std::string to_string() const;
     };
 
-    class StmtListNode: public Node {
-    public:
-        std::vector<std::shared_ptr<Node> > stmts;
-        StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts);
-        NodeType get_type() const;
-        std::string to_string() const;
-    };
-
     class BlockStmtNode: public Node {
     public:
         std::shared_ptr<Node> stmt_list_node;
@@ -100,7 +98,61 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
+    
+    class IfStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> cond;
+        std::shared_ptr<Node> body;
+        IfStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& body);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
 
+    class IfElseStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> cond;
+        std::shared_ptr<Node> if_body;
+        std::shared_ptr<Node> else_body;
+        IfElseStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& if_body,  const std::shared_ptr<Node>& else_body);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class WhileStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> cond;
+        std::shared_ptr<Node> body;
+        WhileStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& body);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class ForStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> init;
+        std::shared_ptr<Node> cond;
+        std::shared_ptr<Node> update;
+        std::shared_ptr<Node> body;
+        ForStmtNode(const std::shared_ptr<Node>& init, const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& update, const std::shared_ptr<Node>& body);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class ReturnStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> expr_node;
+        ReturnStmtNode(const std::shared_ptr<Node>& expr_node);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class StmtListNode: public Node {
+    public:
+        std::vector<std::shared_ptr<Node> > stmts;
+        StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
 };
 
 #endif

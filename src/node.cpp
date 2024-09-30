@@ -106,6 +106,73 @@ namespace tachyon {
         return "(BlockStmtNode " + stmt_list_node->to_string() + ")";
     }
 
+    IfStmtNode::IfStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& body) {
+        this->cond = cond;
+        this->body = body;
+    }
+
+    NodeType IfStmtNode::get_type() const {
+        return NodeType::IF_STMT;
+    }
+
+    std::string IfStmtNode::to_string() const {
+        return "(IfStmtNode " + cond->to_string() + " " + body->to_string() + ")";
+    }
+
+    IfElseStmtNode::IfElseStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& if_body, const std::shared_ptr<Node>& else_body) {
+        this->cond = cond;
+        this->if_body = if_body;
+        this->else_body = else_body;
+    }
+
+    NodeType IfElseStmtNode::get_type() const {
+        return NodeType::IF_ELSE_STMT;
+    }
+
+    std::string IfElseStmtNode::to_string() const {
+        return "(IfElseStmtNode " + cond->to_string() + " " + if_body->to_string() + " " + else_body->to_string()  + ")";
+    }
+
+    ReturnStmtNode::ReturnStmtNode(const std::shared_ptr<Node>& expr_node) {
+        this->expr_node = expr_node;
+    }
+
+    NodeType ReturnStmtNode::get_type() const {
+        return NodeType::RETURN_STMT;
+    }
+
+    std::string ReturnStmtNode::to_string() const {
+        return "(ReturnStmtNode " + expr_node->to_string() + ")";
+    }
+
+    WhileStmtNode::WhileStmtNode(const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& body) {
+        this->cond = cond;
+        this->body = body;
+    }
+
+    NodeType WhileStmtNode::get_type() const {
+        return NodeType::WHILE_STMT;
+    }
+
+    std::string WhileStmtNode::to_string() const {
+        return "(WhileStmtNode " + cond->to_string() + " " + body->to_string() + ")";
+    }
+
+    ForStmtNode::ForStmtNode(const std::shared_ptr<Node>& init, const std::shared_ptr<Node>& cond, const std::shared_ptr<Node>& update, const std::shared_ptr<Node>& body) {
+        this->init = init;
+        this->cond = cond;
+        this->update = update;
+        this->body = body;
+    }
+
+    NodeType ForStmtNode::get_type() const {
+        return NodeType::FOR_STMT;
+    }
+
+    std::string ForStmtNode::to_string() const {
+        return "(ForStmtNode " + init->to_string() + " " + cond->to_string()  + " " + update->to_string()  + " " + body->to_string() + ")";
+    }
+
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts) {
         this->stmts = stmts;
     }
@@ -123,6 +190,5 @@ namespace tachyon {
         result += ")";
         return result;
     }
-
 };
 

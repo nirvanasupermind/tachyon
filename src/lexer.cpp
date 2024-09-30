@@ -38,6 +38,9 @@ namespace tachyon {
                 if(current_char == '=') {
                     tokens.push_back(Token(line, TokenType::PLUS_EQ, "+="));
                     advance();                    
+                } else if(current_char == '+') {
+                    tokens.push_back(Token(line, TokenType::INC, "++"));
+                    advance();  
                 } else {
                     tokens.push_back(Token(old_line, TokenType::PLUS, "+"));
                 }
@@ -47,6 +50,9 @@ namespace tachyon {
                 if(current_char == '=') {
                     tokens.push_back(Token(line, TokenType::MINUS_EQ, "-="));
                     advance();                    
+                }else if(current_char == '-') {
+                    tokens.push_back(Token(line, TokenType::DEC, "--"));
+                    advance();  
                 } else {
                     tokens.push_back(Token(old_line, TokenType::MINUS, "-"));
                 }
@@ -202,7 +208,8 @@ namespace tachyon {
             advance();
         }
 
-        if(identifier_str == "var") {
+        if(identifier_str == "var" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while" || identifier_str == "for"
+       || identifier_str == "def" || identifier_str == "return") {
             return Token(line, TokenType::KEYWORD, identifier_str);
         } else {
             return Token(line, TokenType::IDENTIFIER, identifier_str);

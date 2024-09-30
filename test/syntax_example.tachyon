@@ -1,0 +1,13 @@
+class Point {
+    def init(self, x, y) {
+        self.x = x;
+        self.y = y;
+    }
+
+    def sum(self) {
+        return self.x + self.y;
+    }
+}
+
+var myPoint = Point(3, 5);
+printObject(myPoint.sum());

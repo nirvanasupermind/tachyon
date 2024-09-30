@@ -1,5 +1,5 @@
 default:
-	clang++ src/*.cpp test/shell.cpp -o test/shell -std=c++11
+	clang++ src/*.cpp -o /usr/local/bin/tachyonc -std=c++11
 
 # ifeq ($(OS),Windows_NT)
 #     SOURCE := src\*.cpp

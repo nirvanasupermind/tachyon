@@ -1,0 +1,1 @@
+(StmtListNode (ForStmtNode (VarDefNode IDENTIFIER:i (NumberNode NUMBER:0)) (ExprStmtNode (BinOpNode LT:< (IdentifierNode IDENTIFIER:i) (NumberNode NUMBER:3))) (BinOpNode PLUS_EQ:+= (IdentifierNode IDENTIFIER:i) (NumberNode NUMBER:1)) (BlockStmtNode (StmtListNode (VarDefNode IDENTIFIER:x (NumberNode NUMBER:5))))))

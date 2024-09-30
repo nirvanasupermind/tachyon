@@ -36,6 +36,8 @@ namespace tachyon {
         XOR_EQ,
         LSH_EQ,
         RSH_EQ,
+        INC,
+        DEC,
         LPAREN,
         RPAREN,
         LCURLY,

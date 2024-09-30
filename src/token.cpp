@@ -110,6 +110,12 @@ namespace tachyon {
         case TokenType::RSH_EQ:
             result += "RSH_EQ:";
             break;
+        case TokenType::INC:
+            result += "INC:";
+            break;
+        case TokenType::DEC:
+            result += "DEC:";
+            break;
         case TokenType::LPAREN:
             result += "LPAREN:";
             break;
