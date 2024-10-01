@@ -1,1 +1,4 @@
-f(5);
+var Point = "";
+Point.a = 5;
+Point.b = 7;
+print(Point.get(0));

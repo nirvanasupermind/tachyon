@@ -20,6 +20,9 @@ namespace tachyon {
         case TokenType::NUMBER:
             result += "NUMBER:";
             break;
+        case TokenType::STRING:
+            result += "STRING:";
+            break;
         case TokenType::IDENTIFIER:
             result += "IDENTIFIER:";
             break;
@@ -122,11 +125,20 @@ namespace tachyon {
         case TokenType::RPAREN:
             result += "RPAREN:";
             break;
+        case TokenType::LSQUARE:
+            result += "LSQUARE:";
+            break;
+        case TokenType::RSQUARE:
+            result += "RSQUARE:";
+            break;
         case TokenType::LCURLY:
             result += "LCURLY:";
             break;
         case TokenType::RCURLY:
             result += "RCURLY:";
+            break;
+        case TokenType::PERIOD:
+            result += "PERIOD:";
             break;
         case TokenType::COMMA:
             result += "COMMA:";

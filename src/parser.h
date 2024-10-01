@@ -15,9 +15,12 @@ namespace tachyon {
         Token current_tok;
         Parser(const std::string& filename, const std::vector<Token>& tokens);
         void advance();
+        // void unadvance();
         void raise_error();
         std::shared_ptr<Node> parse();
         std::shared_ptr<Node> factor();
+        std::shared_ptr<Node> vector_expr();
+        std::shared_ptr<Node> lambda_expr();
         std::shared_ptr<Node> postfix_expr();
         std::shared_ptr<Node> multiplicative_expr();
         std::shared_ptr<Node> additive_expr();
@@ -28,6 +31,7 @@ namespace tachyon {
         std::shared_ptr<Node> xor_expr();
         std::shared_ptr<Node> or_expr();
         std::shared_ptr<Node> assign_expr();
+        std::shared_ptr<Node> bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops);
         std::shared_ptr<Node> expr();
         std::shared_ptr<Node> expr_stmt();
         std::shared_ptr<Node> var_def_stmt();
@@ -39,7 +43,6 @@ namespace tachyon {
         std::shared_ptr<Node> func_def_stmt();
         std::shared_ptr<Node> stmt();
         std::shared_ptr<Node> stmt_list(TokenType end);
-        std::shared_ptr<Node> bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops);
     };
 };
 

@@ -18,6 +18,11 @@ namespace tachyon {
         }
     }
 
+    // void Parser::unadvance() {
+    //     tok_idx--;
+    //     current_tok = tokens.at(tok_idx);
+    // }
+
     void Parser::raise_error() {
         throw std::runtime_error(filename + ":" + std::to_string(current_tok.line) + ": unexpected '" + (current_tok.val) + "'");
     }
@@ -45,43 +50,135 @@ namespace tachyon {
             advance();
             return std::make_shared<NumberNode>(NumberNode(tok));
         }
+        else if (tok.type == TokenType::STRING) {
+            advance();
+            return std::make_shared<StringNode>(StringNode(tok));
+        }
         else if (tok.type == TokenType::IDENTIFIER) {
             advance();
             return std::make_shared<IdentifierNode>(IdentifierNode(tok));
+        }
+        else if (tok.type == TokenType::LSQUARE) {
+            return vector_expr();
+        }
+        else if (tok.type == TokenType::KEYWORD && tok.val == "lambda") {
+            return lambda_expr();
         }
         else {
             raise_error();
         }
     }
 
+    std::shared_ptr<Node> Parser::vector_expr() {
+        if (current_tok.type != TokenType::LSQUARE) {
+            raise_error();
+        }
+        advance();
+        std::vector<std::shared_ptr<Node> > elements;
+        if (current_tok.type == TokenType::RSQUARE) {
+            advance();
+        }
+        else {
+            while (true) {
+                elements.push_back(expr());
+                if (current_tok.type == TokenType::RSQUARE) {
+                    advance();
+                    break;
+                }
+                else if (current_tok.type == TokenType::COMMA) {
+                    advance();
+                }
+                else {
+                    raise_error();
+                }
+            }
+        }
+        return std::make_shared<VectorNode>(VectorNode(elements));
+    }
+
+
+    std::shared_ptr<Node> Parser::lambda_expr() {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "lambda")) {
+            raise_error();
+        }
+        advance();
+        if (current_tok.type != TokenType::LPAREN) {
+            raise_error();
+        }
+        advance();
+        std::vector<Token> arg_names;
+        if (current_tok.type == TokenType::RPAREN) {
+            advance();
+        }
+        else {
+            while (true) {
+                if (current_tok.type != TokenType::IDENTIFIER) {
+                    raise_error();
+                }
+                arg_names.push_back(current_tok);
+                advance();
+                if (current_tok.type == TokenType::RPAREN) {
+                    advance();
+                    break;
+                }
+                else if (current_tok.type == TokenType::COMMA) {
+                    advance();
+                }
+                else {
+                    raise_error();
+                }
+            }
+        }
+
+        std::shared_ptr<Node> body = block_stmt();
+        return std::make_shared<LambdaExprNode>(LambdaExprNode(arg_names, body));
+    }
+
     std::shared_ptr<Node> Parser::postfix_expr() {
         std::shared_ptr<Node> result = factor();
 
         while (true) {
-            if(current_tok.type == TokenType::LPAREN) {
+            if (current_tok.type == TokenType::LPAREN) {
+                advance();
                 std::vector<std::shared_ptr<Node> > args;
-                while(true) {
-                    args.push_back(expr());
-                    if (current_tok.type == TokenType::RPAREN) {
-                        advance();
-                        break;
-                    }
-                    else if (current_tok.type == TokenType::COMMA) {
-                        advance();
-                    }
-                    else {
-                        raise_error();
+                if (current_tok.type == TokenType::RPAREN) {
+                    advance();
+                }
+                else {
+                    while (true) {
+                        args.push_back(expr());
+                        if (current_tok.type == TokenType::RPAREN) {
+                            advance();
+                            break;
+                        }
+                        else if (current_tok.type == TokenType::COMMA) {
+                            advance();
+                        }
+                        else {
+                            raise_error();
+                        }
                     }
                 }
                 result = std::make_shared<CallExprNode>(CallExprNode(result, args));
-            } else if(current_tok.type == TokenType::INC || current_tok.type == TokenType::DEC) {
+            }
+            else if (current_tok.type == TokenType::PERIOD) {
+                advance();
+                if(current_tok.type != TokenType::IDENTIFIER) {
+                    raise_error();
+                }
+                result = std::make_shared<ObjectPropNode>(ObjectPropNode(result, current_tok));
+                advance();
+            }
+            else if (current_tok.type == TokenType::INC || current_tok.type == TokenType::DEC) {
                 result = std::make_shared<UnaryOpNode>(UnaryOpNode(current_tok, result));
                 advance();
-            } else {
-                advance();
+            }
+            else {
+                // advance();
                 break;
             }
         }
+
         return result;
     }
 
@@ -124,9 +221,21 @@ namespace tachyon {
         TokenType::LSH_EQ, TokenType::RSH_EQ });
     }
 
+    std::shared_ptr<Node> Parser::bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops) {
+        std::shared_ptr<Node> left = func();
+
+        while (std::find(ops.begin(), ops.end(), current_tok.type) != ops.end()) {
+            Token op_tok = current_tok;
+            advance();
+            std::shared_ptr<Node> right = func();
+            left = std::make_shared<BinOpNode>(BinOpNode(left, op_tok, right));
+        }
+
+        return left;
+    }
+
     std::shared_ptr<Node> Parser::expr() {
-        std::shared_ptr<Node> res = assign_expr();
-        return res;
+        return assign_expr();
     }
 
     std::shared_ptr<Node> Parser::expr_stmt() {
@@ -248,36 +357,41 @@ namespace tachyon {
     }
 
     std::shared_ptr<Node> Parser::func_def_stmt() {
-        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "function")) {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "def")) {
             raise_error();
         }
 
         advance();
-        Token name_tok;
-        if (current_tok.type == TokenType::IDENTIFIER) {
-            name_tok = current_tok;
-            advance();
+        if (current_tok.type != TokenType::IDENTIFIER) {
+            raise_error();
         }
+        Token name_tok = current_tok;
+        advance();
         if (current_tok.type != TokenType::LPAREN) {
             raise_error();
         }
         advance();
         std::vector<Token> arg_names;
-        while (true) {
-            if (current_tok.type != TokenType::IDENTIFIER) {
-                raise_error();
-            }
-            arg_names.push_back(current_tok);
+        if (current_tok.type == TokenType::RPAREN) {
             advance();
-            if (current_tok.type == TokenType::RPAREN) {
+        }
+        else {
+            while (true) {
+                if (current_tok.type != TokenType::IDENTIFIER) {
+                    raise_error();
+                }
+                arg_names.push_back(current_tok);
                 advance();
-                break;
-            }
-            else if (current_tok.type == TokenType::COMMA) {
-                advance();
-            }
-            else {
-                raise_error();
+                if (current_tok.type == TokenType::RPAREN) {
+                    advance();
+                    break;
+                }
+                else if (current_tok.type == TokenType::COMMA) {
+                    advance();
+                }
+                else {
+                    raise_error();
+                }
             }
         }
         std::shared_ptr<Node> body = block_stmt();
@@ -304,7 +418,7 @@ namespace tachyon {
         else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "return") {
             return return_stmt();
         }
-        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "function") {
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "def") {
             return func_def_stmt();
         }
         else {
@@ -321,18 +435,5 @@ namespace tachyon {
             raise_error();
         }
         return std::make_shared<StmtListNode>(StmtListNode(stmts));
-    }
-
-    std::shared_ptr<Node> Parser::bin_op(const std::function<std::shared_ptr<Node>()>& func, const std::vector<TokenType>& ops) {
-        std::shared_ptr<Node> left = func();
-
-        while (std::find(ops.begin(), ops.end(), current_tok.type) != ops.end()) {
-            Token op_tok = current_tok;
-            advance();
-            std::shared_ptr<Node> right = func();
-            left = std::make_shared<BinOpNode>(BinOpNode(left, op_tok, right));
-        }
-        
-        return left;
     }
 };

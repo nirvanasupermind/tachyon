@@ -32,6 +32,9 @@ namespace tachyon {
             else if (isdigit(current_char)) {
                 tokens.push_back(make_number());
             }
+            else if (current_char == '\"') {
+                tokens.push_back(make_string());
+            }
             else if (isalpha(current_char) || current_char == '_') {
                 tokens.push_back(make_identifier());
             }
@@ -203,12 +206,24 @@ namespace tachyon {
                 tokens.push_back(Token(line, TokenType::RPAREN, ")"));
                 advance();
             }
+            else if (current_char == '[') {
+                tokens.push_back(Token(line, TokenType::LSQUARE, "["));
+                advance();
+            }
+            else if (current_char == ']') {
+                tokens.push_back(Token(line, TokenType::RSQUARE, "]"));
+                advance();
+            }
             else if (current_char == '{') {
                 tokens.push_back(Token(line, TokenType::LCURLY, "{"));
                 advance();
             }
             else if (current_char == '}') {
                 tokens.push_back(Token(line, TokenType::RCURLY, "}"));
+                advance();
+            }
+            else if (current_char == '.') {
+                tokens.push_back(Token(line, TokenType::PERIOD, "."));
                 advance();
             }
             else if (current_char == ',') {
@@ -244,6 +259,19 @@ namespace tachyon {
         return Token(line, TokenType::NUMBER, num_str);
     }
 
+    Token Lexer::make_string() {
+        int old_line = line;
+        advance();
+        std::string str = "";
+        while (current_char != '\0' && current_char != '"') {
+            str += current_char;
+            advance();
+        }
+        advance();
+        return Token(old_line, TokenType::STRING, str);
+    }
+
+
     Token Lexer::make_identifier() {
         std::string identifier_str = "";
         while (current_char != '\0' && (isalnum(current_char) || current_char == '_')) {
@@ -252,7 +280,7 @@ namespace tachyon {
         }
 
         if (identifier_str == "var" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
-            || identifier_str == "for" || identifier_str == "return" || identifier_str == "function") {
+            || identifier_str == "for" || identifier_str == "return" || identifier_str == "def" || identifier_str == "lambda") {
             return Token(line, TokenType::KEYWORD, identifier_str);
         }
         else {

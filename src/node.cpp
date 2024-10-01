@@ -16,6 +16,36 @@ namespace tachyon {
         return "(NumberNode " + tok.to_string() + ")";
     }
 
+   StringNode::StringNode(const Token& tok) {
+        this->tok = tok;
+    }
+
+    NodeType StringNode::get_type() const {
+        return NodeType::STRING;
+    }
+
+    std::string StringNode::to_string() const {
+        return "(StringNode " + tok.to_string() + ")";
+    }
+    
+    VectorNode::VectorNode(const std::vector<std::shared_ptr<Node> >& elements) {
+        this->elements = elements;
+    }
+
+    NodeType VectorNode::get_type() const {
+        return NodeType::VECTOR;
+    }
+
+    std::string VectorNode::to_string() const {
+        std::string result = "(VectorNode ";
+        for(int i = 0; i < elements.size(); i++) {
+            result += elements.at(i)->to_string() + " ";
+        }
+        result = result.substr(0, result.size() - 1);
+        result += ")";
+        return result;
+    }
+
     IdentifierNode::IdentifierNode(const Token& tok) {
         this->tok = tok;
     }
@@ -28,6 +58,23 @@ namespace tachyon {
         return "(IdentifierNode " + tok.to_string() + ")";
     }
 
+    LambdaExprNode::LambdaExprNode(const std::vector<Token>& arg_names, const std::shared_ptr<Node>& body) {
+        this->arg_names = arg_names;
+        this->body = body;
+    }
+
+    NodeType LambdaExprNode::get_type() const {
+        return NodeType::LAMBDA_EXPR;
+    }
+
+    std::string LambdaExprNode::to_string() const {
+        std::string result = "(LambdaExprNode ";
+            for(int i = 0; i < arg_names.size(); i++) {
+            result += arg_names.at(i).to_string() + " ";
+        }
+        result += body->to_string();
+        return result;
+    }
 
     CallExprNode::CallExprNode(const std::shared_ptr<Node>& callee, const std::vector<std::shared_ptr<Node> >& args) {
         this->callee = callee;
@@ -177,6 +224,9 @@ namespace tachyon {
         return NodeType::FOR_STMT;
     }
 
+    std::string ForStmtNode::to_string() const {
+        return "(ForStmtNode " + init->to_string() + " " + cond->to_string()  + " " + update->to_string()  + " " + body->to_string() + ")";
+    }
 
     ReturnStmtNode::ReturnStmtNode(const std::shared_ptr<Node>& expr_node) {
         this->expr_node = expr_node;
@@ -201,7 +251,7 @@ namespace tachyon {
     }
 
     std::string FuncDefStmtNode::to_string() const {
-        std::string result = "(FuncDefStmtNode " + name_tok.to_string();
+        std::string result = "(FuncDefStmtNode " + name_tok.to_string() + " ";
             for(int i = 0; i < arg_names.size(); i++) {
             result += arg_names.at(i).to_string() + " ";
         }
@@ -209,8 +259,18 @@ namespace tachyon {
         return result;
     }
 
-    std::string ForStmtNode::to_string() const {
-        return "(ForStmtNode " + init->to_string() + " " + cond->to_string()  + " " + update->to_string()  + " " + body->to_string() + ")";
+
+    ObjectPropNode::ObjectPropNode(const std::shared_ptr<Node>& obj, const Token& prop) {
+        this->obj = obj;
+        this->prop = prop;
+    }
+
+    NodeType ObjectPropNode::get_type() const {
+        return NodeType::OBJECT_PROP;
+    }
+
+    std::string ObjectPropNode::to_string() const {
+        return "(ObjectPropNode  " + obj->to_string() + " " + prop.to_string() + ")";
     }
 
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts) {

@@ -1,1 +1,1 @@
-(StmtListNode (FuncDefStmtNode IDENTIFIER:fIDENTIFIER:x (BlockStmtNode (StmtListNode (ReturnStmtNode (BinOpNode PLUS:+ (IdentifierNode IDENTIFIER:x) (NumberNode NUMBER:1))))))
+(StmtListNode (VarDefNode IDENTIFIER:Point (StringNode STRING:)) (ExprStmtNode (BinOpNode EQ:= (ObjectPropNode  (IdentifierNode IDENTIFIER:Point) IDENTIFIER:a) (NumberNode NUMBER:5))) (ExprStmtNode (BinOpNode EQ:= (ObjectPropNode  (IdentifierNode IDENTIFIER:Point) IDENTIFIER:b) (NumberNode NUMBER:7))) (ExprStmtNode (CallExprNode (CallExprNode (NumberNode NUMBER:0)))))

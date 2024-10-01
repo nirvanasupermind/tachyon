@@ -6,6 +6,7 @@
 namespace tachyon {
     enum class TokenType {
         NUMBER,
+        STRING,
         IDENTIFIER,
         KEYWORD,
         PLUS,
@@ -40,8 +41,11 @@ namespace tachyon {
         DEC,
         LPAREN,
         RPAREN,
+        LSQUARE,
+        RSQUARE,
         LCURLY,
         RCURLY,
+        PERIOD,
         COMMA,
         SEMICOLON,
         EOF_

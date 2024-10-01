@@ -9,8 +9,12 @@
 namespace tachyon {
     enum class NodeType {
         NUMBER,
+        STRING,
+        VECTOR,
         IDENTIFIER,
+        LAMBDA_EXPR,
         CALL_EXPR,
+        OBJECT_PROP,
         UNARY_OP,
         BIN_OP,
         VAR_DEF,
@@ -38,11 +42,37 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
-  
+
+    class StringNode: public Node {
+    public:
+        Token tok;
+        StringNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class VectorNode: public Node {
+    public:
+        std::vector<std::shared_ptr<Node> > elements;
+        VectorNode(const std::vector<std::shared_ptr<Node> >& elements);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
     class IdentifierNode: public Node {
     public:
         Token tok;
         IdentifierNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+
+    class LambdaExprNode: public Node {
+    public:
+        std::vector<Token> arg_names;
+        std::shared_ptr<Node> body;
+        LambdaExprNode(const std::vector<Token>& arg_names, const std::shared_ptr<Node>& body);
         NodeType get_type() const;
         std::string to_string() const;
     };
@@ -52,6 +82,15 @@ namespace tachyon {
         std::shared_ptr<Node> callee;
         std::vector<std::shared_ptr<Node> > args;
         CallExprNode(const std::shared_ptr<Node>& callee, const std::vector<std::shared_ptr<Node> >& args);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class ObjectPropNode: public Node {
+    public:
+        std::shared_ptr<Node> obj;
+        Token prop;
+        ObjectPropNode(const std::shared_ptr<Node>& obj, const Token& prop);
         NodeType get_type() const;
         std::string to_string() const;
     };
@@ -83,15 +122,6 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
-
-    // class VarAssignNode: public Node {
-    // public:
-    //     Token name_tok;
-    //     std::shared_ptr<Node> val;
-    //     VarAssignNode(const Token& name_tok, const std::shared_ptr<Node>& val);
-    //     NodeType get_type() const;
-    //     std::string to_string() const;
-    // };
 
     class ExprStmtNode: public Node {
     public:
