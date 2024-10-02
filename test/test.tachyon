@@ -1,4 +1,2 @@
-var Point = "";
-Point.a = 5;
-Point.b = 7;
-print(Point.get(0));
+var x = {a: 2, b: 3};
+x.temp = 5;

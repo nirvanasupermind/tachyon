@@ -61,6 +61,9 @@ namespace tachyon {
         else if (tok.type == TokenType::LSQUARE) {
             return vector_expr();
         }
+        else if (tok.type == TokenType::LCURLY) {
+            return object_expr();
+        }
         else if (tok.type == TokenType::KEYWORD && tok.val == "lambda") {
             return lambda_expr();
         }
@@ -94,6 +97,43 @@ namespace tachyon {
             }
         }
         return std::make_shared<VectorNode>(VectorNode(elements));
+    }
+
+    std::shared_ptr<Node> Parser::object_expr() {
+        if (current_tok.type != TokenType::LCURLY) {
+            raise_error();
+        }
+        advance();
+        std::vector<Token> keys;
+        std::vector<std::shared_ptr<Node> > vals;
+        if (current_tok.type == TokenType::RCURLY) {
+            advance();
+        }
+        else {
+            while (true) {
+                if (current_tok.type != TokenType::IDENTIFIER) {
+                   raise_error();
+                }   
+                keys.push_back(current_tok);
+                advance();
+                if (current_tok.type != TokenType::COLON) {
+                   raise_error();
+                }   
+                advance();             
+                vals.push_back(expr());
+                if (current_tok.type == TokenType::RCURLY) {
+                    advance();
+                    break;
+                }
+                else if (current_tok.type == TokenType::COMMA) {
+                    advance();
+                }
+                else {
+                    raise_error();
+                }
+            }
+        }
+        return std::make_shared<ObjectNode>(ObjectNode(keys, vals));
     }
 
 
@@ -130,7 +170,7 @@ namespace tachyon {
             }
         }
 
-        std::shared_ptr<Node> body = block_stmt();
+        std::shared_ptr<Node> body = simple_block_stmt();
         return std::make_shared<LambdaExprNode>(LambdaExprNode(arg_names, body));
     }
 
@@ -270,6 +310,14 @@ namespace tachyon {
     }
 
     std::shared_ptr<Node> Parser::block_stmt() {
+        if (current_tok.type != TokenType::KEYWORD && current_tok.val == "block") {
+            raise_error();
+        }
+        advance();
+        return simple_block_stmt();
+    }
+
+    std::shared_ptr<Node> Parser::simple_block_stmt() {
         if (current_tok.type != TokenType::LCURLY) {
             raise_error();
         }
@@ -293,10 +341,10 @@ namespace tachyon {
             raise_error();
         }
         advance();
-        std::shared_ptr<Node> body = block_stmt();
+        std::shared_ptr<Node> body = simple_block_stmt();
         if (current_tok.type == TokenType::KEYWORD && current_tok.val == "else") {
             advance();
-            std::shared_ptr<Node> else_body = block_stmt();
+            std::shared_ptr<Node> else_body = simple_block_stmt();
             return std::make_shared<IfElseStmtNode>(IfElseStmtNode(cond, body, else_body));
         }
         else {
@@ -318,7 +366,7 @@ namespace tachyon {
             raise_error();
         }
         advance();
-        std::shared_ptr<Node> body = block_stmt();
+        std::shared_ptr<Node> body = simple_block_stmt();
         return std::make_shared<WhileStmtNode>(WhileStmtNode(cond, body));
     }
 
@@ -338,7 +386,7 @@ namespace tachyon {
             raise_error();
         }
         advance();
-        std::shared_ptr<Node> body = block_stmt();
+        std::shared_ptr<Node> body = simple_block_stmt();
         return std::make_shared<ForStmtNode>(ForStmtNode(init, cond, update, body));
     }
 
@@ -394,13 +442,13 @@ namespace tachyon {
                 }
             }
         }
-        std::shared_ptr<Node> body = block_stmt();
+        std::shared_ptr<Node> body = simple_block_stmt();
         return std::make_shared<FuncDefStmtNode>(FuncDefStmtNode(name_tok, arg_names, body));
     }
 
 
     std::shared_ptr<Node> Parser::stmt() {
-        if (current_tok.type == TokenType::LCURLY) {
+        if (current_tok.type == TokenType::KEYWORD && current_tok.val == "block") {
             return block_stmt();
         }
         else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "var") {

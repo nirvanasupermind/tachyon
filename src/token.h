@@ -47,6 +47,7 @@ namespace tachyon {
         RCURLY,
         PERIOD,
         COMMA,
+        COLON,
         SEMICOLON,
         EOF_
     };

@@ -46,6 +46,31 @@ namespace tachyon {
         return result;
     }
 
+    
+    ObjectNode::ObjectNode(const std::vector<Token>& keys, const std::vector<std::shared_ptr<Node> >& vals) {
+        this->keys = keys;
+        this->vals = vals;
+    }
+
+    NodeType ObjectNode::get_type() const {
+        return NodeType::OBJECT;
+    }
+
+    std::string ObjectNode::to_string() const {
+        std::string result = "(ObjectNode (";
+        for(int i = 0; i < keys.size(); i++) {
+            result += keys.at(i).to_string() + " ";
+        }
+        result = result.substr(0, result.size() - 1);
+        result += ") (";
+        for(int i = 0; i < vals.size(); i++) {
+            result += vals.at(i)->to_string() + " ";
+        }
+        result = result.substr(0, result.size() - 1);
+        result += "))";
+        return result;
+    }
+
     IdentifierNode::IdentifierNode(const Token& tok) {
         this->tok = tok;
     }

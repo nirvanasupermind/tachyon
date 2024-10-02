@@ -11,6 +11,7 @@ namespace tachyon {
         NUMBER,
         STRING,
         VECTOR,
+        OBJECT,
         IDENTIFIER,
         LAMBDA_EXPR,
         CALL_EXPR,
@@ -58,6 +59,16 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
+
+    class ObjectNode: public Node {
+    public:
+        std::vector<Token> keys;
+        std::vector<std::shared_ptr<Node> > vals;
+        ObjectNode(const std::vector<Token>& keys, const std::vector<std::shared_ptr<Node> >& vals);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
 
     class IdentifierNode: public Node {
     public:
