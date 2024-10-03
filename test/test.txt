@@ -1,1 +1,0 @@
-(StmtListNode (VarDefNode IDENTIFIER:x (ObjectNode (IDENTIFIER:a IDENTIFIER:b) ((NumberNode NUMBER:2) (NumberNode NUMBER:3)))) (ExprStmtNode (BinOpNode EQ:= (ObjectPropNode  (IdentifierNode IDENTIFIER:x) IDENTIFIER:temp) (NumberNode NUMBER:5))))

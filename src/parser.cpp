@@ -40,7 +40,7 @@ namespace tachyon {
         else if (tok.type == TokenType::LPAREN) {
             advance();
             std::shared_ptr<Node> inner_expr = expr();
-            if (tok.type != TokenType::RPAREN) {
+            if (current_tok.type != TokenType::RPAREN) {
                 raise_error();
             }
             advance();
@@ -135,7 +135,6 @@ namespace tachyon {
         }
         return std::make_shared<ObjectNode>(ObjectNode(keys, vals));
     }
-
 
     std::shared_ptr<Node> Parser::lambda_expr() {
         if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "lambda")) {

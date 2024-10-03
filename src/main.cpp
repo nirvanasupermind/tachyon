@@ -10,31 +10,100 @@
 #include "lexer.h"
 #include "node.h"
 #include "parser.h"
+#include "transpiler.h"
 
 void transpile(const std::string& filename, const std::string& text, bool i) {
     tachyon::Lexer lexer(filename, text);
     std::vector<tachyon::Token> tokens = lexer.make_tokens();
     tachyon::Parser parser(filename, tokens);
     std::shared_ptr<tachyon::Node> tree = parser.parse();
+    tachyon::Transpiler transpiler;
+    transpiler.visit(tree);
+    std::string stl = R"V0G0N(
+#include <iostream>
+#include <string>
+#include <map>
+
+double to_tachyon_object(std::map<std::string, double> map) {
+    std::map<std::string, double>* ptr = &map;
+    double result;
+    std::memcpy(&ptr, &result, sizeof(ptr));
+    return result;
+}
+
+std::map<std::string, double> from_tachyon_object(double dbl) {
+    std::map<std::string, double>* ptr;
+    std::memcpy(&dbl, &ptr, sizeof(ptr));
+    return *ptr;
+}
+
+double tachyon_object_get(double obj, const std::string& key) {
+    std::map<std::string, double> map = from_tachyon_object(obj);
+    if(map.count(key) != 0) {
+        return map.at(key);
+    } else {
+        return from_tachyon_object(map.at("proto")).at(key);
+    }
+}
+
+void tachyon_object_set(double obj, const std::string& key, double val) {
+    std::map<std::string, double> map = from_tachyon_object(obj);
+    map[key] = val;
+}
+
+double String = to_tachyon_object({});
+
+double to_tachyon_string(std::string str) {
+    std::string* ptr = &str;
+    double dbl;
+    std::memcpy(&ptr, &dbl, sizeof(ptr));
+    return to_tachyon_object({{"_str",dbl},{"proto",String}});
+}
+
+std::string from_tachyon_string(double str) {
+    double dbl = from_tachyon_object(str).at("_str");
+    std::string* ptr;
+    std::memcpy(&dbl, &ptr, sizeof(ptr));
+    return *ptr;
+}
+
+double Vector = to_tachyon_object({});
+
+double to_tachyon_vector(std::vector<double> vec) {
+    std::vector<double>* ptr = &vec;
+    double dbl;
+    std::memcpy(&ptr, &dbl, sizeof(ptr));
+    return to_tachyon_object({{"_vec",dbl},{"proto",Vector}});
+}
+
+std::vector<double> from_tachyon_vector(double vec) {
+    double dbl = from_tachyon_object(vec).at("_vec");
+    std::vector<double>* ptr;
+    std::memcpy(&dbl, &ptr, sizeof(ptr));
+    return *ptr;
+}
+    )V0G0N";
+
     std::string filename_noext = filename.substr(0, filename.size() - 8);
     std::ofstream out_file;
-    out_file.open(filename_noext + ".txt");
-    out_file << tree->to_string();
+    out_file.open(filename_noext + ".cpp");
+    out_file << stl << "int main(){\n" << transpiler.code.str() << "\nreturn 0;\n}";
     out_file.close();
-// #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-//     // Windows
-//     system(("clang++ " + filename_noext + ".cpp -o " + filename_noext + ".exe-std=c++11").c_str());
-//     if (!i) {
-//         system(("del " + ffilename_noext + ".cpp").c_str());
-//     }
-// #else
-//     // Linux and Mac
-//     system(("clang++ " + filename_noext + ".cpp -o " + filename_noext + " -std=c++11").c_str());
-//     if (!i) {
-//         system(("rm -rf " + filename_noext + ".cpp").c_str());
-//     }
-// #endif
-    std::size_t idx = filename.find_last_of("/\\");
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+    // Windows
+    system(("clang++ " + filename_noext + ".cpp -o " + filename_noext + ".exe-std=c++11").c_str());
+    if (!i) {
+        system(("del " + filename_noext + ".cpp").c_str());
+    }
+#else
+    // Linux and Mac
+    system(("clang++ " + filename_noext + ".cpp -o " + filename_noext + " -std=c++11").c_str());
+    if (!i) {
+        system(("rm -rf " + filename_noext + ".cpp").c_str());
+    }
+#endif
+    // std::size_t idx = filename.find_last_of("/\\");
 }
 
 int main(int argc, char** argv) {
