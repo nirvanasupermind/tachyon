@@ -20,41 +20,81 @@ void transpile(const std::string& filename, const std::string& text, bool i) {
     tachyon::Transpiler transpiler;
     transpiler.visit(tree);
     std::string stl = R"V0G0N(
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
+#include <functional>
 
 class TachyonObject { 
 public:
     std::map<std::string, double> map;
-    std::shared_ptr<TachyonObject> proto;
     std::string str;
     std::vector<double> vec;
+    std::function<double(const std::vector<double>&)> func;
+
     TachyonObject(const std::map<std::string, double>& map) {
         this->map = map;
     }
-    TachyonObject(const std::map<std::string, double>& map, const std::shared_ptr<TachyonObject>& proto) {
+
+    TachyonObject(const std::map<std::string, double>& map, const std::string& str) {
         this->map = map;
-        this->proto = proto;
+        this->str = str;
     }
-    
+
+    TachyonObject(const std::map<std::string, double>& map, const std::vector<double>& vec) {
+        this->map = map;
+        this->vec = vec;
+    }
+
+    TachyonObject(const std::map<std::string, double>& map, const std::function<double(const std::vector<double>&)>& func) {
+        this->map = map;
+        this->func = func;
+    }
+
     double get(const std::string& key) {
-        if(!proto) {
+        if(this->map.count("prototype") == 0) {
             return map.at(key);
         } else {
-            return proto.get(key);
+            return TachyonObject::from_double(this->map.at("prototype"))->get(key);
         }
+    }
+
+    void set(const std::string& key, double val) {
+        map[key] = val;
+    }
+
+    double to_double() const {
+        double result;
+        std::memcpy(&result, this, sizeof(result));
+        return result;
+    }
+
+    static std::shared_ptr<TachyonObject> from_double(double d) {
+        TachyonObject* result;
+        std::memcpy(&result, &d, sizeof(result));
+        return std::shared_ptr<TachyonObject>(result);
     }
 };
 
+double String = TachyonObject({}).to_double();
+double Vector = TachyonObject({}).to_double();
+double Function = TachyonObject({}).to_double();
+double System = TachyonObject({}).to_double();
+void setup() {
+TachyonObject::from_double(System)->set("printDouble", (TachyonObject({{"prototype",Function}},[](const std::vector<double>& args) {
+    double x = args.at(0);
+    std::cout << x << '\n';
+}).to_double()));
+}
 
     )V0G0N";
 
     std::string filename_noext = filename.substr(0, filename.size() - 8);
     std::ofstream out_file;
     out_file.open(filename_noext + ".cpp");
-    out_file << stl << "int main(){\n" << transpiler.code.str() << "\nreturn 0;\n}";
+    out_file << stl << "int main(){\nsetup();\n" << transpiler.code.str() << "\nreturn 0;\n}";
     out_file.close();
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)

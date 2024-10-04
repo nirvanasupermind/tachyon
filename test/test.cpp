@@ -1,74 +1,76 @@
 
+
 #include <iostream>
 #include <string>
+#include <vector>
 #include <map>
+#include <functional>
 
-double to_tachyon_object(std::map<std::string, double> map) {
-    std::map<std::string, double>* ptr = &map;
-    double result;
-    std::memcpy(&result, &ptr, sizeof(ptr));
-    return result;
-}
+class TachyonObject { 
+public:
+    std::map<std::string, double> map;
+    std::string str;
+    std::vector<double> vec;
+    std::function<double(const std::vector<double>&)> func;
 
-std::map<std::string, double> from_tachyon_object(double obj) {
-    std::map<std::string, double>* ptr;
-    std::memcpy(&ptr, &obj, sizeof(ptr));
-    std::cout << "new ptr " << ptr << '\n';
-    return *ptr;
-}
-
-double tachyon_object_get(double obj, const std::string& key) {
-    std::map<std::string, double> map = from_tachyon_object(obj);
-    if (map.count(key) != 0) {
-        return map.at(key);
+    TachyonObject(const std::map<std::string, double>& map) {
+        this->map = map;
     }
-    else {
-        return from_tachyon_object(map.at("proto")).at(key);
+
+    TachyonObject(const std::map<std::string, double>& map, const std::string& str) {
+        this->map = map;
+        this->str = str;
     }
+
+    TachyonObject(const std::map<std::string, double>& map, const std::vector<double>& vec) {
+        this->map = map;
+        this->vec = vec;
+    }
+
+    TachyonObject(const std::map<std::string, double>& map, const std::function<double(const std::vector<double>&)>& func) {
+        this->map = map;
+        this->func = func;
+    }
+
+    double get(const std::string& key) {
+        if(this->map.count("prototype") == 0) {
+            return map.at(key);
+        } else {
+            return TachyonObject::from_double(this->map.at("prototype"))->get(key);
+        }
+    }
+
+    void set(const std::string& key, double val) {
+        map[key] = val;
+    }
+
+    double to_double() const {
+        double result;
+        std::memcpy(&result, this, sizeof(result));
+        return result;
+    }
+
+    static std::shared_ptr<TachyonObject> from_double(double d) {
+        TachyonObject* result;
+        std::memcpy(&result, &d, sizeof(result));
+        return std::shared_ptr<TachyonObject>(result);
+    }
+};
+
+double String = TachyonObject({}).to_double();
+double Vector = TachyonObject({}).to_double();
+double Function = TachyonObject({}).to_double();
+double System = TachyonObject({}).to_double();
+void setup() {
+TachyonObject::from_double(System)->set("printDouble", (TachyonObject({{"prototype",Function}},[](const std::vector<double>& args) {
+    double x = args.at(0);
+    std::cout << x << '\n';
+}).to_double()));
 }
 
-void tachyon_object_set(double obj, const std::string& key, double val) {
-    std::map<std::string, double> map = from_tachyon_object(obj);
-    map[key] = val;
-}
+    int main(){
+setup();
+;
 
-double String = to_tachyon_object({});
-
-double to_tachyon_string(std::string str) {
-    std::string* ptr = &str;
-    double dbl;
-    std::memcpy(&dbl, &ptr, sizeof(ptr));
-    return to_tachyon_object({ {"str",dbl},{"proto",String} });
-}
-
-std::string from_tachyon_string(double str) {
-    auto whatever = from_tachyon_object(str);
-    std::cout << "WE MADE IT!!" << '\n';
-    return "HAHA";
-    // double packed_addr = from_tachyon_object(str).at("str");
-    // std::string* ptr;
-    // std::memcpy(&ptr, &packed_addr, sizeof(ptr));
-    // return *ptr;
-}
-
-double Vector = to_tachyon_object({});
-
-double to_tachyon_vector(std::vector<double> vec) {
-    std::vector<double>* ptr = &vec;
-    double dbl;
-    std::memcpy(&dbl, &ptr, sizeof(ptr));
-    return to_tachyon_object({ {"_vec",dbl},{"proto",Vector} });
-}
-
-std::vector<double> from_tachyon_vector(double vec) {
-    double dbl = from_tachyon_object(vec).at("_vec");
-    std::vector<double>* ptr;
-    std::memcpy(&ptr, &dbl, sizeof(ptr));
-    return *ptr;
-}
-
-int main() {
-    auto a = from_tachyon_object(to_tachyon_string("Hello World"));
-    std::cout << "WE MADE IT" << '\n';
-    return 0;
+return 0;
 }
