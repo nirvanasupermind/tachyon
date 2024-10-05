@@ -78,19 +78,19 @@ namespace tachyon {
     }
 
     void Transpiler::visit_string_node(const std::shared_ptr<StringNode>& node) {
-        code << "(TachyonObject({{\"prototype\",String}}, \"" << node->tok.val << "\").to_double())";
+        code << "make_tachyon_string(\""  << node->tok.val << "\")";
     }
 
     void Transpiler::visit_vector_node(const std::shared_ptr<VectorNode>& node) {
-        code << "(TachyonObject({{\"prototype\",Vector}}, std::vector<double>{";
+        code << "make_tachyon_vector({";
         if (node->elements.size() == 0) {
-            code << "}).to_double())";
+            code << "})";
         }
         else {
             for (int i = 0; i < node->elements.size(); i++) {
                 visit(node->elements.at(i));
                 if (i == node->elements.size() - 1) {
-                    code << "}).to_double())";
+                    code << "})";
                 }
                 else {
                     code << ",";
@@ -100,16 +100,17 @@ namespace tachyon {
     }
 
     void Transpiler::visit_object_node(const std::shared_ptr<ObjectNode>& node) {
-        code << "(TachyonObject({";
+        code << "make_tachyon_object({";
         if (node->keys.size() == 0) {
-            code << "}).to_double())";
+            code << "})";
         }
         else {
             for (int i = 0; i < node->keys.size(); i++) {
                 code << "{\"" << node->keys.at(i).val << "\",";
                 visit(node->vals.at(i));
+                code << "}";
                 if (i == node->keys.size() - 1) {
-                    code << "}).to_double())";
+                    code << "})";
                 }
                 else {
                     code << ",";
@@ -118,14 +119,13 @@ namespace tachyon {
         }
     }
 
-
     void Transpiler::visit_lambda_expr_node(const std::shared_ptr<LambdaExprNode>& node) {
-        code << "(TachyonObject({{\"prototype\",Function}},[](const std::vector<double>& args) {\n";
+        code << "make_tachyon_function([](const std::vector<double>& args) {\n";
         for(int i = 0; i < node->arg_names.size(); i++) {
             code << "double " << node->arg_names.at(i).val << " = args.at(" << i << ");\n";
         }
         visit(node->body);
-        code << "}).to_double());";
+        code << "});";
     }
 
     void Transpiler::visit_identifier_node(const std::shared_ptr<IdentifierNode>& node) {
