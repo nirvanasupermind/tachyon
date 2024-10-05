@@ -60,9 +60,27 @@ double make_tachyon_object(const std::map<std::string, double>& map) {
     return std::make_shared<TachyonObject>(TachyonObject(map))->to_double();
 }
 
-double String = make_tachyon_object({});
-double Vector = make_tachyon_object({});
+double tachyon_object_get(double obj, const std::string& key){
+    return TachyonObject::from_double(obj)->get(key);
+}
+
+void tachyon_object_set(double obj, const std::string& key, double val){
+    TachyonObject::from_double(obj)->set(key, val);
+}
+
 double Function = make_tachyon_object({});
+
+double make_tachyon_function(const std::function<double(const std::vector<double>&)>& func) {
+    return std::make_shared<TachyonObject>(TachyonObject({{"prototype", Function}}, func))->to_double();
+}
+
+double String = make_tachyon_object({
+    {"toString", make_tachyon_function([](const std::vector<double>& args) {
+        return args.at(0);
+    })}
+});
+
+double Vector = make_tachyon_object({});
 
 double make_tachyon_string(const std::string& str) {
     return std::make_shared<TachyonObject>(TachyonObject({{"prototype", String}}, str))->to_double();
@@ -72,12 +90,7 @@ double make_tachyon_vector(const std::vector<double>& vec) {
     return std::make_shared<TachyonObject>(TachyonObject({{"prototype", Vector}}, vec))->to_double();
 }
 
-double make_tachyon_function(const std::function<double(const std::vector<double>&)>& func) {
-    return std::make_shared<TachyonObject>(TachyonObject({{"prototype", Function}}, func))->to_double();
-}
-
-void setup() {
-}
+double System = make_tachyon_object({});
     int main(){
 setup();
 make_tachyon_string("Hello world");
