@@ -8,7 +8,10 @@
 
 namespace tachyon {
     enum class NodeType {
-        NUMBER,
+        INT,
+        FLOAT,
+        NULL_,
+        BOOL,
         STRING,
         VECTOR,
         OBJECT,
@@ -18,7 +21,7 @@ namespace tachyon {
         OBJECT_PROP,
         UNARY_OP,
         BIN_OP,
-        VAR_DEF,
+        VAR_DEF_STMT,
         EXPR_STMT,
         BLOCK_STMT,
         IF_STMT,
@@ -36,10 +39,33 @@ namespace tachyon {
         virtual std::string to_string() const = 0;
     };
 
-    class NumberNode: public Node {
+    class IntNode: public Node {
     public:
         Token tok;
-        NumberNode(const Token& tok);
+        IntNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class FloatNode: public Node {
+    public:
+        Token tok;
+        FloatNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class NullNode: public Node {
+    public:
+        NullNode();
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class BoolNode: public Node {
+    public:
+        Token tok;
+        BoolNode(const Token& tok);
         NodeType get_type() const;
         std::string to_string() const;
     };
@@ -125,11 +151,11 @@ namespace tachyon {
         std::string to_string() const;
     };
 
-    class VarDefNode: public Node {
+    class VarDefStmtNode: public Node {
     public:
         Token name_tok;
         std::shared_ptr<Node> val;
-        VarDefNode(const Token& name_tok, const std::shared_ptr<Node>& val);
+        VarDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& val);
         NodeType get_type() const;
         std::string to_string() const;
     };

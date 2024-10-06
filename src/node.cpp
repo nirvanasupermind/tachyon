@@ -4,16 +4,51 @@
 #include "node.h"
 
 namespace tachyon {
-    NumberNode::NumberNode(const Token& tok) {
+    IntNode::IntNode(const Token& tok) {
         this->tok = tok;
     }
 
-    NodeType NumberNode::get_type() const {
-        return NodeType::NUMBER;
+    NodeType IntNode::get_type() const {
+        return NodeType::INT;
     }
 
-    std::string NumberNode::to_string() const {
-        return "(NumberNode " + tok.to_string() + ")";
+    std::string IntNode::to_string() const {
+        return "(IntNode " + tok.to_string() + ")";
+    }
+
+    FloatNode::FloatNode(const Token& tok) {
+        this->tok = tok;
+    }
+
+    NodeType FloatNode::get_type() const {
+        return NodeType::FLOAT;
+    }
+
+    std::string FloatNode::to_string() const {
+        return "(FloatNode " + tok.to_string() + ")";
+    }
+    
+    NullNode::NullNode() {
+    }
+
+    NodeType NullNode::get_type() const {
+        return NodeType::NULL_;
+    }
+
+    std::string NullNode::to_string() const {
+        return "(NullNode)";
+    }
+
+    BoolNode::BoolNode(const Token& tok) {
+        this->tok = tok;
+    }
+
+    NodeType BoolNode::get_type() const {
+        return NodeType::BOOL;
+    }
+
+    std::string BoolNode::to_string() const {
+        return "(BoolNode " + tok.to_string() + ")";
     }
 
    StringNode::StringNode(const Token& tok) {
@@ -147,16 +182,16 @@ namespace tachyon {
         return "(BinOpNode " + this->op_tok.to_string() + " " + this->left_node->to_string() + " " + this->right_node->to_string() + ")";
     }
 
-    VarDefNode::VarDefNode(const Token& name_tok, const std::shared_ptr<Node>& val) {
+    VarDefStmtNode::VarDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& val) {
         this->name_tok = name_tok;
         this->val = val;
     }
 
-    NodeType VarDefNode::get_type() const {
-        return NodeType::VAR_DEF;
+    NodeType VarDefStmtNode::get_type() const {
+        return NodeType::VAR_DEF_STMT;
     }
 
-    std::string VarDefNode::to_string() const {
+    std::string VarDefStmtNode::to_string() const {
         return "(VarDefNode " + name_tok.to_string() + " " + val->to_string() + ")";
     }
 

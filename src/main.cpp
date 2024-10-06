@@ -19,99 +19,154 @@ void transpile(const std::string& filename, const std::string& text, bool i) {
     std::shared_ptr<tachyon::Node> tree = parser.parse();
     tachyon::Transpiler transpiler;
     transpiler.visit(tree);
-    std::string stl = R"V0G0N(
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <functional>
-class TachyonObject {
-public:
-    std::map<std::string, double> map;
-    std::string str;
-    std::vector<double> vec;
-    std::function<double(const std::vector<double>&)> func;
-    TachyonObject(const std::map<std::string, double>& map) {
-        this->map = map;
+    std::string stl = R"V0G0N( 
+    #include <iostream>
+    #include <cstring>
+    #include <cstdint>
+
+    namespace tachyon_internal {        
+        uint64_t to_int(int32_t x) {
+            uint64_t result = 0;
+            std::memcpy(&result, &x, sizeof(x));
+            result = (result << 2) + 1;
+            return result;
+        }
+
+        int32_t from_int(uint64_t x) {
+            uint64_t y = x >> 2;
+            int32_t result = 0;
+            std::memcpy(&result, &y, sizeof(result));
+            return result;
+        }
+
+        uint64_t to_float(float x) {
+            uint64_t result = 0;
+            std::memcpy(&result, &x, sizeof(x));
+            result = (result + 1) << 2;
+            return result;
+        }
+
+        float from_float(uint64_t x) {
+            uint64_t y = (x - 1) >> 2;
+            float result = 0.0f;
+            std::memcpy(&result, &y, sizeof(result));
+            return result;
+        }
+
+        uint64_t minus(uint64_t x) {
+            if((x & 3) == 1) {
+                return to_int(-from_int(x));
+            } else if((x & 3) == 2) {
+                return to_float(-from_float(x));
+            }
+        }
+
+        uint64_t not_(uint64_t x) {
+            return to_int(~from_int(x));
+        }
+
+        uint64_t add(uint64_t x, uint64_t y) {
+            if((x & 3) == 1 && (y & 3) == 1) {
+                return to_int(from_int(x) + from_int(y));
+            } else if((x & 3) == 1 && (y & 3) == 2) {
+                return to_float(from_int(x) + from_float(y));
+            } else if((x & 3) == 2 && (y & 3) == 1) {
+                return to_float(from_float(x) + from_int(y));
+            } else if((x & 3) == 2 && (y & 3) == 2) {
+                return to_float(from_float(x) + from_float(y));
+            }
+        }
+
+
+        uint64_t sub(uint64_t x, uint64_t y) {
+            if((x & 3) == 1 && (y & 3) == 1) {
+                return to_int(from_int(x) - from_int(y));
+            } else if((x & 3) == 1 && (y & 3) == 2) {
+                return to_float(from_int(x) - from_float(y));
+            } else if((x & 3) == 2 && (y & 3) == 1) {
+                return to_float(from_float(x) - from_int(y));
+            } else if((x & 3) == 2 && (y & 3) == 2) {
+                return to_float(from_float(x) - from_float(y));
+            }
+        }
+
+        uint64_t mul(uint64_t x, uint64_t y) {
+            if((x & 3) == 1 && (y & 3) == 1) {
+                return to_int(from_int(x) * from_int(y));
+            } else if((x & 3) == 1 && (y & 3) == 2) {
+                return to_float(from_int(x) * from_float(y));
+            } else if((x & 3) == 2 && (y & 3) == 1) {
+                return to_float(from_float(x) * from_int(y));
+            } else if((x & 3) == 2 && (y & 3) == 2) {
+                return to_float(from_float(x) * from_float(y));
+            }
+        }
+
+        uint64_t div(uint64_t x, uint64_t y) {
+            if((x & 3) == 1 && (y & 3) == 1) {
+                return to_int(from_int(x) / from_int(y));
+            } else if((x & 3) == 1 && (y & 3) == 2) {
+                return to_float(from_int(x) / from_float(y));
+            } else if((x & 3) == 2 && (y & 3) == 1) {
+                return to_float(from_float(x) / from_int(y));
+            } else if((x & 3) == 2 && (y & 3) == 2) {
+                return to_float(from_float(x) / from_float(y));
+            }
+        }
+
+        uint64_t mod(uint64_t x, uint64_t y) {
+            if((x & 3) == 1 && (y & 3) == 1) {
+                return to_int(from_int(x) % from_int(y));
+            } else if((x & 3) == 1 && (y & 3) == 2) {
+                return to_float(std::fmod(from_int(x), from_float(y)));
+            } else if((x & 3) == 2 && (y & 3) == 1) {
+                return to_float(std::fmod(from_float(x), from_int(y)));
+            } else if((x & 3) == 2 && (y & 3) == 2) {
+                return to_float(std::fmod(from_float(x), from_float(y)));
+            }
+        }
+
+        uint64_t and_(uint64_t x, uint64_t y) {
+            return to_int(from_int(x) & from_int(y));
+        }
+
+        uint64_t or_(uint64_t x, uint64_t y) {
+            return to_int(from_int(x) | from_int(y));
+        }
+        
+        uint64_t xor_(uint64_t x, uint64_t y) {
+            return to_int(from_int(x) ^ from_int(y));
+        }
+
+        uint64_t lsh(uint64_t x, uint64_t y) {
+            return to_int(from_int(x) << from_int(y));
+        }
+
+        uint64_t rsh(uint64_t x, uint64_t y) {
+            return to_int(from_int(x) >> from_int(y));
+        }
+
+        uint64_t lt(uint64_t x, uint64_t y) {
+            return (from_int(x) < from_int(y)) ? 11ULL : 3ULL;
+        }
+
+        uint64_t le(uint64_t x, uint64_t y) {
+            return (from_int(x) <= from_int(y)) ? 11ULL : 3ULL;
+        }
+
+        uint64_t gt(uint64_t x, uint64_t y) {
+            return (from_int(x) > from_int(y)) ? 11ULL : 3ULL;
+        }
+
+        uint64_t ge(uint64_t x, uint64_t y) {
+            return (from_int(x) >= from_int(y)) ? 11ULL : 3ULL;
+        }
     }
-    TachyonObject(const std::map<std::string, double>& map, const std::string& str) {
-        this->map = map;
-        this->str = str;
-    }
-    
-    TachyonObject(const std::map<std::string, double>& map, const std::vector<double>& vec) {
-        this->map = map;
-        this->vec = vec;
-    }
-    
-    TachyonObject(const std::map<std::string, double>& map, const std::function<double(const std::vector<double>&)>& func) {
-        this->map = map;
-        this->func = func;
+
+    void setup() {
     }
 
-    double get(const std::string& key) {
-    if(map.count(key) == 0) {
-    return TachyonObject::from_double(map.at("proto"))->get(key);
-    } else {
-    return map.at(key);
-    }
-    }
 
-    void set(const std::string& key, double val) {
-        map[key] = val;
-    }
-
-    double to_double() {
-        TachyonObject* temp = this;
-        double result;
-        std::memcpy(&result, &temp, sizeof(result));
-        return result;
-    }
-
-    static std::shared_ptr<TachyonObject> from_double(double d) {
-        TachyonObject* result;
-        std::memcpy(&result, &d, sizeof(result));
-        return std::shared_ptr<TachyonObject>(result);
-    }
-
-};
-
-
-double make_tachyon_object(const std::map<std::string, double>& map) {
-    return std::make_shared<TachyonObject>(TachyonObject(map))->to_double();
-}
-
-double tachyon_object_get(double obj, const std::string& key){
-    return TachyonObject::from_double(obj)->get(key);
-}
-
-void tachyon_object_set(double obj, const std::string& key, double val){
-    TachyonObject::from_double(obj)->set(key, val);
-}
-
-double Function = make_tachyon_object({});
-
-double make_tachyon_function(const std::function<double(const std::vector<double>&)>& func) {
-    return std::make_shared<TachyonObject>(TachyonObject({{"prototype", Function}}, func))->to_double();
-}
-
-double String = make_tachyon_object({
-    {"toString", make_tachyon_function([](const std::vector<double>& args) {
-        return args.at(0);
-    })}
-});
-
-double Vector = make_tachyon_object({});
-
-double make_tachyon_string(const std::string& str) {
-    return std::make_shared<TachyonObject>(TachyonObject({{"prototype", String}}, str))->to_double();
-}
-
-double make_tachyon_vector(const std::vector<double>& vec) {
-    return std::make_shared<TachyonObject>(TachyonObject({{"prototype", Vector}}, vec))->to_double();
-}
-
-double System = make_tachyon_object({});
     )V0G0N";
 
     std::string filename_noext = filename.substr(0, filename.size() - 8);
