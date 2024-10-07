@@ -17,8 +17,17 @@ namespace tachyon {
         case NodeType::NUMBER:
             visit_number_node(std::static_pointer_cast<NumberNode>(node));
             break;
+        case NodeType::STRING:
+            visit_string_node(std::static_pointer_cast<StringNode>(node));
+            break;
+        case NodeType::VECTOR:
+            visit_vector_node(std::static_pointer_cast<VectorNode>(node));
+            break;
         case NodeType::IDENTIFIER:
             visit_identifier_node(std::static_pointer_cast<IdentifierNode>(node));
+            break;
+        case NodeType::CALL_EXPR:
+            visit_call_expr_node(std::static_pointer_cast<CallExprNode>(node));
             break;
         case NodeType::UNARY_OP:
             visit_unary_op_node(std::static_pointer_cast<UnaryOpNode>(node));
@@ -51,7 +60,7 @@ namespace tachyon {
             visit_stmt_list_node(std::static_pointer_cast<StmtListNode>(node));
             break;
         default:
-            std::cout << "UNKNOWN NODE: " << node->to_string();
+            std::cout << "UNKNOWN NODE: " << node->to_string() << '\n';
             break;
         }
     }
@@ -62,14 +71,55 @@ namespace tachyon {
         code << y << "ULL";
     }
 
+    void Transpiler::visit_string_node(const std::shared_ptr<StringNode>& node) {
+        code << "pack_object(std::make_shared<Object>(Object(\"" << node->tok.val << "\", String)))";
+    }
+
+    void Transpiler::visit_vector_node(const std::shared_ptr<VectorNode>& node) {
+        code << "pack_object(std::make_shared<Object>(Object({";
+        if(node->elements.size() == 0) {
+                code << "}, Vector)))";
+        } else {
+
+        for(int i = 0; i < node->elements.size(); i++) {
+            visit(node->elements.at(i));
+            if(i == node->elements.size() - 1) {
+                code << "}, Vector)))";
+            } else {
+                code << ",";
+            }
+        }
+        }
+    }
+
+
     void Transpiler::visit_identifier_node(const std::shared_ptr<IdentifierNode>& node) {
         code << node->tok.val;
     }
 
+    void Transpiler::visit_call_expr_node(const std::shared_ptr<CallExprNode>& node) {
+        code << "unpack_object(";
+        visit(node->callee);
+        code << ")->func({";
+        if(node->args.size() == 0) {
+                code << "})";
+        } else {
+
+        for(int i = 0; i < node->args.size(); i++) {
+            visit(node->args.at(i));
+            if(i == node->args.size() - 1) {
+                code << "})";
+            } else {
+                code << ",";
+            }
+        }
+        }
+    }
+
     void Transpiler::visit_unary_op_node(const std::shared_ptr<UnaryOpNode>& node) {
-        code << "to_number(";
+        code << "pack_number(";
         code << node->op_tok.val;
-        code << "from_number(";
+        code << "unpack_number(";
         visit(node->right_node);
         code << "))";
     }
@@ -81,9 +131,9 @@ namespace tachyon {
             visit(node->right_node);
         }
         else {
-            code << "to_number(from_number(";
+            code << "pack_number(unpack_number(";
             visit(node->left_node);
-            code << ")" << node->op_tok.val << "from_number(";
+            code << ")" << node->op_tok.val << "unpack_number(";
             visit(node->right_node);
             code << "))";
         }
