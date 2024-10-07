@@ -4,51 +4,16 @@
 #include "node.h"
 
 namespace tachyon {
-    IntNode::IntNode(const Token& tok) {
+    NumberNode::NumberNode(const Token& tok) {
         this->tok = tok;
     }
 
-    NodeType IntNode::get_type() const {
-        return NodeType::INT;
+    NodeType NumberNode::get_type() const {
+        return NodeType::NUMBER;
     }
 
-    std::string IntNode::to_string() const {
-        return "(IntNode " + tok.to_string() + ")";
-    }
-
-    FloatNode::FloatNode(const Token& tok) {
-        this->tok = tok;
-    }
-
-    NodeType FloatNode::get_type() const {
-        return NodeType::FLOAT;
-    }
-
-    std::string FloatNode::to_string() const {
-        return "(FloatNode " + tok.to_string() + ")";
-    }
-    
-    NullNode::NullNode() {
-    }
-
-    NodeType NullNode::get_type() const {
-        return NodeType::NULL_;
-    }
-
-    std::string NullNode::to_string() const {
-        return "(NullNode)";
-    }
-
-    BoolNode::BoolNode(const Token& tok) {
-        this->tok = tok;
-    }
-
-    NodeType BoolNode::get_type() const {
-        return NodeType::BOOL;
-    }
-
-    std::string BoolNode::to_string() const {
-        return "(BoolNode " + tok.to_string() + ")";
+    std::string NumberNode::to_string() const {
+        return "(NumberNode " + tok.to_string() + ")";
     }
 
    StringNode::StringNode(const Token& tok) {

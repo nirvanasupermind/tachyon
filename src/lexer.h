@@ -6,21 +6,6 @@
 #include "token.h"
 
 namespace tachyon {
-    const std::vector<std::string> KEYWORDS{
-        "null",
-        "true",
-        "false",
-        "var",
-        "block",
-        "if",
-        "else",
-        "while",
-        "for",
-        "return",
-        "lambda",
-        "def"
-    };
-    
     class Lexer {
     public:
         std::string filename;

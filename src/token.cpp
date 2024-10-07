@@ -17,11 +17,8 @@ namespace tachyon {
     std::string Token::to_string() const {
         std::string result = "";
         switch (type) {
-        case TokenType::INT:
-            result += "INT:";
-            break;
-        case TokenType::FLOAT:
-            result += "INT:";
+        case TokenType::NUMBER:
+            result += "NUMBER:";
             break;
         case TokenType::STRING:
             result += "STRING:";
@@ -58,15 +55,6 @@ namespace tachyon {
             break;
         case TokenType::XOR:
             result += "XOR:";
-            break;
-        case TokenType::LOGICAL_NOT:
-            result += "LOGICAL_NOT:";
-            break;
-        case TokenType::LOGICAL_AND:
-            result += "LOGICAL_AND:";
-            break;
-        case TokenType::LOGICAL_OR:
-            result += "LOGICAL_OR:";
             break;
         case TokenType::LSH:
             result += "LSH:";

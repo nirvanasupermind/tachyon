@@ -46,25 +46,9 @@ namespace tachyon {
             advance();
             return inner_expr;
         }
-        else if (tok.type == TokenType::INT) {
+        else if (tok.type == TokenType::NUMBER) {
             advance();
-            return std::make_shared<IntNode>(IntNode(tok));
-        }
-        else if (tok.type == TokenType::FLOAT) {
-            advance();
-            return std::make_shared<FloatNode>(FloatNode(tok));
-        }
-        else if (tok.type == TokenType::FLOAT) {
-            advance();
-            return std::make_shared<FloatNode>(FloatNode(tok));
-        }
-        else if (tok.type == TokenType::KEYWORD && tok.val == "null") {
-            advance();
-            return std::make_shared<NullNode>(NullNode());
-        }
-        else if (tok.type == TokenType::KEYWORD && (tok.val == "true" || tok.val == "false")) {
-            advance();
-            return std::make_shared<BoolNode>(BoolNode(tok));
+            return std::make_shared<NumberNode>(NumberNode(tok));
         }
         else if (tok.type == TokenType::STRING) {
             advance();
@@ -269,16 +253,8 @@ namespace tachyon {
         return bin_op([this]() {return this->xor_expr(); }, { TokenType::OR });
     }
 
-    std::shared_ptr<Node> Parser::logical_and_expr() {
-        return bin_op([this]() {return this->or_expr(); }, { TokenType::LOGICAL_AND });
-    }
-
-    std::shared_ptr<Node> Parser::logical_or_expr() {
-        return bin_op([this]() {return this->logical_and_expr(); }, { TokenType::LOGICAL_OR });
-    }
-
     std::shared_ptr<Node> Parser::assign_expr() {
-        return bin_op([this]() {return this->logical_or_expr(); }, { TokenType::EQ, TokenType::PLUS_EQ, TokenType::MINUS_EQ,
+        return bin_op([this]() {return this->or_expr(); }, { TokenType::EQ, TokenType::PLUS_EQ, TokenType::MINUS_EQ,
         TokenType::MUL_EQ, TokenType::DIV_EQ, TokenType::MOD_EQ,
         TokenType::AND_EQ, TokenType::OR_EQ, TokenType::XOR_EQ,
         TokenType::LSH_EQ, TokenType::RSH_EQ });
@@ -406,7 +382,7 @@ namespace tachyon {
         std::shared_ptr<Node> cond = expr();
         if (current_tok.type != TokenType::SEMICOLON) {
             raise_error();
-        }
+        }        
         advance();
         std::shared_ptr<Node> update = expr();
         if (current_tok.type != TokenType::RPAREN) {

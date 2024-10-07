@@ -5,8 +5,7 @@
 
 namespace tachyon {
     enum class TokenType {
-        INT,
-        FLOAT,
+        NUMBER,
         STRING,
         IDENTIFIER,
         KEYWORD,
@@ -19,9 +18,6 @@ namespace tachyon {
         AND,
         OR,
         XOR,
-        LOGICAL_NOT,
-        LOGICAL_AND,
-        LOGICAL_OR,
         LSH,
         RSH,
         EE,

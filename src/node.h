@@ -8,10 +8,7 @@
 
 namespace tachyon {
     enum class NodeType {
-        INT,
-        FLOAT,
-        NULL_,
-        BOOL,
+        NUMBER,
         STRING,
         VECTOR,
         OBJECT,
@@ -39,33 +36,10 @@ namespace tachyon {
         virtual std::string to_string() const = 0;
     };
 
-    class IntNode: public Node {
+    class NumberNode: public Node {
     public:
         Token tok;
-        IntNode(const Token& tok);
-        NodeType get_type() const;
-        std::string to_string() const;
-    };
-
-    class FloatNode: public Node {
-    public:
-        Token tok;
-        FloatNode(const Token& tok);
-        NodeType get_type() const;
-        std::string to_string() const;
-    };
-
-    class NullNode: public Node {
-    public:
-        NullNode();
-        NodeType get_type() const;
-        std::string to_string() const;
-    };
-
-    class BoolNode: public Node {
-    public:
-        Token tok;
-        BoolNode(const Token& tok);
+        NumberNode(const Token& tok);
         NodeType get_type() const;
         std::string to_string() const;
     };

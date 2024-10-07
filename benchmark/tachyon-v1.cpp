@@ -597,15 +597,12 @@ TachyonVal Exception = TachyonVal::make_object({
     });
 
 int main(int argc, char** argv) {
-        auto start = std::chrono::system_clock::now();
-
-for(TachyonVal i = TachyonVal::make_num(0); ((i < TachyonVal::make_num(1e+09))).b; (i = (i + TachyonVal::make_num(1)))) {
+auto start = std::chrono::system_clock::now();
+for(TachyonVal i = TachyonVal::make_num(0); ((i < TachyonVal::make_num(1e+07))).b; (i = (i + TachyonVal::make_num(1)))) {
 TachyonVal x = (TachyonVal::make_num(2) + TachyonVal::make_num(2));
 }
-
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-    
     return 0;
 }
