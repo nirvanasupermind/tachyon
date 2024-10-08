@@ -72,23 +72,26 @@ namespace tachyon {
     }
 
     void Transpiler::visit_string_node(const std::shared_ptr<StringNode>& node) {
-        code << "pack_object(std::make_shared<Object>(Object(\"" << node->tok.val << "\", String)))";
+        code << "pack_object(std::make_shared<TachyonString>(TachyonString(\"" << node->tok.val << "\", String)))";
+
     }
 
     void Transpiler::visit_vector_node(const std::shared_ptr<VectorNode>& node) {
-        code << "pack_object(std::make_shared<Object>(Object({";
-        if(node->elements.size() == 0) {
-                code << "}, Vector)))";
-        } else {
-
-        for(int i = 0; i < node->elements.size(); i++) {
-            visit(node->elements.at(i));
-            if(i == node->elements.size() - 1) {
-                code << "}, Vector)))";
-            } else {
-                code << ",";
-            }
+        code << "pack_object(std::make_shared<TachyonVector>(TachyonVector({";
+        if (node->elements.size() == 0) {
+            code << "}, Vector)))";
         }
+        else {
+
+            for (int i = 0; i < node->elements.size(); i++) {
+                visit(node->elements.at(i));
+                if (i == node->elements.size() - 1) {
+                    code << "}, Vector)))";
+                }
+                else {
+                    code << ",";
+                }
+            }
         }
     }
 
@@ -98,21 +101,23 @@ namespace tachyon {
     }
 
     void Transpiler::visit_call_expr_node(const std::shared_ptr<CallExprNode>& node) {
-        code << "unpack_object(";
+        code << "std::static_pointer_cast<TachyonFunction>(unpack_object(";
         visit(node->callee);
-        code << ")->func({";
-        if(node->args.size() == 0) {
-                code << "})";
-        } else {
-
-        for(int i = 0; i < node->args.size(); i++) {
-            visit(node->args.at(i));
-            if(i == node->args.size() - 1) {
-                code << "})";
-            } else {
-                code << ",";
-            }
+        code << "))->func({";
+        if (node->args.size() == 0) {
+            code << "})";
         }
+        else {
+
+            for (int i = 0; i < node->args.size(); i++) {
+                visit(node->args.at(i));
+                if (i == node->args.size() - 1) {
+                    code << "})";
+                }
+                else {
+                    code << ",";
+                }
+            }
         }
     }
 

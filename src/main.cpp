@@ -25,43 +25,63 @@ void transpile(const std::string& filename, const std::string& text, bool i) {
 #include <string>
 #include <vector>
 #include <functional>
+#include <cstdint>
 
-class Object {
+class TachyonObject {
 public:
     std::map<std::string, uint64_t> props;
     uint64_t proto;
-    std::string str;
-    std::vector<uint64_t> vec;
-    std::function<uint64_t(const std::vector<uint64_t>&)> func;
-    Object (const std::map<std::string, uint64_t>& props) {
+    TachyonObject() {
+        this->props = {};
+        this->proto = 0ULL;
+    }
+
+    TachyonObject(const std::map<std::string, uint64_t>& props) {
         this->props = props;
+        this->proto = 0ULL;
     }
-    Object (const std::map<std::string, uint64_t>& props, uint64_t proto) {
+    TachyonObject(const std::map<std::string, uint64_t>& props, uint64_t proto) {
         this->props = props;
-        this->proto = proto;
-    }
-    Object(const std::string& str, uint64_t proto) {
-        this->str = str;
-        this->proto = proto;
-    }
-    Object(const std::vector<uint64_t>& vec, uint64_t proto) {
-        this->vec = vec;
-        this->proto = proto;
-    }
-    Object(const std::function<uint64_t(const std::vector<uint64_t>&)> func, uint64_t proto) {
-        this->func = func;
         this->proto = proto;
     }
 
     uint64_t get(const std::string& prop) {
-        if(props.count(prop) == 0) {
+        if (props.count(prop) == 0) {
             return props.at(prop);
-        } else {
-            return std::shared_ptr<Object>((Object*)proto)->props.at(prop);
+        }
+        else {
+            return std::shared_ptr<TachyonObject>((TachyonObject*)proto)->props.at(prop);
         }
     }
 };
 
+class TachyonString : public TachyonObject {
+public:
+    std::string str;
+    TachyonString(const std::string& str, uint64_t proto) {
+        this->str = str;
+        this->proto = proto;
+    }
+};
+
+class TachyonVector : public TachyonObject {
+public:
+    std::vector<uint64_t> vec;
+    TachyonVector(const std::vector<uint64_t>& vec, uint64_t proto) {
+        this->vec = vec;
+        this->proto = proto;
+    }
+};
+
+
+class TachyonFunction : public TachyonObject {
+public:
+    std::function<uint64_t(const std::vector<uint64_t>&)> func;
+    TachyonFunction(const std::function<uint64_t(const std::vector<uint64_t>&)> func, uint64_t proto) {
+        this->func = func;
+        this->proto = proto;
+    }
+};
 
 uint64_t pack_number(float x) {
     return (((*(uint64_t*)(&x)) & 0xffffffff) << 1) + 1;
@@ -72,23 +92,23 @@ float unpack_number(uint64_t x) {
     return *(float*)(&y);
 }
 
-uint64_t pack_object(const std::shared_ptr<Object>& x) {
+uint64_t pack_object(const std::shared_ptr<TachyonObject>& x) {
     return (uint64_t)(x.get());
 }
 
-std::shared_ptr<Object> unpack_object(uint64_t x) {
-    return std::shared_ptr<Object>((Object*)x);
+std::shared_ptr<TachyonObject> unpack_object(uint64_t x) {
+    return std::shared_ptr<TachyonObject>((TachyonObject*)x);
 }
 
-uint64_t String = pack_object(std::make_shared<Object>(Object({})));
-uint64_t Vector = pack_object(std::make_shared<Object>(Object({})));
-uint64_t Function = pack_object(std::make_shared<Object>(Object({})));
-uint64_t print = pack_object(std::make_shared<Object>(Object([] (const std::vector<uint64_t>& args) {
-        if((args.at(0) & 1) == 1) {
-            std::cout << unpack_number(args.at(0)) << '\n';
-        }
-        return 0;
-}, Function)));
+uint64_t String = pack_object(std::make_shared<TachyonObject>(TachyonObject({}, 0ULL)));
+uint64_t Vector = pack_object(std::make_shared<TachyonObject>(TachyonObject({}, 0ULL)));
+uint64_t Function = pack_object(std::make_shared<TachyonObject>(TachyonObject({}, 0ULL)));
+uint64_t print = pack_object(std::make_shared<TachyonFunction>(TachyonFunction([](const std::vector<uint64_t>& args) {
+    if ((args.at(0) & 1) == 1) {
+        std::cout << unpack_number(args.at(0)) << '\n';
+    }
+    return 0;
+    }, Function)));
 
     )V0G0N";
 
