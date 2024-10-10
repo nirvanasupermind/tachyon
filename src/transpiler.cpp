@@ -66,27 +66,24 @@ namespace tachyon {
     }
 
     void Transpiler::visit_number_node(const std::shared_ptr<NumberNode>& node) {
-        float x = std::stof(node->tok.val);
-        uint64_t y = (((*(uint64_t*)(&x)) & 0xffffffff) << 1) + 1;
-        code << y << "ULL";
+        code << "std::make_shared<TachyonVal>(TachyonVal(" << node->tok.val << "))";
     }
 
     void Transpiler::visit_string_node(const std::shared_ptr<StringNode>& node) {
-        code << "pack_object(std::make_shared<TachyonString>(TachyonString(\"" << node->tok.val << "\", String)))";
-
+        code << "std::make_shared<TachyonString>(TachyonString({},String," + node->tok.val << "))";
     }
 
     void Transpiler::visit_vector_node(const std::shared_ptr<VectorNode>& node) {
-        code << "pack_object(std::make_shared<TachyonVector>(TachyonVector({";
+        code << "std::make_shared<TachyonVector>(TachyonVector({},Vector,{";
         if (node->elements.size() == 0) {
-            code << "}, Vector)))";
+            code << "}))";
         }
         else {
 
             for (int i = 0; i < node->elements.size(); i++) {
                 visit(node->elements.at(i));
                 if (i == node->elements.size() - 1) {
-                    code << "}, Vector)))";
+                    code << "}))";
                 }
                 else {
                     code << ",";
@@ -101,14 +98,13 @@ namespace tachyon {
     }
 
     void Transpiler::visit_call_expr_node(const std::shared_ptr<CallExprNode>& node) {
-        code << "std::static_pointer_cast<TachyonFunction>(unpack_object(";
+        code << "std::static_pointer_cast<TachyonFunction>(";
         visit(node->callee);
-        code << "))->func({";
+        code << ")->func({";
         if (node->args.size() == 0) {
             code << "})";
         }
         else {
-
             for (int i = 0; i < node->args.size(); i++) {
                 visit(node->args.at(i));
                 if (i == node->args.size() - 1) {
@@ -122,11 +118,10 @@ namespace tachyon {
     }
 
     void Transpiler::visit_unary_op_node(const std::shared_ptr<UnaryOpNode>& node) {
-        code << "pack_number(";
+        code << "std::make_shared<TachyonVal>(TachyonVal(";
         code << node->op_tok.val;
-        code << "unpack_number(";
         visit(node->right_node);
-        code << "))";
+        code << "->num))";
     }
 
     void Transpiler::visit_bin_op_node(const std::shared_ptr<BinOpNode>& node) {
@@ -136,16 +131,16 @@ namespace tachyon {
             visit(node->right_node);
         }
         else {
-            code << "pack_number(unpack_number(";
+            code << "std::make_shared<TachyonVal>(TachyonVal(";
             visit(node->left_node);
-            code << ")" << node->op_tok.val << "unpack_number(";
+            code << "->num" << node->op_tok.val;
             visit(node->right_node);
-            code << "))";
+            code << "->num))";
         }
     }
 
     void Transpiler::visit_var_def_stmt_node(const std::shared_ptr<VarDefStmtNode>& node) {
-        code << "uint64_t " << node->name_tok.val << "=";
+        code << "std::shared_ptr<TachyonVal> " << node->name_tok.val << "=";
         visit(node->val);
         code << ";";
     }
@@ -164,14 +159,14 @@ namespace tachyon {
     void Transpiler::visit_if_stmt_node(const std::shared_ptr<IfStmtNode>& node) {
         code << "if((";
         visit(node->cond);
-        code << ") != 1ULL)";
+        code << ")->num)";
         visit(node->body);
     }
 
     void Transpiler::visit_if_else_stmt_node(const std::shared_ptr<IfElseStmtNode>& node) {
         code << "if((";
         visit(node->cond);
-        code << ") != 1ULL)";
+        code << ")->num)";
         visit(node->if_body);
         code << "else";
         visit(node->else_body);
@@ -180,7 +175,7 @@ namespace tachyon {
     void Transpiler::visit_while_stmt_node(const std::shared_ptr<WhileStmtNode>& node) {
         code << "while((";
         visit(node->cond);
-        code << ") != 1ULL)";
+        code << ")->num)";
         visit(node->body);
     }
 
@@ -189,7 +184,7 @@ namespace tachyon {
         visit(node->init);
         code << "(";
         visit(node->cond);
-        code << ") != 1ULL;";
+        code << ")->num";
         visit(node->update);
         code << ")";
         visit(node->body);
