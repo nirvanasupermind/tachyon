@@ -26,77 +26,46 @@ void transpile(const std::string& filename, const std::string& text, bool i) {
 #include <vector>
 #include <functional>
 
-class TachyonVal {
+using func_ptr =  std::function<uint64_t(const std::vector<uint64_t>&)>;
+
+uint64_t pack_number(float x) {
+    return (((*(uint64_t*)(&x)) & 0xffffffff) << 1) + 1;
+}
+
+float unpack_number(uint64_t x) {
+    uint64_t y = x >> 1;
+    return *((float*)(&y));
+}
+
+class TachyonObject {
 public:
-    double num;
-    TachyonVal() {
-        this->num = 0.0;
-    }
-    TachyonVal(double num) {
-        this->num = num;
-    }
-};
-
-using func_ptr = std::function<std::shared_ptr<TachyonVal>(const std::vector<std::shared_ptr<TachyonVal> >&)>;
-
-
-class TachyonObject: public TachyonVal {
-public:
-    std::unordered_map<std::string, std::shared_ptr<TachyonVal> > map;
-    std::shared_ptr<TachyonObject> proto;
-
-    TachyonObject(const std::unordered_map<std::string, std::shared_ptr<TachyonVal> >& map) {
+    std::map<std::string, uint64_t>* map;
+    void* other_data;
+    TachyonObject(std::map<std::string, uint64_t>* map) {
         this->map = map;
     }
-
-    TachyonObject(const std::unordered_map<std::string, std::shared_ptr<TachyonVal> >& map, const std::shared_ptr<TachyonObject>& proto) {
+    TachyonObject(std::map<std::string, uint64_t>* map, void* other_data) {
         this->map = map;
-        this->proto = proto;
+        this->other_data = other_data;
     }
 };
 
-class TachyonString: public TachyonObject {
-public:
-    std::string str;
+uint64_t pack_object(TachyonObject* x) {
+    return *(uint64_t*)(&x);
+}
 
-    TachyonString(const std::unordered_map<std::string, std::shared_ptr<TachyonVal> >& map, const std::shared_ptr<TachyonObject>& proto,
-        const std::string& str)
-        : TachyonObject(map, proto) {
-        this->str = str;
-    }
-};
+TachyonObject* unpack_object(uint64_t x) {
+    return *(TachyonObject**)(&x);
+}
 
-
-class TachyonVector: public TachyonObject {
-public:
-    std::vector<std::shared_ptr<TachyonObject> > vec;
-
-    TachyonVector(const std::unordered_map<std::string, std::shared_ptr<TachyonVal> >& map, const std::shared_ptr<TachyonObject>& proto,
-        const std::vector<std::shared_ptr<TachyonObject> >& vec)
-        : TachyonObject(map, proto) {
-        this->vec = vec;
-    }
-};
-
-class TachyonFunction: public TachyonObject {
-public:
-    func_ptr func;
-
-    TachyonFunction(const std::unordered_map<std::string, std::shared_ptr<TachyonVal> >& map, const std::shared_ptr<TachyonObject>& proto,
-        const func_ptr& func)
-        : TachyonObject(map, proto) {
-        this->func = func;
-    }
-};
-
-
-std::shared_ptr<TachyonObject> String = std::make_shared<TachyonObject>(TachyonObject({}));
-std::shared_ptr<TachyonObject> Vector = std::make_shared<TachyonObject>(TachyonObject({}));
-std::shared_ptr<TachyonObject> Function = std::make_shared<TachyonObject>(TachyonObject({}));
-std::shared_ptr<TachyonVal> print = std::make_shared<TachyonFunction>(TachyonFunction({}, Function, [] (const std::vector<std::shared_ptr<TachyonVal> > &args) {
-    std::cout << args.at(0)->num << '\n';
-    return std::make_shared<TachyonVal>(TachyonVal(0.0));
-}));
+uint64_t String = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t Vector = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t Function = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t print = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& args) {
+std::cout << unpack_number(args.at(0)) << '\n';
+return 1ULL;
+})));
 
     )V0G0N";
 
