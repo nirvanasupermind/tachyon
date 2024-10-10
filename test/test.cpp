@@ -47,7 +47,7 @@ return 1ULL;
 })));
 
     int main(){
-(*(func_ptr*)(unpack_object(print)->other_data))({2168455169ULL});
+(*(func_ptr*)(unpack_object(print)->other_data))({pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",String}}),new std::string("a")))});
 
 return 0;
 }

@@ -5,47 +5,57 @@
 #include <vector>
 #include <functional>
 
-class TachyonVal {
+using func_ptr =  std::function<uint64_t(const std::vector<uint64_t>&)>;
+
+uint64_t pack_number(float x) {
+    return (((*(uint64_t*)(&x)) & 0xffffffff) << 1) + 1;
+}
+
+float unpack_number(uint64_t x) {
+    uint64_t y = x >> 1;
+    return *((float*)(&y));
+}
+
+class TachyonObject {
 public:
-    double num;
-    std::map<std::string, TachyonVal>* props;
+    std::map<std::string, uint64_t>* map;
     void* other_data;
-    TachyonVal(double num) {
-        this->num = num;
+    TachyonObject(std::map<std::string, uint64_t>* map) {
+        this->map = map;
     }
-    TachyonVal(std::map<std::string, TachyonVal>* props) {
-        this->props = props;
-    }
-    TachyonVal(std::map<std::string, TachyonVal>* props, void* other_data) {
-        this->props = props;
+    TachyonObject(std::map<std::string, uint64_t>* map, void* other_data) {
+        this->map = map;
         this->other_data = other_data;
     }
-    // ~TachyonVal() {
-    //     free(props);
-    //     free(other_data);
-    // }
 };
 
-TachyonVal String = TachyonVal(new std::map<std::string, TachyonVal>({}));
-TachyonVal Vector = TachyonVal(new std::map<std::string, TachyonVal>({}));
-TachyonVal Function = TachyonVal(new std::map<std::string, TachyonVal>({}));
-TachyonVal print = TachyonVal(new std::map<std::string, TachyonVal>({}), new std::function<TachyonVal(const std::vector<TachyonVal>&)>([](const std::vector<TachyonVal>& args) {
-    std::cout << args.at(0).num << '\n';
-    return TachyonVal(0.0);
-}));
+uint64_t pack_object(TachyonObject* x) {
+    return *(uint64_t*)(&x);
+}
+
+TachyonObject* unpack_object(uint64_t x) {
+    return *(TachyonObject**)(&x);
+}
+
+uint64_t String = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t Vector = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t Function = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t print = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& args) {
+std::cout << unpack_number(args.at(0)) << '\n';
+return 1ULL;
+})));
 
     int main(){
-        auto start = std::chrono::system_clock::now();
-
-TachyonVal i=TachyonVal(0.0);while((TachyonVal((i).num<(TachyonVal(10000000.0)).num)).num != 0.0) {i=TachyonVal((i).num+(TachyonVal(1.0)).num);
+auto start = std::chrono::system_clock::now();
+uint64_t i=1ULL;while((pack_number(unpack_number(i)<unpack_number(2519805185ULL))) != 1ULL) {i=pack_number(unpack_number(i)+unpack_number(2130706433ULL));
 {
-TachyonVal x=TachyonVal((TachyonVal(2.0)).num+(TachyonVal(2.0)).num);
+uint64_t x=pack_number(unpack_number(2147483649ULL)+unpack_number(2147483649ULL));
 }}
+
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-
-
 return 0;
 }

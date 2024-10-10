@@ -71,11 +71,11 @@ namespace tachyon {
     }
 
     void Transpiler::visit_string_node(const std::shared_ptr<StringNode>& node) {
-        code << "pack_object(new TachyonObject(new std::map<std::string, uint64_t>({\"prototype\",String}),new std::string(\"" + node->tok.val << "\")))";
+        code << "pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{\"prototype\",String}}),new std::string(\"" + node->tok.val << "\")))";
     }
 
     void Transpiler::visit_vector_node(const std::shared_ptr<VectorNode>& node) {
-        code << "pack_object(new TachyonObject(new std::map<std::string, uint64_t>({\"prototype\",Vector}), new std::vector({";
+        code << "pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{\"prototype\",Vector}}), new std::vector({";
         if (node->elements.size() == 0) {
             code << "})))";
         }
@@ -134,7 +134,7 @@ namespace tachyon {
         else {
             code << "pack_number(unpack_number(";
             visit(node->left_node);
-            code << ")" << node->op_tok.val << "unpack_(";
+            code << ")" << node->op_tok.val << "unpack_number(";
             visit(node->right_node);
             code << "))";
         }
