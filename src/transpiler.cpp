@@ -90,7 +90,7 @@ namespace tachyon {
     }
 
     void Transpiler::visit_vector_node(const std::shared_ptr<VectorNode>& node) {
-        code << "pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{\"prototype\",Vector}}), new std::vector({";
+        code << "pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{\"prototype\",Vector}}), new std::vector<uint64_t>({";
         if (node->elements.size() == 0) {
             code << "})))";
         }

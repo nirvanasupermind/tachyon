@@ -1,7 +1,1 @@
-var Complex = {
-    toString: lambda(x) {
-        return "SO COMPLEX";
-    }
-};
-
-print({prototype: Complex});
+print({});
