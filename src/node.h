@@ -69,7 +69,6 @@ namespace tachyon {
         std::string to_string() const;
     };
 
-
     class IdentifierNode: public Node {
     public:
         Token tok;

@@ -1,1 +1,8 @@
-print("a");
+var Point = {
+    sum: lambda(self) {
+        return self.x + self.y;
+    }
+};
+
+var myPoint = {x: 2, y: 2, prototype: Point};
+print(myPoint.sum(myPoint));

@@ -39,14 +39,26 @@ float unpack_number(uint64_t x) {
 
 class TachyonObject {
 public:
-    std::map<std::string, uint64_t>* map;
-    void* other_data;
-    TachyonObject(std::map<std::string, uint64_t>* map) {
-        this->map = map;
+    std::map<std::string, uint64_t>* props;
+    void* other_data = nullptr;
+    TachyonObject(std::map<std::string, uint64_t>* props) {
+        this->props = props;
     }
-    TachyonObject(std::map<std::string, uint64_t>* map, void* other_data) {
-        this->map = map;
+    TachyonObject(std::map<std::string, uint64_t>* props, void* other_data) {
+        this->props = props;
         this->other_data = other_data;
+    }
+    ~TachyonObject() {
+        free(props);
+        free(other_data);
+    }
+    uint64_t get(const std::string& key) {
+        if(props->count(key)) {
+            return props->at(key);
+        } else {
+            uint64_t prototype = props->at("prototype");
+            return (*(TachyonObject**)(&prototype))->get(key);
+        }
     }
 };
 
