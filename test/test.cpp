@@ -39,6 +39,16 @@ public:
             return (*(TachyonObject**)(&prototype))->get(key);
         }
     }
+    bool has(const std::string& key) {
+        if(props->count(key)) {
+            return true;
+        } else if(props->count("prototype")) {
+            uint64_t prototype = props->at("prototype");
+            return (*(TachyonObject**)(&prototype))->has(key);
+        } else {
+            return false;
+        }
+    }
 };
 
 uint64_t pack_object(TachyonObject* x) {
@@ -49,23 +59,40 @@ TachyonObject* unpack_object(uint64_t x) {
     return *(TachyonObject**)(&x);
 }
 
-uint64_t String = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t String = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({
+    {"toString", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+return _args.at(0);
+})))}
+
+})));
+
 uint64_t Vector = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
 uint64_t Function = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
 uint64_t print = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
-new func_ptr([] (const std::vector<uint64_t>& args) {
-std::cout << unpack_number(args.at(0)) << '\n';
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t x = _args.at(0);
+if((x & 1) == 0) {
+TachyonObject* obj = unpack_object(x);
+if(obj->has("toString")) {
+uint64_t str = (*(func_ptr*)(unpack_object(obj->get("toString"))->other_data))({x});
+std::cout << *(std::string*)(unpack_object(str)->other_data) << '\n';
+} else {
+    std::cout << obj << '\n';
+}
+} else {
+std::cout << unpack_number(x) << '\n';
+}
 return 1ULL;
 })));
 
     int main(){
-uint64_t Point = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"sum",pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), new func_ptr([] (const std::vector<uint64_t>& _args) {uint64_t self= _args.at(0);
+uint64_t Complex = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"toString",pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), new func_ptr([=] (const std::vector<uint64_t>& _args) {uint64_t x= _args.at(0);
 {
-return pack_number(unpack_number(unpack_object(self)->get("x"))+unpack_number(unpack_object(self)->get("y")));
+return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",String}}),new std::string("SO COMPLEX")));
 }return 1ULL;
 })))}})));
-uint64_t myPoint = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"x",2147483649ULL},{"y",2147483649ULL},{"prototype",Point}})));
-(*(func_ptr*)(unpack_object(print)->other_data))({(*(func_ptr*)(unpack_object(unpack_object(myPoint)->get("sum"))->other_data))({myPoint})});
+(*(func_ptr*)(unpack_object(print)->other_data))({pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",Complex}})))});
 
 return 0;
 }
