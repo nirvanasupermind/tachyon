@@ -1,2 +1,3 @@
 var x = "hello guys";
-print(x.back());
+x.set(1, "Z");
+print(x.substr(0, x.size() - 1));
