@@ -1,1 +1,2 @@
-print({});
+var x = "hello guys";
+print(x.back());

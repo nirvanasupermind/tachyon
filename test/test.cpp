@@ -61,10 +61,119 @@ TachyonObject* unpack_object(uint64_t x) {
 }
 
 uint64_t String = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({
+
+{"at",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+uint64_t idx = _args.at(1);
+
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+float idx_float = unpack_number(idx);
+
+return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",String}}),new std::string(1, self_str.at(idx_float))));
+})))},
+
+
+{"front",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+
+return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",String}}),new std::string(1, self_str.front())));
+})))},
+
+
+{"back",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+
+return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",String}}),new std::string(1, self_str.back())));
+})))},
+
+{"empty",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+
+return pack_number(self_str.empty());
+})))},
+
+{"size",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+
+return pack_number(self_str.size());
+})))},
+
+{"empty",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+
+return pack_number(self_str.empty());
+})))},
+
+
+{"clear",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+self_str.clear();
+
+return 1ULL;
+})))},
+
+{"insert",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+uint64_t index = _args.at(1);
+uint64_t str = _args.at(2);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+std::string str_str = *(std::string*)(unpack_object(str)->other_data);
+self_str.insert(unpack_number(index), str_str);
+
+return 1ULL;
+})))},
+
+{"erase",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+uint64_t position = _args.at(1);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+self_str.erase(unpack_number(position));
+
+return 1ULL;
+})))},
+
+
+{"erase",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+uint64_t position = _args.at(1);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+self_str.erase(unpack_number(position));
+
+return 1ULL;
+})))},
+
+{"pushBack",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
+new func_ptr([] (const std::vector<uint64_t>& _args) {
+uint64_t self = _args.at(0);
+uint64_t chr = _args.at(1);
+std::string self_str = *(std::string*)(unpack_object(self)->other_data);
+std::string chr_str = *(std::string*)(unpack_object(chr)->other_data);
+self_str.push_back(chr_str.at(0));
+return 1ULL;
+})))},
+
+
     {"toString", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
 new func_ptr([] (const std::vector<uint64_t>& _args) {
 return _args.at(0);
 })))},
+
 {"from",  pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}), 
 new func_ptr([] (const std::vector<uint64_t>& _args) {
 uint64_t x = _args.at(1);
@@ -131,7 +240,8 @@ return 1ULL;
 })));
 
     int main(){
-(*(func_ptr*)(unpack_object(print)->other_data))({pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})))});
+uint64_t x = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({{"prototype",String}}),new std::string("hello guys")));
+(*(func_ptr*)(unpack_object(print)->other_data))({(*(func_ptr*)(unpack_object(unpack_object(x)->get("back"))->other_data))({x})});
 
 return 0;
 }
