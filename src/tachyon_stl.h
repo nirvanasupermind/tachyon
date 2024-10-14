@@ -72,7 +72,6 @@ uint64_t Vector = pack_object(new TachyonObject(new std::map<std::string, uint64
 uint64_t Function = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
 uint64_t Complex = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
 
-
 void tachyon_stl_setup() {
     unpack_object(Math)->set("cos", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
@@ -586,8 +585,37 @@ void tachyon_stl_setup() {
             uint64_t val = _args.at(1);
             std::vector<uint64_t>* self_vec = (std::vector<uint64_t>*)(unpack_object(self)->other_data);
             self_vec->pop_back();
-            ;return 1ULL;
+            return 1ULL;
             }))));
+
+    unpack_object(Vector)->set("concat", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            uint64_t other = _args.at(1);
+            std::vector<uint64_t> result = *(std::vector<uint64_t>*)(unpack_object(self)->other_data);
+            std::vector<uint64_t> other_vec = *(std::vector<uint64_t>*)(unpack_object(other)->other_data);
+
+            result.insert( result.end(), other_vec.begin(), other_vec.end() );
+            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Vector} }), new std::vector<uint64_t>(result)));
+            }))));
+
+    unpack_object(Vector)->set("join", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            uint64_t delimiter = _args.at(1);
+            std::vector<uint64_t> self_vec = *(std::vector<uint64_t>*)(unpack_object(self)->other_data);
+            std::string delimiter_str = *(std::string*)(unpack_object(delimiter)->other_data);
+            std::string result = "";
+                for (int i = 0; i < self_vec.size(); i++) {
+                    uint64_t temp = ((*(func_ptr*)(unpack_object(unpack_object(String)->get("from"))->other_data))({ String,self_vec.at(i) }));
+                    result += *(std::string*)(unpack_object(temp)->other_data);
+                    if (i != self_vec.size() - 1) {
+                        result += delimiter_str;
+                    }
+                }
+            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(result)));
+            }))));
+
 
     unpack_object(Vector)->set("toString", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {

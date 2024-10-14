@@ -276,14 +276,13 @@ namespace tachyon {
         return Token(old_line, TokenType::STRING, str);
     }
 
-
     Token Lexer::make_identifier() {
         std::string identifier_str = "";
         while (current_char != '\0' && (isalnum(current_char) || current_char == '_')) {
             identifier_str += current_char;
             advance();
         }
-
+        
         if (identifier_str == "var" || identifier_str == "block" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
             || identifier_str == "for" || identifier_str == "return" || identifier_str == "def" || identifier_str == "lambda") {
             return Token(line, TokenType::KEYWORD, identifier_str);
