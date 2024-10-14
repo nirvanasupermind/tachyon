@@ -5,6 +5,7 @@
 #include <functional>
 #include <sstream>
 #include <random>
+#include <complex>
 
 using func_ptr = std::function<uint64_t(const std::vector<uint64_t>&)>;
 
@@ -19,12 +20,12 @@ float unpack_number(uint64_t x) {
 
 class TachyonObject {
 public:
-    std::map<std::string, uint64_t>* props;
+    std::unordered_map<std::string, uint64_t>* props;
     void* other_data = nullptr;
-    TachyonObject(std::map<std::string, uint64_t>* props) {
+    TachyonObject(std::unordered_map<std::string, uint64_t>* props) {
         this->props = props;
     }
-    TachyonObject(std::map<std::string, uint64_t>* props, void* other_data) {
+    TachyonObject(std::unordered_map<std::string, uint64_t>* props, void* other_data) {
         this->props = props;
         this->other_data = other_data;
     }
@@ -66,180 +67,180 @@ TachyonObject* unpack_object(uint64_t x) {
     return *(TachyonObject**)(&x);
 }
 
-uint64_t Math = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
-uint64_t String = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
-uint64_t Vector = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
-uint64_t Function = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
-uint64_t Complex = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({})));
+uint64_t Math = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
+uint64_t String = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
+uint64_t Vector = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
+uint64_t Function = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
+uint64_t Complex = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
 
 void tachyon_stl_setup() {
-    unpack_object(Math)->set("cos", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("cos", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::cos(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("sin", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("sin", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::sin(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("tan", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("tan", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::tan(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("acos", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("acos", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::acos(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("asin", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("asin", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::asin(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("atan", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("atan", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::atan(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("atan2", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("atan2", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::atan2(unpack_number(_args.at(1)), unpack_number(_args.at(2))));
             }))));
 
-    unpack_object(Math)->set("cosh", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("cosh", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::cosh(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("sinh", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("sinh", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::sinh(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("tanh", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("tanh", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::tanh(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("acosh", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("acosh", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::acosh(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("asinh", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("asinh", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::asinh(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("atanh", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("atanh", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::atanh(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("exp", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("exp", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::exp(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("log", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("log", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::log(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("log10", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("log10", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::log10(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("exp2", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("exp2", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::exp2(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("expm1", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("expm1", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::expm1(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("log1p", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("log1p", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::log1p(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("log2", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("log2", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::log2(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("pow", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("pow", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::pow(unpack_number(_args.at(1)), unpack_number(_args.at(2))));
             }))));
 
-    unpack_object(Math)->set("sqrt", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("sqrt", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::sqrt(unpack_number(_args.at(1))));
             }))));
 
 
-    unpack_object(Math)->set("cbrt", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("cbrt", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::cbrt(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("hypot", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("hypot", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::hypot(unpack_number(_args.at(1)), unpack_number(_args.at(2))));
             }))));
 
-    unpack_object(Math)->set("erf", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("erf", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::erf(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("erfc", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("erfc", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::erfc(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("tgamma", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("tgamma", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::tgamma(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("lgamma", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("lgamma", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::lgamma(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("ceil", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("ceil", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::ceil(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("floor", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("floor", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::floor(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("trunc", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("trunc", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::trunc(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("round", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("round", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::round(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("log2", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("log2", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return pack_number(std::log2(unpack_number(_args.at(1))));
             }))));
 
-    unpack_object(Math)->set("random", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Math)->set("random", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             std::random_device rd;  // Seed
             std::mt19937 gen(rd());  // Mersenne Twister generator
@@ -258,7 +259,7 @@ void tachyon_stl_setup() {
 
     unpack_object(Math)->set("NAN", pack_number(NAN));
 
-    unpack_object(String)->set("at", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("at", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t index = _args.at(1);
@@ -266,10 +267,10 @@ void tachyon_stl_setup() {
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
             float index_float = unpack_number(index);
 
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(1, self_str.at(index_float))));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(1, self_str.at(index_float))));
             }))));
 
-    unpack_object(String)->set("set", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("set", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t index = _args.at(1);
@@ -284,23 +285,23 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("front", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("front", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
 
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(1, self_str.front())));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(1, self_str.front())));
             }))));
 
-    unpack_object(String)->set("back", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("back", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
 
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(1, self_str.back())));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(1, self_str.back())));
             }))));
 
-    unpack_object(String)->set("empty", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("empty", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
@@ -308,7 +309,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.empty());
             }))));
 
-    unpack_object(String)->set("size", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("size", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
@@ -316,7 +317,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.size());
             }))));
 
-    unpack_object(String)->set("empty", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("empty", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
@@ -324,7 +325,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.empty());
             }))));
 
-    unpack_object(String)->set("clear", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("clear", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string* self_str = (std::string*)(unpack_object(self)->other_data);
@@ -333,7 +334,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("insert", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("insert", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t index = _args.at(1);
@@ -345,7 +346,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("erase", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("erase", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t position = _args.at(1);
@@ -355,7 +356,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("pushBack", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("pushBack", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t chr = _args.at(1);
@@ -365,7 +366,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("popBack", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("popBack", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string* self_str = (std::string*)(unpack_object(self)->other_data);
@@ -373,7 +374,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("replace", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("replace", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t first = _args.at(1);
@@ -389,7 +390,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(String)->set("find", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("find", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t str = _args.at(1);
@@ -398,7 +399,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.find(str_str));
             }))));
 
-    unpack_object(String)->set("rfind", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("rfind", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t str = _args.at(1);
@@ -407,7 +408,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.rfind(str_str));
             }))));
 
-    unpack_object(String)->set("compare", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("compare", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t str = _args.at(1);
@@ -416,7 +417,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.compare(str_str));
             }))));
 
-    unpack_object(String)->set("contains", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("contains", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t str = _args.at(1);
@@ -425,7 +426,7 @@ void tachyon_stl_setup() {
             return pack_number(self_str.find(str_str) != std::string::npos);
             }))));
 
-    unpack_object(String)->set("substr", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("substr", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t pos = _args.at(1);
@@ -435,20 +436,20 @@ void tachyon_stl_setup() {
             float pos_float = unpack_number(pos);
             float count_float = unpack_number(count);
 
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(self_str.substr(pos_float, count_float))));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(self_str.substr(pos_float, count_float))));
             }))));
 
-    unpack_object(String)->set("concat", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("concat", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t str = _args.at(1);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
             std::string str_str = *(std::string*)(unpack_object(str)->other_data);
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(self_str + str_str)));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(self_str + str_str)));
             }))));
 
 
-    unpack_object(String)->set("split", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("split", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::string self_str = *(std::string*)(unpack_object(self)->other_data);
@@ -459,21 +460,21 @@ void tachyon_stl_setup() {
             std::string token;
             while ((pos = self_str.find(delimiter_str)) != std::string::npos) {
                 token = self_str.substr(0, pos);
-                tokens.push_back(pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(token))));
+                tokens.push_back(pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(token))));
                 self_str.erase(0, pos + delimiter_str.size());
             }
-            tokens.push_back(pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(self_str))));
+            tokens.push_back(pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(self_str))));
 
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Vector} }), new std::vector<uint64_t>(tokens)));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Vector} }), new std::vector<uint64_t>(tokens)));
             }))));
 
 
-    unpack_object(String)->set("toString", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}),
+    unpack_object(String)->set("toString", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             return _args.at(0);
             }))));
 
-    unpack_object(String)->set("from", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(String)->set("from", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t x = _args.at(1);
             if ((x & 1) == 0) {
@@ -484,18 +485,18 @@ void tachyon_stl_setup() {
                 else {
                     std::ostringstream oss;
                     oss << obj;
-                    return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(oss.str())));
+                    return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(oss.str())));
                 }
             }
             else {
                 std::ostringstream oss;
                 oss << unpack_number(x);
-                return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(oss.str())));
+                return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(oss.str())));
             }
             return 1ULL;
             }))));
 
-    unpack_object(Vector)->set("at", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("at", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t index = _args.at(1);
@@ -507,7 +508,7 @@ void tachyon_stl_setup() {
             }))));
 
 
-    unpack_object(Vector)->set("set", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("set", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t index = _args.at(1);
@@ -519,7 +520,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(Vector)->set("front", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("front", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::vector<uint64_t> self_vec = *(std::vector<uint64_t>*)(unpack_object(self)->other_data);
@@ -527,7 +528,7 @@ void tachyon_stl_setup() {
             return self_vec.front();
             }))));
 
-    unpack_object(Vector)->set("back", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("back", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::vector<uint64_t> self_vec = *(std::vector<uint64_t>*)(unpack_object(self)->other_data);
@@ -535,7 +536,7 @@ void tachyon_stl_setup() {
             return self_vec.back();
             }))));
 
-    unpack_object(Vector)->set("empty", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("empty", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::vector<uint64_t> self_vec = *(std::vector<uint64_t>*)(unpack_object(self)->other_data);
@@ -543,7 +544,7 @@ void tachyon_stl_setup() {
             return pack_number(self_vec.empty());
             }))));
 
-    unpack_object(Vector)->set("size", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("size", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::vector<uint64_t> self_vec = *(std::vector<uint64_t>*)(unpack_object(self)->other_data);
@@ -551,7 +552,7 @@ void tachyon_stl_setup() {
             return pack_number(self_vec.size());
             }))));
 
-    unpack_object(Vector)->set("clear", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("clear", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             std::vector<uint64_t>* self_vec = (std::vector<uint64_t>*)(unpack_object(self)->other_data);
@@ -559,7 +560,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(Vector)->set("insert", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("insert", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t pos = _args.at(1);
@@ -570,7 +571,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(Vector)->set("pushBack", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("pushBack", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t val = _args.at(1);
@@ -579,7 +580,7 @@ void tachyon_stl_setup() {
             ;return 1ULL;
             }))));
 
-    unpack_object(Vector)->set("popBack", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("popBack", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t val = _args.at(1);
@@ -588,7 +589,7 @@ void tachyon_stl_setup() {
             return 1ULL;
             }))));
 
-    unpack_object(Vector)->set("concat", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("concat", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t other = _args.at(1);
@@ -596,10 +597,10 @@ void tachyon_stl_setup() {
             std::vector<uint64_t> other_vec = *(std::vector<uint64_t>*)(unpack_object(other)->other_data);
 
             result.insert( result.end(), other_vec.begin(), other_vec.end() );
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Vector} }), new std::vector<uint64_t>(result)));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Vector} }), new std::vector<uint64_t>(result)));
             }))));
 
-    unpack_object(Vector)->set("join", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",Function} }),
+    unpack_object(Vector)->set("join", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Function} }),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t self = _args.at(0);
             uint64_t delimiter = _args.at(1);
@@ -613,11 +614,11 @@ void tachyon_stl_setup() {
                         result += delimiter_str;
                     }
                 }
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(result)));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(result)));
             }))));
 
 
-    unpack_object(Vector)->set("toString", pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}),
+    unpack_object(Vector)->set("toString", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             std::vector<uint64_t> vec = *(std::vector<uint64_t>*)(unpack_object(_args.at(0))->other_data);
             std::string result = "[";
@@ -637,12 +638,63 @@ void tachyon_stl_setup() {
                 }
             }
 
-            return pack_object(new TachyonObject(new std::map<std::string, uint64_t>({ {"prototype",String} }), new std::string(result)));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(result)));
+            }))));
+
+    unpack_object(Complex)->set("make", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            float real = unpack_number(_args.at(1));
+            float imag = unpack_number(_args.at(2));
+            return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Complex} }), new std::complex<float>(real, imag)));
+            }))));
+
+    unpack_object(Complex)->set("real", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            std::complex<float> self_complex = *(std::complex<float>*)(unpack_object(self)->other_data);
+            return pack_number(self_complex.real());
+            }))));
+
+    unpack_object(Complex)->set("imag", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            std::complex<float> self_complex = *(std::complex<float>*)(unpack_object(self)->other_data);
+            return pack_number(self_complex.imag());
+            }))));
+
+
+    unpack_object(Complex)->set("abs", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            std::complex<float> self_complex = *(std::complex<float>*)(unpack_object(self)->other_data);
+            return pack_number(std::abs(self_complex));
+            }))));
+
+    
+    unpack_object(Complex)->set("arg", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            std::complex<float> self_complex = *(std::complex<float>*)(unpack_object(self)->other_data);
+            return pack_number(std::arg(self_complex));
+            }))));
+
+
+    unpack_object(Complex)->set("norm", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t self = _args.at(0);
+            std::complex<float> self_complex = *(std::complex<float>*)(unpack_object(self)->other_data);
+            return pack_number(std::norm(self_complex));
             }))));
 }
 
+uint64_t input = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+    new func_ptr([](const std::vector<uint64_t>& _args) {
+        std::string result;
+        std::cin >> result;
+        return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",String} }), new std::string(result)));
+        })));
 
-uint64_t print = pack_object(new TachyonObject(new std::map<std::string, uint64_t>({}),
+uint64_t print = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
     new func_ptr([](const std::vector<uint64_t>& _args) {
         uint64_t x = _args.at(0);
         if ((x & 1) == 0) {
