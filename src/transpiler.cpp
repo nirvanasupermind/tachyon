@@ -274,6 +274,13 @@ namespace tachyon {
             visit(node->right_node);
             code << ")))";
         }
+        else if(node->op_tok.type == TokenType::EE || node->op_tok.type == TokenType::NE) {
+             code << "pack_number(";
+            visit(node->left_node);
+            code << node->op_tok.val;
+            visit(node->right_node);
+            code << ")";   
+        }
         else {
             code << "pack_number(unpack_number(";
             visit(node->left_node);

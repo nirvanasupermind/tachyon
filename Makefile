@@ -1,5 +1,6 @@
 default:
 	clang++ src/*.cpp -o /usr/local/bin/tachyonc -std=c++11
+	cp src/tachyon_stl.h /usr/local/include/tachyon_stl.h
 
 # ifeq ($(OS),Windows_NT)
 #     SOURCE := src\*.cpp
