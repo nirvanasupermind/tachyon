@@ -1,2 +1,2 @@
 var x = Complex.fromComponents(1, 1);
-print(x.arg() / Math.PI);
+print(x);
