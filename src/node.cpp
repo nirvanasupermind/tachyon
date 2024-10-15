@@ -46,20 +46,19 @@ namespace tachyon {
         return result;
     }
 
-    
-    ObjectNode::ObjectNode(const std::vector<Token>& keys, const std::vector<std::shared_ptr<Node> >& vals) {
+    MapNode::MapNode(const std::vector<std::shared_ptr<Node> >& keys, const std::vector<std::shared_ptr<Node> >& vals) {
         this->keys = keys;
         this->vals = vals;
     }
 
-    NodeType ObjectNode::get_type() const {
-        return NodeType::OBJECT;
+    NodeType MapNode::get_type() const {
+        return NodeType::MAP;
     }
 
-    std::string ObjectNode::to_string() const {
-        std::string result = "(ObjectNode (";
+    std::string MapNode::to_string() const {
+        std::string result = "(MapNode (";
         for(int i = 0; i < keys.size(); i++) {
-            result += keys.at(i).to_string() + " ";
+            result += keys.at(i)->to_string() + " ";
         }
         result = result.substr(0, result.size() - 1);
         result += ") (";
@@ -284,7 +283,6 @@ namespace tachyon {
         return result;
     }
 
-
     ObjectPropNode::ObjectPropNode(const std::shared_ptr<Node>& obj, const Token& prop) {
         this->obj = obj;
         this->prop = prop;
@@ -296,6 +294,24 @@ namespace tachyon {
 
     std::string ObjectPropNode::to_string() const {
         return "(ObjectPropNode  " + obj->to_string() + " " + prop.to_string() + ")";
+    }
+
+    ClassDefStmtNode::ClassDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& superclass, const std::shared_ptr<Node>& body) {
+        this->name_tok = name_tok;
+        this->superclass = superclass;
+        this->body = body;
+    }
+
+    NodeType ClassDefStmtNode::get_type() const {
+        return NodeType::CLASS_DEF_STMT;
+    }
+
+    std::string ClassDefStmtNode::to_string() const {
+        if(superclass.get() == nullptr) {
+        return "(ClassDefStmtNode " + name_tok.to_string() + " " + body->to_string() + ")";
+        } else {
+        return "(ClassDefStmtNode " + name_tok.to_string() + " " + superclass->to_string() + " " + body->to_string() + ")";
+        }
     }
 
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts) {
@@ -315,5 +331,6 @@ namespace tachyon {
         result += ")";
         return result;
     }
+
 };
 

@@ -20,7 +20,7 @@ namespace tachyon {
         std::shared_ptr<Node> parse();
         std::shared_ptr<Node> factor();
         std::shared_ptr<Node> vector_expr();
-        std::shared_ptr<Node> object_expr();
+        std::shared_ptr<Node> map_expr();
         std::shared_ptr<Node> lambda_expr();
         std::shared_ptr<Node> postfix_expr();
         std::shared_ptr<Node> multiplicative_expr();
@@ -43,6 +43,7 @@ namespace tachyon {
         std::shared_ptr<Node> for_stmt();
         std::shared_ptr<Node> return_stmt();
         std::shared_ptr<Node> func_def_stmt();
+        std::shared_ptr<Node> class_def_stmt();
         std::shared_ptr<Node> stmt();
         std::shared_ptr<Node> stmt_list(TokenType end);
     };

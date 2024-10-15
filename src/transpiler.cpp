@@ -23,9 +23,9 @@ namespace tachyon {
         case NodeType::VECTOR:
             visit_vector_node(std::static_pointer_cast<VectorNode>(node));
             break;
-        case NodeType::OBJECT:
-            visit_object_node(std::static_pointer_cast<ObjectNode>(node));
-            break;;
+        case NodeType::MAP:
+            visit_map_node(std::static_pointer_cast<MapNode>(node));
+            break;
         case NodeType::IDENTIFIER:
             visit_identifier_node(std::static_pointer_cast<IdentifierNode>(node));
             break;
@@ -71,6 +71,7 @@ namespace tachyon {
         case NodeType::FUNC_DEF_STMT:
             visit_func_def_stmt_node(std::static_pointer_cast<FuncDefStmtNode>(node));
             break;
+
         case NodeType::STMT_LIST:
             visit_stmt_list_node(std::static_pointer_cast<StmtListNode>(node));
             break;
@@ -400,6 +401,8 @@ namespace tachyon {
         visit(node->body);
         code << "\nreturn 1ULL;\n})))";
     }
+
+
 
     void Transpiler::visit_stmt_list_node(const std::shared_ptr<StmtListNode>& node) {
         for (int i = 0; i < node->stmts.size(); i++) {

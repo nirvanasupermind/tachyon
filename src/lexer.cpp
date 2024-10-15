@@ -283,8 +283,10 @@ namespace tachyon {
             advance();
         }
         
-        if (identifier_str == "var" || identifier_str == "block" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
-            || identifier_str == "for" || identifier_str == "return" || identifier_str == "def" || identifier_str == "lambda") {
+        if (/* identifier_str == "true" || identifier_str == "false" || identifier_str == "null" || */ 
+        identifier_str == "var" || identifier_str == "block" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
+            || identifier_str == "for" || identifier_str == "return" || identifier_str == "def" || identifier_str == "lambda" 
+            || identifier_str == "class" || identifier_str == "extends") {
             return Token(line, TokenType::KEYWORD, identifier_str);
         }
         else {
