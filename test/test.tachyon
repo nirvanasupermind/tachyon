@@ -1,2 +1,3 @@
-var x = Complex.fromComponents(1, 1);
-print(x);
+var i = 0;
+i++;
+print(i);

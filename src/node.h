@@ -9,9 +9,11 @@
 namespace tachyon {
     enum class NodeType {
         NUMBER,
+        BOOL,
+        NULL_,
         STRING,
         VECTOR,
-        MAP,
+        OBJECT,
         IDENTIFIER,
         LAMBDA_EXPR,
         CALL_EXPR,
@@ -27,7 +29,6 @@ namespace tachyon {
         FOR_STMT,
         RETURN_STMT,
         FUNC_DEF_STMT,
-        CLASS_DEF_STMT,
         STMT_LIST
     };
 
@@ -41,6 +42,21 @@ namespace tachyon {
     public:
         Token tok;
         NumberNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class BoolNode: public Node {
+    public:
+        Token tok;
+        BoolNode(const Token& tok);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class NullNode: public Node {
+    public:
+        NullNode();
         NodeType get_type() const;
         std::string to_string() const;
     };
@@ -61,11 +77,11 @@ namespace tachyon {
         std::string to_string() const;
     };
 
-    class MapNode: public Node {
+    class ObjectNode: public Node {
     public:
-        std::vector<std::shared_ptr<Node> > keys;
+        std::vector<Token> keys;
         std::vector<std::shared_ptr<Node> > vals;
-        MapNode(const std::vector<std::shared_ptr<Node> >& keys, const std::vector<std::shared_ptr<Node> >& vals);
+        ObjectNode(const std::vector<Token>& keys, const std::vector<std::shared_ptr<Node> >& vals);
         NodeType get_type() const;
         std::string to_string() const;
     };
@@ -77,6 +93,7 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
+
 
     class LambdaExprNode: public Node {
     public:
@@ -205,18 +222,6 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
-
-
-    class ClassDefStmtNode: public Node {
-    public:
-        Token name_tok;
-        std::shared_ptr<Node> superclass;
-        std::shared_ptr<Node> body;
-        ClassDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& superclass, const std::shared_ptr<Node>& body);
-        NodeType get_type() const;
-        std::string to_string() const;
-    };
-
 
     class StmtListNode: public Node {
     public:

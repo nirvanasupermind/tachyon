@@ -14,9 +14,11 @@ namespace tachyon {
         Transpiler();
         void visit(const std::shared_ptr<Node>& node);
         void visit_number_node(const std::shared_ptr<NumberNode>& node);
+        void visit_bool_node(const std::shared_ptr<BoolNode>& node);
+        void visit_null_node(const std::shared_ptr<NullNode>& node);
         void visit_string_node(const std::shared_ptr<StringNode>& node);
         void visit_vector_node(const std::shared_ptr<VectorNode>& node);
-        void visit_map_node(const std::shared_ptr<MapNode>& node);
+        void visit_object_node(const std::shared_ptr<ObjectNode>& node);
         void visit_identifier_node(const std::shared_ptr<IdentifierNode>& node);
         void visit_call_expr_node(const std::shared_ptr<CallExprNode>& node);
         void visit_object_prop_node(const std::shared_ptr<ObjectPropNode>& node);

@@ -86,6 +86,11 @@ namespace tachyon {
                     tokens.push_back(Token(line, TokenType::DIV_EQ, "/="));
                     advance();
                 }
+                else if(current_char == '/') {
+                    while(current_char != '\n') {
+                        advance();
+                    }
+                }
                 else {
                     tokens.push_back(Token(old_line, TokenType::DIV, "/"));
                 }
@@ -112,6 +117,9 @@ namespace tachyon {
                     tokens.push_back(Token(line, TokenType::AND_EQ, "&="));
                     advance();
                 }
+                else if(current_char == '&') {
+                    tokens.push_back(Token(line, TokenType::LOGICAL_AND, "&="));
+                }
                 else {
                     tokens.push_back(Token(old_line, TokenType::AND, "&"));
                 }
@@ -122,6 +130,9 @@ namespace tachyon {
                 if (current_char == '=') {
                     tokens.push_back(Token(line, TokenType::OR_EQ, "|="));
                     advance();
+                }
+                else if(current_char == '|') {
+                    tokens.push_back(Token(line, TokenType::LOGICAL_OR, "|="));
                 }
                 else {
                     tokens.push_back(Token(old_line, TokenType::OR, "|"));
@@ -283,10 +294,9 @@ namespace tachyon {
             advance();
         }
         
-        if (/* identifier_str == "true" || identifier_str == "false" || identifier_str == "null" || */ 
-        identifier_str == "var" || identifier_str == "block" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
-            || identifier_str == "for" || identifier_str == "return" || identifier_str == "def" || identifier_str == "lambda" 
-            || identifier_str == "class" || identifier_str == "extends") {
+        if (identifier_str == "true" || identifier_str == "false" || identifier_str == "null" ||
+            identifier_str == "var" || identifier_str == "block" || identifier_str == "if" || identifier_str == "else" || identifier_str == "while"
+            || identifier_str == "for" || identifier_str == "return" || identifier_str == "def" || identifier_str == "lambda") {
             return Token(line, TokenType::KEYWORD, identifier_str);
         }
         else {

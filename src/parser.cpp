@@ -50,6 +50,14 @@ namespace tachyon {
             advance();
             return std::make_shared<NumberNode>(NumberNode(tok));
         }
+        else if (tok.type == TokenType::KEYWORD && (tok.val == "true" || tok.val == "false")) {
+            advance();
+            return std::make_shared<BoolNode>(BoolNode(tok));
+        }
+        else if (tok.type == TokenType::KEYWORD && tok.val == "null") {
+            advance();
+            return std::make_shared<NullNode>(NullNode());
+        }
         else if (tok.type == TokenType::STRING) {
             advance();
             return std::make_shared<StringNode>(StringNode(tok));
@@ -62,7 +70,7 @@ namespace tachyon {
             return vector_expr();
         }
         else if (tok.type == TokenType::LCURLY) {
-            return map_expr();
+            return object_expr();
         }
         else if (tok.type == TokenType::KEYWORD && tok.val == "lambda") {
             return lambda_expr();
@@ -99,19 +107,23 @@ namespace tachyon {
         return std::make_shared<VectorNode>(VectorNode(elements));
     }
 
-    std::shared_ptr<Node> Parser::map_expr() {
+    std::shared_ptr<Node> Parser::object_expr() {
         if (current_tok.type != TokenType::LCURLY) {
             raise_error();
         }
         advance();
-        std::vector<std::shared_ptr<Node> > keys;
+        std::vector<Token> keys;
         std::vector<std::shared_ptr<Node> > vals;
         if (current_tok.type == TokenType::RCURLY) {
             advance();
         }
         else {
             while (true) {
-                keys.push_back(expr());
+                if (current_tok.type != TokenType::IDENTIFIER) {
+                   raise_error();
+                }   
+                keys.push_back(current_tok);
+                advance();
                 if (current_tok.type != TokenType::COLON) {
                    raise_error();
                 }   
@@ -129,7 +141,7 @@ namespace tachyon {
                 }
             }
         }
-        return std::make_shared<MapNode>(MapNode(keys, vals));
+        return std::make_shared<ObjectNode>(ObjectNode(keys, vals));
     }
 
     std::shared_ptr<Node> Parser::lambda_expr() {
@@ -247,6 +259,15 @@ namespace tachyon {
 
     std::shared_ptr<Node> Parser::or_expr() {
         return bin_op([this]() {return this->xor_expr(); }, { TokenType::OR });
+    }
+    
+
+    std::shared_ptr<Node> Parser::logical_and_expr() {
+        return bin_op([this]() {return this->or_expr(); }, { TokenType::LOGICAL_AND });
+    }
+
+    std::shared_ptr<Node> Parser::logical_or_expr() {
+        return bin_op([this]() {return this->logical_or_expr(); }, { TokenType::LOGICAL_OR });
     }
 
     std::shared_ptr<Node> Parser::assign_expr() {
@@ -446,28 +467,6 @@ namespace tachyon {
     }
 
 
-    std::shared_ptr<Node> Parser::class_def_stmt() {
-        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "class")) {
-            raise_error();
-        }
-
-        advance();
-        if (current_tok.type != TokenType::IDENTIFIER) {
-            raise_error();
-        }
-        Token name_tok = current_tok;
-        advance();
-        std::shared_ptr<Node> superclass = std::make_shared<Node>(nullptr);
-        if (current_tok.val == "extends") {
-            advance();
-            superclass = expr(); 
-        } else {
-            advance();
-        }
-        std::shared_ptr<Node> body = simple_block_stmt();
-        return std::make_shared<ClassDefStmtNode>(ClassDefStmtNode(name_tok, superclass, body));
-    }
-
     std::shared_ptr<Node> Parser::stmt() {
         if (current_tok.type == TokenType::KEYWORD && current_tok.val == "block") {
             return block_stmt();
@@ -489,9 +488,6 @@ namespace tachyon {
         }
         else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "def") {
             return func_def_stmt();
-        }
-        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "class") {
-            return class_def_stmt();
         }
         else {
             return expr_stmt();
