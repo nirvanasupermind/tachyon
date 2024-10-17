@@ -325,6 +325,28 @@ namespace tachyon {
         return std::make_shared<VarDefStmtNode>(VarDefStmtNode(name_tok, val));
     }
 
+    std::shared_ptr<Node> Parser::const_def_stmt() {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "const")) {
+            raise_error();
+        }
+        advance();
+        Token name_tok = current_tok;
+        if (current_tok.type != TokenType::IDENTIFIER) {
+            raise_error();
+        }
+        advance();
+        if (current_tok.type != TokenType::EQ) {
+            raise_error();
+        }
+        advance();
+        std::shared_ptr<Node> val = expr();
+        if (current_tok.type != TokenType::SEMICOLON) {
+            raise_error();
+        }
+        advance();
+        return std::make_shared<ConstDefStmtNode>(ConstDefStmtNode(name_tok, val));
+    }
+
     std::shared_ptr<Node> Parser::block_stmt() {
         if (current_tok.type != TokenType::KEYWORD && current_tok.val == "block") {
             raise_error();
@@ -514,6 +536,9 @@ namespace tachyon {
         }
         else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "var") {
             return var_def_stmt();
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "const") {
+            return const_def_stmt();
         }
         else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "if") {
             return if_stmt();

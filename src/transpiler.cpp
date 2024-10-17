@@ -53,11 +53,14 @@ namespace tachyon {
         case NodeType::BIN_OP:
             visit_bin_op_node(std::static_pointer_cast<BinOpNode>(node));
             break;
+        case NodeType::EXPR_STMT:
+            visit_expr_stmt_node(std::static_pointer_cast<ExprStmtNode>(node));
+            break;
         case NodeType::VAR_DEF_STMT:
             visit_var_def_stmt_node(std::static_pointer_cast<VarDefStmtNode>(node));
             break;
-        case NodeType::EXPR_STMT:
-            visit_expr_stmt_node(std::static_pointer_cast<ExprStmtNode>(node));
+        case NodeType::CONST_DEF_STMT:
+            visit_const_def_stmt_node(std::static_pointer_cast<ConstDefStmtNode>(node));
             break;
         case NodeType::BLOCK_STMT:
             visit_block_stmt_node(std::static_pointer_cast<BlockStmtNode>(node));
@@ -372,14 +375,20 @@ namespace tachyon {
         code << "\nreturn 1ULL;\n})))";
     }
 
+   void Transpiler::visit_expr_stmt_node(const std::shared_ptr<ExprStmtNode>& node) {
+        visit(node->expr_node);
+        code << ";";
+    }
+    
     void Transpiler::visit_var_def_stmt_node(const std::shared_ptr<VarDefStmtNode>& node) {
         code << "uint64_t " << node->name_tok.val << " = ";
         visit(node->val);
         code << ";";
     }
 
-    void Transpiler::visit_expr_stmt_node(const std::shared_ptr<ExprStmtNode>& node) {
-        visit(node->expr_node);
+    void Transpiler::visit_const_def_stmt_node(const std::shared_ptr<ConstDefStmtNode>& node) {
+        code << "const uint64_t " << node->name_tok.val << " = ";
+        visit(node->val);
         code << ";";
     }
 
@@ -428,7 +437,6 @@ namespace tachyon {
         visit(node->expr_node);
         code << ";";
     }
-
 
     void Transpiler::visit_func_def_stmt_node(const std::shared_ptr<FuncDefStmtNode>& node) {
         code << "uint64_t " << node->name_tok.val << " = ";

@@ -21,6 +21,7 @@ namespace tachyon {
         UNARY_OP,
         BIN_OP,
         VAR_DEF_STMT,
+        CONST_DEF_STMT,
         EXPR_STMT,
         BLOCK_STMT,
         IF_STMT,
@@ -148,6 +149,16 @@ namespace tachyon {
         Token name_tok;
         std::shared_ptr<Node> val;
         VarDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& val);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+
+    class ConstDefStmtNode: public Node {
+    public:
+        Token name_tok;
+        std::shared_ptr<Node> val;
+        ConstDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& val);
         NodeType get_type() const;
         std::string to_string() const;
     };

@@ -183,6 +183,19 @@ namespace tachyon {
         return "(VarDefNode " + name_tok.to_string() + " " + val->to_string() + ")";
     }
 
+    ConstDefStmtNode::ConstDefStmtNode(const Token& name_tok, const std::shared_ptr<Node>& val) {
+        this->name_tok = name_tok;
+        this->val = val;
+    }
+
+    NodeType ConstDefStmtNode::get_type() const {
+        return NodeType::CONST_DEF_STMT;
+    }
+
+    std::string ConstDefStmtNode::to_string() const {
+        return "(ConstDefStmtNode " + name_tok.to_string() + " " + val->to_string() + ")";
+    }
+
     // VarAssignNode::VarAssignNode(const Token& name_tok, const std::shared_ptr<Node>& val) {
     //     this->name_tok = name_tok;
     //     this->val = val;
