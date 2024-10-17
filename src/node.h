@@ -29,6 +29,8 @@ namespace tachyon {
         FOR_STMT,
         RETURN_STMT,
         FUNC_DEF_STMT,
+        TRY_CATCH_STMT,
+        INCLUDE_STMT,
         STMT_LIST
     };
 
@@ -223,6 +225,25 @@ namespace tachyon {
         std::string to_string() const;
     };
 
+
+    class TryCatchStmtNode: public Node {
+    public:
+        std::shared_ptr<Node> try_body;
+        Token error;
+        std::shared_ptr<Node> catch_body;
+        TryCatchStmtNode(const std::shared_ptr<Node>& try_body, const Token& error,  const std::shared_ptr<Node>& catch_body);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
+    class IncludeStmtNode: public Node {
+    public:
+        Token path;
+        IncludeStmtNode(const Token& path);
+        NodeType get_type() const;
+        std::string to_string() const;
+    };
+
     class StmtListNode: public Node {
     public:
         std::vector<std::shared_ptr<Node> > stmts;
@@ -230,6 +251,8 @@ namespace tachyon {
         NodeType get_type() const;
         std::string to_string() const;
     };
-};
+
+
+}
 
 #endif

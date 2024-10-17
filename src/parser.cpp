@@ -120,14 +120,14 @@ namespace tachyon {
         else {
             while (true) {
                 if (current_tok.type != TokenType::IDENTIFIER) {
-                   raise_error();
-                }   
+                    raise_error();
+                }
                 keys.push_back(current_tok);
                 advance();
                 if (current_tok.type != TokenType::COLON) {
-                   raise_error();
-                }   
-                advance();             
+                    raise_error();
+                }
+                advance();
                 vals.push_back(expr());
                 if (current_tok.type == TokenType::RCURLY) {
                     advance();
@@ -210,7 +210,7 @@ namespace tachyon {
             }
             else if (current_tok.type == TokenType::PERIOD) {
                 advance();
-                if(current_tok.type != TokenType::IDENTIFIER) {
+                if (current_tok.type != TokenType::IDENTIFIER) {
                     raise_error();
                 }
                 result = std::make_shared<ObjectPropNode>(ObjectPropNode(result, current_tok));
@@ -260,7 +260,7 @@ namespace tachyon {
     std::shared_ptr<Node> Parser::or_expr() {
         return bin_op([this]() {return this->xor_expr(); }, { TokenType::OR });
     }
-    
+
 
     std::shared_ptr<Node> Parser::logical_and_expr() {
         return bin_op([this]() {return this->or_expr(); }, { TokenType::LOGICAL_AND });
@@ -399,7 +399,7 @@ namespace tachyon {
         std::shared_ptr<Node> cond = expr();
         if (current_tok.type != TokenType::SEMICOLON) {
             raise_error();
-        }        
+        }
         advance();
         std::shared_ptr<Node> update = expr();
         if (current_tok.type != TokenType::RPAREN) {
@@ -467,6 +467,47 @@ namespace tachyon {
     }
 
 
+    std::shared_ptr<Node> Parser::try_catch_stmt() {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "try")) {
+            raise_error();
+        }
+        advance();
+        std::shared_ptr<Node> try_body = simple_block_stmt();
+        advance();
+        if (!(current_tok.type == TokenType::LPAREN)) {
+            raise_error();
+        }
+        advance();
+        if (!(current_tok.type == TokenType::IDENTIFIER)) {
+            raise_error();
+        }
+        Token error = current_tok;
+        advance();
+        if (!(current_tok.type == TokenType::RPAREN)) {
+            raise_error();
+        }
+        advance();
+        std::shared_ptr<Node> catch_body = simple_block_stmt();
+        return std::make_shared<TryCatchStmtNode>(TryCatchStmtNode(try_body, error, catch_body));
+    }
+
+    std::shared_ptr<Node> Parser::include_stmt() {
+        if (!(current_tok.type == TokenType::KEYWORD && current_tok.val == "include")) {
+            raise_error();
+        }
+        advance();
+        if (!(current_tok.type == TokenType::STRING)) {
+            raise_error();
+        }
+        Token path = current_tok;
+        advance();
+        if (current_tok.type != TokenType::SEMICOLON) {
+            raise_error();
+        }
+        advance();
+        return std::make_shared<IncludeStmtNode>(IncludeStmtNode(path));
+    }
+
     std::shared_ptr<Node> Parser::stmt() {
         if (current_tok.type == TokenType::KEYWORD && current_tok.val == "block") {
             return block_stmt();
@@ -488,6 +529,12 @@ namespace tachyon {
         }
         else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "def") {
             return func_def_stmt();
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "try") {
+            return try_catch_stmt();
+        }
+        else if (current_tok.type == TokenType::KEYWORD && current_tok.val == "include") {
+            return include_stmt();
         }
         else {
             return expr_stmt();

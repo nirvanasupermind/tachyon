@@ -1,1 +1,2 @@
-print(28571429 - 28571428);
+include "test/test2.tachyon";
+print(x);

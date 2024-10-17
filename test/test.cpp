@@ -9,7 +9,9 @@
 #include "/usr/local/include/tachyon_stl.h"
     int main(){
 tachyon_stl_setup();
-(*(func_ptr*)(unpack_object(print)->other_data))({pack_number(unpack_number(5090307657ULL)-unpack_number(5090307657ULL))});
+uint64_t x = 4336910337ULL;
+
+(*(func_ptr*)(unpack_object(print)->other_data))({x});
 
 return 0;
 }

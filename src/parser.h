@@ -45,6 +45,9 @@ namespace tachyon {
         std::shared_ptr<Node> for_stmt();
         std::shared_ptr<Node> return_stmt();
         std::shared_ptr<Node> func_def_stmt();
+        std::shared_ptr<Node> try_catch_stmt();
+        std::shared_ptr<Node> include_stmt();
+
         std::shared_ptr<Node> stmt();
         std::shared_ptr<Node> stmt_list(TokenType end);
     };

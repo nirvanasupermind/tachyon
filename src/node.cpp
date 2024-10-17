@@ -321,6 +321,32 @@ namespace tachyon {
         return "(ObjectPropNode  " + obj->to_string() + " " + prop.to_string() + ")";
     }
 
+    TryCatchStmtNode::TryCatchStmtNode(const std::shared_ptr<Node>& try_body, const Token& error, const std::shared_ptr<Node>& catch_body) {
+        this->try_body = try_body;
+        this->error = error;
+        this->catch_body = catch_body;
+    }
+
+    NodeType TryCatchStmtNode::get_type() const {
+        return NodeType::TRY_CATCH_STMT;
+    }
+
+    std::string TryCatchStmtNode::to_string() const {
+        return "(TryCatchStmtNode  " + try_body->to_string() + " " + error.to_string() + " " + catch_body->to_string() + ")";
+    }
+
+    IncludeStmtNode::IncludeStmtNode(const Token& path) {
+        this->path = path;
+    }
+
+    NodeType IncludeStmtNode::get_type() const {
+        return NodeType::INCLUDE_STMT;
+    }
+
+    std::string IncludeStmtNode::to_string() const {
+        return "(IncludeStmtNode " + path.to_string() + ")";
+    }
+
     StmtListNode::StmtListNode(const std::vector<std::shared_ptr<Node> >& stmts) {
         this->stmts = stmts;
     }

@@ -735,7 +735,6 @@ void tachyon_stl_setup() {
     unpack_object(Error)->set("fromMsg", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t msg = _args.at(1);
-            std::cout << msg << '\n';
             return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Error}, { "msg", msg } })));
             }))));
 
@@ -745,7 +744,6 @@ void tachyon_stl_setup() {
             throw std::runtime_error(*(std::string*)(unpack_object(unpack_object(self)->get("msg"))->other_data));
             return 6ULL;
             }))));
-
 
     // unpack_object(Complex)->set("fromComponents", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
     //     new func_ptr([](const std::vector<uint64_t>& _args) {

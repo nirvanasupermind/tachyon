@@ -2,8 +2,12 @@
 #include <memory>
 #include <sstream>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "token.h"
+#include "lexer.h"
 #include "node.h"
+#include "parser.h"
 #include "transpiler.h"
 
 namespace tachyon {
@@ -12,7 +16,6 @@ namespace tachyon {
     }
 
     void Transpiler::visit(const std::shared_ptr<Node>& node) {
-
         switch (node->get_type()) {
         case NodeType::NUMBER:
             visit_number_node(std::static_pointer_cast<NumberNode>(node));
@@ -77,6 +80,12 @@ namespace tachyon {
         case NodeType::FUNC_DEF_STMT:
             visit_func_def_stmt_node(std::static_pointer_cast<FuncDefStmtNode>(node));
             break;
+        case NodeType::TRY_CATCH_STMT:
+            visit_try_catch_stmt_node(std::static_pointer_cast<TryCatchStmtNode>(node));
+            break;
+        case NodeType::INCLUDE_STMT:
+            visit_include_stmt_node(std::static_pointer_cast<IncludeStmtNode>(node));
+            break;
         case NodeType::STMT_LIST:
             visit_stmt_list_node(std::static_pointer_cast<StmtListNode>(node));
             break;
@@ -85,7 +94,6 @@ namespace tachyon {
             break;
         }
     }
-
     void Transpiler::visit_number_node(const std::shared_ptr<NumberNode>& node) {
         float x = std::stof(node->tok.val);
         uint64_t temp = 0ULL;
@@ -421,6 +429,7 @@ namespace tachyon {
         code << ";";
     }
 
+
     void Transpiler::visit_func_def_stmt_node(const std::shared_ptr<FuncDefStmtNode>& node) {
         code << "uint64_t " << node->name_tok.val << " = ";
         code << "pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}), new func_ptr([=] (const std::vector<uint64_t>& _args) {\n";
@@ -429,6 +438,37 @@ namespace tachyon {
         }
         visit(node->body);
         code << "\nreturn 1ULL;\n})));";
+    }
+
+ void Transpiler::visit_try_catch_stmt_node(const std::shared_ptr<TryCatchStmtNode>& node) {
+        code << "try {\n";
+        visit(node->try_body);
+        code << "\n} catch(const std::exception& _err) {\n";
+        code << "uint64_t msg = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({{\"prototype\",String}}), new std::string(_err.what())));\n";
+        code << "uint64_t " << node->error.val << "= pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({{\"prototype\",Error},{\"msg\",msg}})));\n";
+        visit(node->catch_body);
+        code << "\n}";
+    }
+
+    void Transpiler::visit_include_stmt_node(const std::shared_ptr<IncludeStmtNode>& node) {
+        std::string filename = node->path.val;
+        std::ifstream in_file;
+
+        in_file.open(filename);
+
+        std::stringstream strStream;
+        strStream << in_file.rdbuf();
+
+        std::string text = strStream.str();
+
+        Lexer lexer(filename, text);
+        std::vector<Token> tokens = lexer.make_tokens();
+        Parser parser(filename, tokens);
+        std::shared_ptr<Node> tree = parser.parse();
+        Transpiler transpiler;
+        transpiler.visit(tree);
+
+        code << transpiler.code.str();
     }
 
     void Transpiler::visit_stmt_list_node(const std::shared_ptr<StmtListNode>& node) {
