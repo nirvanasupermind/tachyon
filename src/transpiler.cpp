@@ -88,7 +88,9 @@ namespace tachyon {
 
     void Transpiler::visit_number_node(const std::shared_ptr<NumberNode>& node) {
         float x = std::stof(node->tok.val);
-        code << (((*(uint64_t*)(&x)) & 0xffffffff) << 1) + 1 << "ULL";
+        uint64_t temp = 0ULL;
+        std::memcpy(&temp, &x, sizeof(x));
+        code << (temp << 2) + 1 << "ULL";
     }
 
     void Transpiler::visit_bool_node(const std::shared_ptr<BoolNode>& node) {

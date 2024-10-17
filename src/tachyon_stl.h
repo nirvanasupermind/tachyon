@@ -11,12 +11,16 @@
 using func_ptr = std::function<uint64_t(const std::vector<uint64_t>&)>;
 
 uint64_t pack_number(float x) {
-    return (((*(uint64_t*)(&x)) & 0xffffffff) << 2) + 1;
+    uint64_t temp = 0ULL;
+    std::memcpy(&temp, &x, sizeof(x));
+    return (temp << 2) + 1;
 }
 
 float unpack_number(uint64_t x) {
     uint64_t y = x >> 2;
-    return *((float*)(&y));
+    float temp;
+    std::memcpy(&temp, &y, sizeof(temp));
+    return temp;
 }
 
 class TachyonObject {
@@ -74,6 +78,7 @@ uint64_t Vector = pack_object(new TachyonObject(new std::unordered_map<std::stri
 uint64_t Function = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
 uint64_t ThreadID = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
 uint64_t Thread = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
+uint64_t ThisThread = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
 uint64_t Error = pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({})));
 
 void tachyon_stl_setup() {
@@ -698,14 +703,21 @@ void tachyon_stl_setup() {
             return 6ULL;
             }))));
             
+
+    unpack_object(ThisThread)->set("sleepFor", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t ms = _args.at(1);
+            std::chrono::milliseconds duration{ms};
+            std::this_thread::sleep_for(duration);
+            return 6ULL;
+            }))));
+            
     unpack_object(Error)->set("fromMsg", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t msg = _args.at(1);
             std::cout << msg << '\n';
             return pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({ {"prototype",Error}, { "msg", msg } })));
             }))));
-
-
 
     unpack_object(Error)->set("throw", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {
