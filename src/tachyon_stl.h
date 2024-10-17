@@ -679,7 +679,7 @@ void tachyon_stl_setup() {
             std::thread* self_thread = (std::thread*)(unpack_object(self)->other_data);
             std::thread::id result = self_thread->get_id();
             return pack_object(new TachyonObject(new
-                std::unordered_map<std::string, uint64_t>({ {"prototype",Thread} }), new std::thread::id(result)));
+                std::unordered_map<std::string, uint64_t>({ {"prototype",ThreadID} }), new std::thread::id(result)));
             }))));
             
     unpack_object(Thread)->set("hardwareConcurrency", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
@@ -704,13 +704,33 @@ void tachyon_stl_setup() {
             }))));
             
 
+    unpack_object(ThisThread)->set("yield", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            std::this_thread::yield();
+            return 6ULL;
+            }))));
+            
+    unpack_object(ThisThread)->set("getID", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            return pack_object(new TachyonObject(new
+                std::unordered_map<std::string, uint64_t>({ {"prototype",ThreadID} }), new std::thread::id(std::this_thread::get_id())));
+            }))));
+
     unpack_object(ThisThread)->set("sleepFor", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {
             uint64_t ms = _args.at(1);
-            std::chrono::milliseconds duration{ms};
+            std::chrono::milliseconds duration{(int)(unpack_number(ms))};
             std::this_thread::sleep_for(duration);
             return 6ULL;
             }))));
+        
+    unpack_object(ThisThread)->set("sleepUntil", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
+        new func_ptr([](const std::vector<uint64_t>& _args) {
+            uint64_t unix_timestamp = _args.at(1);
+            std::this_thread::sleep_until(std::chrono::system_clock::from_time_t(unpack_number(unix_timestamp)));
+            return 6ULL;
+            }))));
+            
             
     unpack_object(Error)->set("fromMsg", pack_object(new TachyonObject(new std::unordered_map<std::string, uint64_t>({}),
         new func_ptr([](const std::vector<uint64_t>& _args) {

@@ -1,1 +1,1 @@
-ThisThread.sleepFor(100000);
+print(28571429 - 28571428);

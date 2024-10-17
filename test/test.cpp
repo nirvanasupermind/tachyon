@@ -9,7 +9,7 @@
 #include "/usr/local/include/tachyon_stl.h"
     int main(){
 tachyon_stl_setup();
-(*(func_ptr*)(unpack_object(unpack_object(ThisThread)->get("sleepFor"))->other_data))({ThisThread,4815929345ULL});
+(*(func_ptr*)(unpack_object(print)->other_data))({pack_number(unpack_number(5090307657ULL)-unpack_number(5090307657ULL))});
 
 return 0;
 }
