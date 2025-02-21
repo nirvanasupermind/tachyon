@@ -682,7 +682,7 @@ void tachyon_stl_setup() {
 
 
     tachyon_internal::set_member(tachyon_internal::decode_obj(StringUtils), "repr", tachyon_internal::make_func(new TACHYON_FUNC([=](const std::vector<double>& _args) -> double {
-        double val = _args[0];
+        double val = _args[1];
         if (tachyon_internal::is_obj(val)) {
             TACHYON_OBJ* obj = tachyon_internal::decode_obj(val);
             if (tachyon_internal::has_member(obj, "toString")) {
@@ -1001,20 +1001,17 @@ void tachyon_stl_setup() {
         return ftell(file_stream);
         })));
 
-
     tachyon_internal::set_member(tachyon_internal::decode_obj(FileUtils), "seek", tachyon_internal::make_func(new TACHYON_FUNC([=](const std::vector<double>& _args) -> double {
         FILE* file_stream = tachyon_internal::decode_file_stream(_args[1]);
         fseek(file_stream, _args[2], _args[3]);
         return tachyon_internal::null;
         })));
 
-
     tachyon_internal::set_member(tachyon_internal::decode_obj(FileUtils), "rewind", tachyon_internal::make_func(new TACHYON_FUNC([=](const std::vector<double>& _args) -> double {
         FILE* file_stream = tachyon_internal::decode_file_stream(_args[1]);
         rewind(file_stream);
         return tachyon_internal::null;
         })));
-
 
     tachyon_internal::set_member(tachyon_internal::decode_obj(FileUtils), "clearErr", tachyon_internal::make_func(new TACHYON_FUNC([=](const std::vector<double>& _args) -> double {
         FILE* file_stream = tachyon_internal::decode_file_stream(_args[1]);
@@ -1050,7 +1047,7 @@ void tachyon_stl_setup() {
         tachyon_internal::set_member(tachyon_internal::decode_obj(FileUtils), "tmpFile", tachyon_internal::make_func(new TACHYON_FUNC([=](const std::vector<double>& _args) -> double {
         return tachyon_internal::make_file_stream(tmpfile());
         })));
-        
+
     // tachyon_internal::set_member(tachyon_internal::decode_obj(FStreamUtils), "makeFStream", tachyon_internal::make_func(new TACHYON_FUNC([=](const std::vector<double>& _args) -> double {
     //     std::fstream f(*(tachyon_internal::decode_str(_args[1]))); // Open a file_stream named "sample.txt" for writing
 
