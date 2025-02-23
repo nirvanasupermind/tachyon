@@ -1,5 +1,6 @@
 #include <string>
 #include <memory>
+#include <iostream>
 #include "token.h"
 #include "node.h"
 
@@ -153,7 +154,7 @@ namespace tachyon {
     }
 
     double UnaryOpNode::get_double() const {
-        uint64_t right = operand_node->get_double();
+        double right = operand_node->get_double();
         if(std::isnan(right)) {
             return NAN;
         } else if(op_tok.type == TokenType::PLUS) {
