@@ -300,10 +300,10 @@ double print = tachyon_internal::make_func(new TACHYON_FUNC([](const std::vector
         TACHYON_OBJ* obj = tachyon_internal::decode_obj(val);
         if (tachyon_internal::has_member(obj, "toString")) {
             double temp = (*tachyon_internal::decode_func(tachyon_internal::get_member(obj, "toString")))({ val });
-            std::cout << "object at " << *tachyon_internal::decode_str(temp);
+            std::cout << *tachyon_internal::decode_str(temp);
         }
         else {
-            std::cout << obj;
+            std::cout << "object at " << obj;
         }
     }
     else if (tachyon_internal::is_str(val)) {
@@ -723,7 +723,7 @@ void tachyon_stl_setup() {
         }
         else if (tachyon_internal::is_file_stream(val)) {
             std::ostringstream oss;
-            oss << "file_stream at " << tachyon_internal::decode_file_stream(val);
+            oss << "file stream at " << tachyon_internal::decode_file_stream(val);
             return tachyon_internal::make_str(new std::string(oss.str()));
         }
         else if (val == tachyon_internal::null) {
@@ -731,7 +731,7 @@ void tachyon_stl_setup() {
         }
         else {
             std::ostringstream oss;
-            oss << tachyon_internal::decode_file_stream(val);
+            oss << val;
             return tachyon_internal::make_str(new std::string(oss.str()));
         }
         return tachyon_internal::null;
