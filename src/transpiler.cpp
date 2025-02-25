@@ -553,7 +553,7 @@ namespace tachyon {
     }
 
     void Transpiler::visit_throw_stmt_node(const std::shared_ptr<ThrowStmtNode>& node) {
-        code << "throw std::runtime_error(*tachyn_internal::decode_str(";
+        code << "throw std::runtime_error(*tachyon_internal::decode_str(";
         visit(node->expr_node);
         code << "));";
     }
